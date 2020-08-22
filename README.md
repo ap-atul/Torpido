@@ -6,7 +6,7 @@ Goal : To automate the video editing process
 
 ## Project Structure
 
- .
+    .
     ├── ...
     ├── lib                 
     │   ├── utils   
