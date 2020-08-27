@@ -1,4 +1,10 @@
 # file to save all the constants that are to be used
+# ******************* CACHE PART *************************
+# cache store dir
+CACHE_DIR = "model/"
+
+# cache file name
+CACHE_NAME = "vea_cache.joblib"
 
 # ******************* VIDEO PART *************************
 # video width to keep while processing
