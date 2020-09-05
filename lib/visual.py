@@ -6,7 +6,7 @@ import numpy as np
 from joblib import dump
 
 from lib.util.constants import *
-from lib.util.video_reader import VideoGet
+from lib.util.videoReader import VideoGet
 
 """
 This file reads the video and gives ranking to frames
@@ -45,15 +45,20 @@ class Visual:
         # return mean <= thresh
         return cv2.Laplacian(image, cv2.CV_64F).var() >= self.blurThreshold
 
-    def startProcessing(self, inputFile):
+    def startProcessing(self, inputFile, display=False):
         """
         file to run the motion detection and blur detection
+        :param display: display the video while processing
         :param inputFile: input file path
         :return: None
         """
+        if os.path.isfile(inputFile) is False:
+            print(f"[ERROR] File {inputFile} does not exists")
+            return
+
         videoWidth = VIDEO_WIDTH
 
-        # maintaining the motion frames list
+        # maintaining the motion and blur frames list
         motion = dict()
         blur = dict()
 
@@ -62,8 +67,13 @@ class Visual:
 
         fps = myClip.get(cv2.CAP_PROP_FPS)
         totalFrames = myClip.get(cv2.CAP_PROP_FRAME_COUNT)
-        print("TotalFrames ::", totalFrames)
-        print("Video FPS ::", fps)
+
+        # printing some info
+        print("[INFO] Total count of video frames ::", totalFrames)
+        print("[INFO] Video fps ::", fps)
+        print("[INFO] Bit rate ::", cv2.CAP_PROP_BITRATE)
+        print("[INFO] Video format ::", cv2.CAP_PROP_FORMAT)
+        print("[INFO] Video four cc :: ", cv2.CAP_PROP_FOURCC)
 
         threshold = float(MOTION_THRESHOLD)
         np.seterr(divide='ignore')
@@ -103,12 +113,13 @@ class Visual:
             else:
                 motion[frameIndex] = 0
 
-            cv2.imshow("Security Feed", frame)
-            key = cv2.waitKey(1) & 0xFF
+            if display:
+                cv2.imshow("Video Feed", frame)
+                key = cv2.waitKey(1) & 0xFF
 
-            # if the `q` key is pressed, break from the loop
-            if key == ord("q"):
-                break
+                # if the `q` key is pressed, break from the loop
+                if key == ord("q"):
+                    break
 
             # assigning the processed frame as the first frame to cal diff later on
             firstFrame = frame
@@ -116,6 +127,7 @@ class Visual:
         # saving all processed stuffs
         dump(motion, self.motionRankPath)
         dump(blur, self.blurRankPath)
+        print("[INFO] Visual ranking saved .............")
 
         # clearing memory
         myClip.release()

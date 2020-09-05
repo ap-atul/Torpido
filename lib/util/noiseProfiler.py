@@ -11,7 +11,7 @@ from lib.util.linkedList import LinkedList
 
 
 class NoiseProfiler:
-    """Basic denoiser wrapper for keeping store of the settings"""
+    """Basic de noise wrapper for keeping store of the settings"""
 
     def __init__(self, x, timeWindow=0.1, sampleRate=44100, percentileLevel=95, wlevels=4, dbName='db8'):
         self.x = x
@@ -215,10 +215,6 @@ class NoiseProfiler:
                 data.extend(numpy.zeros(self.windowSamples))
 
         return data
-
-    def extractWavelets(self):
-        for window in self.windows:
-            window.extractWaveletPacket(self.dbName, self.wlevels)
 
     def plotWavelets(self):
         wtBandsLength = 0

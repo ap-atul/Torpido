@@ -8,7 +8,7 @@ CACHE_NAME = "vea_cache.joblib"
 
 # ******************* VIDEO PART *************************
 # video width to keep while processing
-VIDEO_WIDTH = 500
+VIDEO_WIDTH = 200
 
 # threshold for video reading motion
 MOTION_THRESHOLD = 50
@@ -45,3 +45,10 @@ MODEL_DIR = "model/"
 
 # model name
 MODEL_NAME = "views_predict_model.joblib"
+
+# ****************** FFMPEG *************************************
+# output video file name extension
+OUT_VIDEO_FILE = "_edited_by_torpido.mp4"
+
+# input audio name to process and later to merge
+IN_AUDIO_FILE = "_audio.wav"

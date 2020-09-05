@@ -25,16 +25,18 @@ class Auditory:
         self.clean = None
         self.info = None
 
-    def startProcessing(self, inputFile, plot=False):
+    def startProcessing(self, inputFile, outputFile, plot=False):
         """
         this function calculates the de noised signal based on the wavelets
         default wavelet is = db4, mode = per and thresh method = soft
         :param inputFile: (str) name of the file
+        :param outputFile: (str) destination file name
         :param plot: (bool) to plot the signal
         :return: None
         """
         if os.path.isfile(inputFile) is False:
-            raise Exception(f"File {inputFile} does not exists")
+            print(f"[ERROR] File {inputFile} does not exists")
+            return
 
         self.fileName = inputFile
 
@@ -54,8 +56,8 @@ class Auditory:
             coefficients[1:] = (pywt.threshold(i, value=thresh, mode=WAVE_THRESH) for i in coefficients[1:])
 
             self.clean = np.concatenate([self.clean, pywt.waverec(coefficients, WAVELET, mode=DEC_REC_MODE)])
-        soundfile.write(inputFile, np.array(self.clean, dtype=float), self.rate)
-        print("Audio de noised successfully")
+        soundfile.write(outputFile, np.array(self.clean, dtype=float), self.rate)
+        print("[INFO] Audio de noised successfully")
 
         if plot:
             self.plotSignals()
@@ -65,15 +67,15 @@ class Auditory:
 
     def plotSignals(self):
         """
-        plotting the cleaned and original data
+        plotting the cleaned and original signals
         :return:
         """
         plt.plot(self.data)
-        plt.title("Original Data")
+        plt.title("Original Signal")
         plt.show()
 
         plt.plot(self.clean)
-        plt.title("Cleaned Data")
+        plt.title("Cleaned Signal")
         plt.show()
 
     def getNoiseFromAudio(self):
@@ -89,4 +91,4 @@ class Auditory:
 
         noiseSignal = NoiseProfiler(data).getNoiseDataPredicted()
         soundfile.write(os.path.join(filePath, "noise.wav"), noiseSignal, rate)
-        print("Noise file generated.")
+        print("[INFO] Noise file generated.")

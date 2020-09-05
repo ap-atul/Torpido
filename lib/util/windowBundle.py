@@ -34,35 +34,6 @@ class WindowBundle:
 
         return self.waveletPacket
 
-    def getWaveletLeafData(self):
-        windowWaveletData = list()
-        leafNodes = [node.path for node in self.waveletPacket.get_level(
-            self.wlevels, 'freq')]
-
-        for node in leafNodes:
-            bandData = self.waveletPacket[node].data
-            windowWaveletData.extend(bandData)
-
-        return windowWaveletData
-
-    def setDenoisedData(self, denoisedData):
-        self.denoisedData = denoisedData
-
-    def getDenoisedData(self):
-        return self.denoisedData
-
-    def setNoiseWindow(self, window):
-        self.noiseWindow = window
-
-    def isBelowThreshold(self, threshold):
-        if self.getRMS() < threshold:
-            return True
-
-        return False
-
-    def getData(self):
-        return self.data
-
     def getRMS(self):
         if self.rms is not None:
             return self.rms
@@ -71,37 +42,3 @@ class WindowBundle:
         self.rms = math.sqrt(squaredSum / len(self.data))
 
         return self.rms
-
-    # gets the Mean Absolute
-    def getMA(self):
-        _sum = numpy.sum(numpy.abs(self.data))
-        ma = _sum / len(self.data)
-
-        return ma
-
-    def getRMSasArray(self):
-        return self.getRMS() * numpy.ones(len(self.data))
-
-    @staticmethod
-    def joinDenoisedData(windows: list):
-        result = []
-        for window in windows:
-            result.extend(window.denoisedData)
-
-        return result
-
-    @staticmethod
-    def joinData(windows: list):
-        result = []
-        for window in windows:
-            result.extend(window.data)
-
-        return result
-
-    @staticmethod
-    def joinNoiseData(windows: list):
-        result = []
-        for window in windows:
-            result.extend(window.noiseWindow.data)
-
-        return result

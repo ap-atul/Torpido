@@ -25,7 +25,7 @@ class Analytics:
                             names[4]: df['view_count']})
 
         ndf.to_csv(self.outputCSV, sep=',', index=False, header=names)
-        print('File processed......')
+        print('[INFO] File processed......')
 
     def train(self):
         df = pd.read_csv(self.outputCSV, low_memory=False, )
