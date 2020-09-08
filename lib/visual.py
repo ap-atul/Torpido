@@ -68,8 +68,8 @@ class Visual:
         self.motion = list()
         self.blur = list()
 
-        video_getter = VideoGet(str(inputFile)).start()
-        myClip = video_getter.stream
+        videoGetter = VideoGet(str(inputFile)).start()
+        myClip = videoGetter.stream
 
         fps = myClip.get(cv2.CAP_PROP_FPS)
         totalFrames = myClip.get(cv2.CAP_PROP_FRAME_COUNT)
@@ -87,15 +87,15 @@ class Visual:
         threshold = float(MOTION_THRESHOLD)
         np.seterr(divide='ignore')
 
-        firstFrame = video_getter.frame
+        firstFrame = videoGetter.frame
         firstFrameProcessed = True
 
         while True:
-            if video_getter.stopped:
-                video_getter.stop()
+            if videoGetter.stopped:
+                videoGetter.stop()
                 break
 
-            frame = video_getter.frame
+            frame = videoGetter.frame
 
             if frame is None:
                 break
@@ -133,6 +133,7 @@ class Visual:
 
         # clearing memory
         myClip.release()
+        videoGetter.stop()
         cv2.destroyAllWindows()
 
         # calling the normalization of ranking
@@ -148,14 +149,14 @@ class Visual:
         since ranking is 0 or 1, the mean will be different and we get more versatile
         results.
 
-        we will read both the list and slice the video to get 1 sec of frames and get
+        we will read both the list and slice the video to get 1 sec of frames(1 * fps) and get
         mean/average as the rank for the 1 sec
         :return: None
         """
         motionNormalize = []
         blurNormalize = []
         for i in range(0, int(self.frameCount), int(self.fps)):
-            if i + int(self.fps) < self.frameCount:
+            if (i + int(self.fps)) < int(self.frameCount):
                 motionNormalize.append(np.mean(self.motion[i: i + int(self.fps)]))
                 blurNormalize.append(np.mean(self.blur[i: i + int(self.fps)]))
 

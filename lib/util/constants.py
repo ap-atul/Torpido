@@ -21,7 +21,7 @@ RANK_TEXT = 5
 
 # ******************* VIDEO PART *************************
 # video width to keep while processing
-VIDEO_WIDTH = 200
+VIDEO_WIDTH = 500
 
 # threshold for video reading motion
 MOTION_THRESHOLD = 50
@@ -58,6 +58,19 @@ RANK_OUT_AUDIO = 'audio_ranking.joblib'
 
 # silence threshold
 SILENCE_THRESHOlD = 0.005
+
+# ********************** TEXTUAL PART ************************
+# min confidence of the text being detected
+TEXT_MIN_CONFIDENCE = 0.5
+
+# text detection is slow so some frames are skipped (sec)
+TEXT_SKIP_FRAMES = 5
+
+# text detection model directory
+TEXT_EAST_MODEL_PATH = "model/frozen_east_text_detection.pb"
+
+# name of the ranking file
+RANK_OUT_TEXT = "text_ranking.joblib"
 
 # ******************* ANALYTICS PART *************************
 MODEL_DIR = "model/"

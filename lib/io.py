@@ -61,6 +61,7 @@ class FFMPEG:
 
         # call ffmpeg tool to do the splitting
         try:
+            print("[INFO] Splitting the video file.")
             for _ in split(inputFile,
                            os.path.join(self.outputFilePath, self.outputAudioFileName)):
                 pass
@@ -82,6 +83,7 @@ class FFMPEG:
 
         # call ffmpeg tool to merge the files
         try:
+            print("[INFO] Writing the output video file.")
             for _ in merge(os.path.join(self.outputFilePath, self.inputFileName),
                            os.path.join(self.outputFilePath, self.outputAudioFileName),
                            os.path.join(self.outputFilePath, self.outputVideoFileName)):
