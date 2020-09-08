@@ -33,7 +33,7 @@ class FFMPEG:
         """
         return os.path.join(self.outputFilePath, self.outputVideoFileName)
 
-    def getOutputAudioFileName(self):
+    def getOutputAudioFileNamePath(self):
         """
         returns the output audio file name generated from input
         :return: string, audio file name with path
@@ -64,7 +64,7 @@ class FFMPEG:
             for _ in split(inputFile,
                            os.path.join(self.outputFilePath, self.outputAudioFileName)):
                 pass
-        except:
+        except ChildProcessError:
             print("[ERROR] Splitting the input file has caused an error.")
             return False
         return True
@@ -86,7 +86,7 @@ class FFMPEG:
                            os.path.join(self.outputFilePath, self.outputAudioFileName),
                            os.path.join(self.outputFilePath, self.outputVideoFileName)):
                 pass
-        except:
+        except ChildProcessError:
             print("[ERROR] Merging the files has caused an error.")
             return False
         return True

@@ -34,6 +34,15 @@ Goal : To automate the video editing process
 6. Select highest ranking sub sequence
 7. Stitch back video and audio and display watch ability scores
 
+## Features
+
+1. Motion detection ranking
+2. BLur detection ranking
+3. Audio de noising
+4. Audio activity ranking / Silence detection
+5. Text detection ranking
+6. Transcript generation (not confirmed)
+
 ## Notes
 
 ## FFT : Fast fourier tranform, mostly discrete fourier transform

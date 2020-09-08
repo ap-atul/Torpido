@@ -3,9 +3,9 @@ import os
 import numpy as np
 import pywt
 import soundfile
+from joblib import dump
 from matplotlib import pyplot as plt
 from statsmodels.robust import mad
-from tqdm import tqdm
 
 from lib.util.constants import *
 from lib.util.noiseProfiler import NoiseProfiler
@@ -16,6 +16,20 @@ wavelet transforms a threshold will be added to each window with certain level
 """
 
 
+def getEnergyRMS(block):
+    """
+    RMS = Root Mean Square to calculate the signal data to the dB, if signal
+    satisfies some threshold the ranking can be affected and audio portion
+    can be ranked
+    RMS -> square root of mean of squared data
+    :param block: array, input signal
+    :return: float, energy in dB
+    """
+    if np.sqrt(np.mean(block ** 2)) > SILENCE_THRESHOlD:
+        return RANK_AUDIO
+    return 0
+
+
 class Auditory:
     def __init__(self):
         self.fileName = None
@@ -24,6 +38,8 @@ class Auditory:
         self.plot = False
         self.clean = None
         self.info = None
+        self.energy = None
+        self.audioRankPath = os.path.join(RANK_DIR, RANK_OUT_AUDIO)
 
     def startProcessing(self, inputFile, outputFile, plot=False):
         """
@@ -43,8 +59,9 @@ class Auditory:
         self.info = soundfile.info(self.fileName)
         self.rate = self.info.samplerate
         self.clean = np.array([])
+        self.energy = []
 
-        for block in tqdm(soundfile.blocks(self.fileName, int(self.rate * self.info.duration * AUDIO_BLOCK))):
+        for block in soundfile.blocks(self.fileName, int(self.rate * AUDIO_BLOCK_SEC)):
             if len(block.shape) > 1:
                 block = block.T[0]
 
@@ -56,8 +73,13 @@ class Auditory:
             coefficients[1:] = (pywt.threshold(i, value=thresh, mode=WAVE_THRESH) for i in coefficients[1:])
 
             self.clean = np.concatenate([self.clean, pywt.waverec(coefficients, WAVELET, mode=DEC_REC_MODE)])
+            self.energy.extend([getEnergyRMS(block) * AUDIO_BLOCK_SEC])  # calculate the audio energy
+
         soundfile.write(outputFile, np.array(self.clean, dtype=float), self.rate)
+        dump(self.energy, self.audioRankPath)
         print("[INFO] Audio de noised successfully")
+        print(f"[INFO] Audio ranking length {len(self.energy)}")
+        print("[INFO] Audio ranking saved .............")
 
         if plot:
             self.plotSignals()
