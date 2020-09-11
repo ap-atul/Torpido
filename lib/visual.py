@@ -1,10 +1,11 @@
 import os
+import time
 
 import cv2
-import imutils
 import numpy as np
 from joblib import dump
 
+from lib.util.cache import Cache
 from lib.util.constants import *
 from lib.util.videoReader import VideoGet
 
@@ -24,6 +25,7 @@ class Visual:
         self.frameCount = None
         self.motion = None
         self.blur = None
+        self.cache = Cache()
 
     def detectBlur(self, image):
         """
@@ -58,11 +60,10 @@ class Visual:
         :param inputFile: input file path
         :return: None
         """
+
         if os.path.isfile(inputFile) is False:
             print(f"[ERROR] File {inputFile} does not exists")
             return
-
-        videoWidth = VIDEO_WIDTH
 
         # maintaining the motion and blur frames list
         self.motion = list()
@@ -71,11 +72,17 @@ class Visual:
         videoGetter = VideoGet(str(inputFile)).start()
         myClip = videoGetter.stream
 
+        if videoGetter.Q.qsize() == 0:
+            time.sleep(1)
+            print("[INFO] Waiting for the buffer to fill up.")
+
         fps = myClip.get(cv2.CAP_PROP_FPS)
         totalFrames = myClip.get(cv2.CAP_PROP_FRAME_COUNT)
 
         self.fps = fps
         self.frameCount = totalFrames
+        self.setVideoFps()
+        self.setVideoFrameCount()
 
         # printing some info
         print("[INFO] Total count of video frames ::", totalFrames)
@@ -85,28 +92,25 @@ class Visual:
         print("[INFO] Video four cc :: ", cv2.CAP_PROP_FOURCC)
 
         threshold = float(MOTION_THRESHOLD)
-        np.seterr(divide='ignore')
 
-        firstFrame = videoGetter.frame
+        count = 0
+        firstFrame = videoGetter.read()
         firstFrameProcessed = True
 
-        while True:
-            if videoGetter.stopped:
-                videoGetter.stop()
-                break
-
-            frame = videoGetter.frame
+        while videoGetter.more():
+            frame = videoGetter.read()
 
             if frame is None:
                 break
 
-            frame = imutils.resize(frame, width=videoWidth)
+            original = frame
+            count += 1
+
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
             self.blur.append(self.detectBlur(frame))
             frame = cv2.GaussianBlur(frame, (21, 21), 0)
 
             if firstFrameProcessed:
-                firstFrame = imutils.resize(firstFrame, width=videoWidth)
                 firstFrame = cv2.cvtColor(firstFrame, cv2.COLOR_BGR2GRAY)
                 firstFrame = cv2.GaussianBlur(firstFrame, (21, 21), 0)
                 firstFrameProcessed = False
@@ -121,7 +125,7 @@ class Visual:
                 self.motion.append(0)
 
             if display:
-                cv2.imshow("Video Feed", frame)
+                cv2.imshow("Video Feed", original)
                 key = cv2.waitKey(1) & 0xFF
 
                 # if the `q` key is pressed, break from the loop
@@ -156,12 +160,28 @@ class Visual:
         motionNormalize = []
         blurNormalize = []
         for i in range(0, int(self.frameCount), int(self.fps)):
-            if (i + int(self.fps)) < int(self.frameCount):
+            if len(self.motion) >= (i + int(self.fps)):
                 motionNormalize.append(np.mean(self.motion[i: i + int(self.fps)]))
                 blurNormalize.append(np.mean(self.blur[i: i + int(self.fps)]))
+            else:
+                break
 
         # saving all processed stuffs
         dump(motionNormalize, self.motionRankPath)
         dump(blurNormalize, self.blurRankPath)
         print(f"[INFO] Visual rank length {len(motionNormalize)}  {len(blurNormalize)}")
         print("[INFO] Visual ranking saved .............")
+
+    def setVideoFps(self):
+        """
+        function to set the original video fps to cache
+        :return: None
+        """
+        self.cache.writeDataToCache(CACHE_FPS, self.fps)
+
+    def setVideoFrameCount(self):
+        """
+        function to set the original video frame count to cache
+        :return: None
+        """
+        self.cache.writeDataToCache(CACHE_FRAME_COUNT, self.frameCount)

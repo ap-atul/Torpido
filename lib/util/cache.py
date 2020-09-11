@@ -37,7 +37,7 @@ class Cache:
             data[key] = value
             dump(data, self.fileName)
 
-        print(f"CACHE STORAGE : {key} -> {value} is stored")
+        print(f"[CACHE] : {key} -> {value} is stored")
 
     def readDataFromCache(self, key):
         """
@@ -51,8 +51,8 @@ class Cache:
             if key in data:
                 return data[key]
             else:
-                print(f"CACHE STORAGE : Requested {key} does not exists")
+                print(f"[CACHE] : Requested {key} does not exists")
                 return None
         else:
-            print(f"CACHE STORAGE : Cache does not exists yet")
+            print(f"[CACHE] : Cache does not exists yet")
             return None

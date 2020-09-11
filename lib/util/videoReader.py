@@ -1,6 +1,11 @@
+import gc
+from queue import Queue
 from threading import Thread
 
 import cv2
+import imutils
+
+from lib.util.constants import VIDEO_WIDTH
 
 
 class VideoGet:
@@ -14,8 +19,8 @@ class VideoGet:
         initialize with the input file to read
         :param src: string, input file
         """
+        self.Q = Queue()
         self.stream = cv2.VideoCapture(src)
-        (self.grabbed, self.frame) = self.stream.read()
         self.stopped = False
 
     def start(self):
@@ -23,20 +28,35 @@ class VideoGet:
         create the thread
         :return: class instance
         """
-        Thread(target=self.get, args=()).start()  # creating a thread
+        Thread(target=self.get, args=()).start()
         return self
 
     def get(self):
         """
         read the frame from the stream, much faster
         in the thread
-        :return: array, single frame
+        :return: None
         """
-        while not self.stopped:
-            if not self.grabbed:
-                self.stop()
-            else:
-                (self.grabbed, self.frame) = self.stream.read()
+        while True:
+            if self.stopped:
+                return
+
+            if not self.Q.full():
+                (grabbed, frame) = self.stream.read()
+
+                if not grabbed:
+                    self.stop()
+                    return
+
+                frame = imutils.resize(frame, width=VIDEO_WIDTH)
+                self.Q.put(frame)
+
+    def read(self):
+        """
+        get the frame from the queue
+        :return: frame
+        """
+        return self.Q.get()
 
     def getCapture(self):
         """
@@ -45,10 +65,18 @@ class VideoGet:
         """
         return self.stream
 
+    def more(self):
+        """
+        checking if there is space in the Q
+        :return: bool
+        """
+        return not self.stopped
+
     def stop(self):
         """
         stop reading the source
         :return: none
         """
         self.stopped = True
+        gc.collect()
         self.stream.release()

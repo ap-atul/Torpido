@@ -7,6 +7,7 @@ from joblib import dump
 from matplotlib import pyplot as plt
 from statsmodels.robust import mad
 
+from lib.util.cache import Cache
 from lib.util.constants import *
 from lib.util.noiseProfiler import NoiseProfiler
 
@@ -14,20 +15,6 @@ from lib.util.noiseProfiler import NoiseProfiler
 Audio de noising process: this class will read the audio file and using
 wavelet transforms a threshold will be added to each window with certain level
 """
-
-
-def getEnergyRMS(block):
-    """
-    RMS = Root Mean Square to calculate the signal data to the dB, if signal
-    satisfies some threshold the ranking can be affected and audio portion
-    can be ranked
-    RMS -> square root of mean of squared data
-    :param block: array, input signal
-    :return: float, energy in dB
-    """
-    if np.sqrt(np.mean(block ** 2)) > SILENCE_THRESHOlD:
-        return RANK_AUDIO
-    return 0
 
 
 class Auditory:
@@ -40,13 +27,14 @@ class Auditory:
         self.info = None
         self.energy = None
         self.audioRankPath = os.path.join(RANK_DIR, RANK_OUT_AUDIO)
+        self.silenceThreshold = SILENCE_THRESHOlD
+        self.cache = Cache()
 
-    def startProcessing(self, inputFile, outputFile, plot=False):
+    def startProcessing(self, inputFile, plot=False):
         """
         this function calculates the de noised signal based on the wavelets
         default wavelet is = db4, mode = per and thresh method = soft
         :param inputFile: (str) name of the file
-        :param outputFile: (str) destination file name
         :param plot: (bool) to plot the signal
         :return: None
         """
@@ -57,11 +45,13 @@ class Auditory:
         self.fileName = inputFile
 
         self.info = soundfile.info(self.fileName)
+        self.setAudioInfo()
         self.rate = self.info.samplerate
         self.clean = np.array([])
         self.energy = []
+        print(f"Audio duration is {self.info.duration} ..................")
 
-        for block in soundfile.blocks(self.fileName, int(self.rate * AUDIO_BLOCK_SEC)):
+        for block in soundfile.blocks(self.fileName, int(self.rate * self.info.duration * AUDIO_BLOCK_PER)):
             if len(block.shape) > 1:
                 block = block.T[0]
 
@@ -73,9 +63,11 @@ class Auditory:
             coefficients[1:] = (pywt.threshold(i, value=thresh, mode=WAVE_THRESH) for i in coefficients[1:])
 
             self.clean = np.concatenate([self.clean, pywt.waverec(coefficients, WAVELET, mode=DEC_REC_MODE)])
-            self.energy.extend([getEnergyRMS(block) * AUDIO_BLOCK_SEC])  # calculate the audio energy
 
-        soundfile.write(outputFile, np.array(self.clean, dtype=float), self.rate)
+            # calculating the audio rank
+            self.energy.extend([self.getEnergyRMS(block)] * max(1, int(len(block) / self.rate)))
+
+        soundfile.write(inputFile, np.array(self.clean, dtype=float), self.rate)
         dump(self.energy, self.audioRankPath)
         print("[INFO] Audio de noised successfully")
         print(f"[INFO] Audio ranking length {len(self.energy)}")
@@ -84,18 +76,27 @@ class Auditory:
         if plot:
             self.plotSignals()
 
-    def getAudioInfo(self):
-        return self.info
+    def getEnergyRMS(self, block):
+        """
+        RMS = Root Mean Square to calculate the signal data to the dB, if signal
+        satisfies some threshold the ranking can be affected and audio portion
+        can be ranked
+        RMS -> square root of mean of squared data
+        :param block: array, input signal
+        :return: float, energy in dB
+        """
+        if np.sqrt(np.mean(block ** 2)) > self.silenceThreshold:
+            return RANK_AUDIO
+        return 0
+
+    def setAudioInfo(self):
+        self.cache.writeDataToCache(CACHE_AUDIO_INFO, self.info)
 
     def plotSignals(self):
         """
         plotting the cleaned and original signals
         :return:
         """
-        plt.plot(self.data)
-        plt.title("Original Signal")
-        plt.show()
-
         plt.plot(self.clean)
         plt.title("Cleaned Signal")
         plt.show()

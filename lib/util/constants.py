@@ -6,6 +6,16 @@ CACHE_DIR = "model/"
 # cache file name
 CACHE_NAME = "vea_cache.joblib"
 
+# cache keys
+# video fps key
+CACHE_FPS = "FPS"
+
+# video frame count
+CACHE_FRAME_COUNT = "FRAME_COUNT"
+
+# audio info object
+CACHE_AUDIO_INFO = "CACHE_AUDIO_INFO"
+
 # ******************* RANKS ****************************
 # ranking for motion in video
 RANK_MOTION = 2
@@ -19,9 +29,12 @@ RANK_AUDIO = 3
 # ranking for text in video
 RANK_TEXT = 5
 
+# output video min rank
+MIN_RANK_OUT_VIDEO = 3
+
 # ******************* VIDEO PART *************************
 # video width to keep while processing
-VIDEO_WIDTH = 500
+VIDEO_WIDTH = 200
 
 # threshold for video reading motion
 MOTION_THRESHOLD = 50
@@ -38,8 +51,8 @@ RANK_OUT_BLUR = "blur_ranking.joblib"
 
 
 # ******************* AUDIO PART *************************
-# reading 1 sec of audio file at a time
-AUDIO_BLOCK_SEC = 1
+# reading 5 percent of audio file at a time
+AUDIO_BLOCK_PER = 0.5
 
 # window level in the wavelet level
 WAVELET_LEVEL = 1
@@ -84,3 +97,6 @@ OUT_VIDEO_FILE = "_edited_by_torpido.mp4"
 
 # input audio name to process and later to merge
 IN_AUDIO_FILE = "_audio.wav"
+
+# supported video file formats
+SUPPORTED_VIDEO_FILES = [".mp4", ".mkv", ".mov", ".flv", ".avi", ".ogg"]
