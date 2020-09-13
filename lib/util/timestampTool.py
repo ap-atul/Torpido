@@ -31,17 +31,19 @@ def readTheRankings():
     textRank = load(textFile)
     audioRank = load(audioFile)
 
+    minRank = min(len(motionRank), len(blurRank),
+                  len(audioRank), len(textRank))
+
     return [motionRank[i] + blurRank[i] +
             textRank[i] + audioRank[i]
-            for i in range(len(textRank))]
+            for i in range(minRank)]
 
 
 def trimByRank(ranks):
     """
     convert the ranks of each sec to timestamp in the video
     formula : sec / fps = duration (sec)
-    :param ranks:
-    :param fps:
+    :param ranks: input ranks for all the secs in the video
     :return:
     """
     timestamps = []
@@ -57,6 +59,8 @@ def trimByRank(ranks):
         else:
             if end is None and start is not None:
                 end = start + prev_end - 1
+                if start == end:
+                    end = None
 
         if start is not None and end is not None:
             start = start
@@ -74,7 +78,6 @@ def trimByRank(ranks):
 
 def getTimestamps():
     sumRank = readTheRankings()
-    print(f"[RANKS] Final ranks generated :: {sumRank}")
     timestamps = trimByRank(sumRank)
 
     finalTimestamp = []

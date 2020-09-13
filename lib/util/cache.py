@@ -3,6 +3,7 @@ import os
 from joblib import dump, load
 
 from lib.util.constants import *
+from lib.util.logger import Log
 
 """
 A simple cache storage helper to store minimal amount of data
@@ -16,9 +17,9 @@ class Cache:
         """
         create the folder path for the cache to store
         """
-        if os.path.isdir(CACHE_DIR) is False:
-            os.mkdir(CACHE_DIR)
-        self.fileName = os.path.join(CACHE_DIR, CACHE_NAME)
+        if os.path.isdir(os.path.join(os.getcwd(), CACHE_DIR)) is False:
+            os.mkdir(os.path.join(os.getcwd(), CACHE_DIR))
+        self.fileName = os.path.join(os.getcwd(), CACHE_DIR, CACHE_NAME)
 
     def writeDataToCache(self, key, value):
         """
@@ -28,16 +29,19 @@ class Cache:
         :return: None
         """
         if os.path.isfile(self.fileName):
-            data = load(self.fileName)
-            data[key] = value
-            dump(data, self.fileName)
-
+            try:
+                data = load(self.fileName)
+                data[key] = value
+                dump(data, self.fileName)
+            except:
+                Log.e("Error reading cache")
+                return
         else:
             data = dict()
             data[key] = value
             dump(data, self.fileName)
 
-        print(f"[CACHE] : {key} -> {value} is stored")
+        Log.d(f"[CACHE] : {key} -> {value} is stored")
 
     def readDataFromCache(self, key):
         """
@@ -51,8 +55,8 @@ class Cache:
             if key in data:
                 return data[key]
             else:
-                print(f"[CACHE] : Requested {key} does not exists")
+                Log.e(f"[CACHE] : Requested {key} does not exists")
                 return None
         else:
-            print(f"[CACHE] : Cache does not exists yet")
+            Log.e(f"[CACHE] : Cache does not exists yet")
             return None

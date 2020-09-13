@@ -1,7 +1,9 @@
+import gc
 import os
 
 from lib.util.constants import OUT_VIDEO_FILE, IN_AUDIO_FILE
 from lib.util.ffmpegTools import split, merge
+from lib.util.logger import Log
 
 """
 This file contains function to separate out video and audio using ffmpeg.
@@ -56,7 +58,7 @@ class FFMPEG:
         :return: boolean, true if success, false if exception/error
         """
         if os.path.isfile(inputFile) is False:
-            print("[ERROR] File does not exists")
+            Log.e("File does not exists")
             return False
 
         self.inputFilePath = os.path.dirname(inputFile)
@@ -67,12 +69,12 @@ class FFMPEG:
 
         # call ffmpeg tool to do the splitting
         try:
-            print("[INFO] Splitting the video file.")
+            Log.d("Splitting the video file.")
             for _ in split(inputFile,
                            os.path.join(self.outputFilePath, self.inputAudioFileName)):
                 pass
         except ChildProcessError:
-            print("[ERROR] Splitting the input file has caused an error.")
+            Log.e("Splitting the input file has caused an error.")
             return False
         return True
 
@@ -84,18 +86,18 @@ class FFMPEG:
         :return: boolean, true for success
         """
         if self.inputFileName is None or self.inputAudioFileName is None:
-            print("[ERROR] Files not found for merging")
+            Log.e("Files not found for merging")
             return False
 
         # call ffmpeg tool to merge the files
         try:
-            print("[INFO] Writing the output video file.")
+            Log.d("Writing the output video file.")
             for _ in merge(os.path.join(self.outputFilePath, self.inputFileName),
                            os.path.join(self.outputFilePath, self.inputAudioFileName),
                            os.path.join(self.outputFilePath, self.outputVideoFileName), timestamps):
                 pass
         except ChildProcessError:
-            print("[ERROR] Merging the files has caused an error.")
+            Log.e("Merging the files has caused an error.")
             return False
         return True
 
@@ -106,4 +108,5 @@ class FFMPEG:
         """
         if os.path.isfile(os.path.join(self.outputFilePath, self.inputAudioFileName)):
             os.unlink(os.path.join(self.outputFilePath, self.inputAudioFileName))
-            print("[INFO] Clean up completed.")
+            Log.d("Clean up completed.")
+        Log.d(f"Garbage collected :: {gc.collect()}")

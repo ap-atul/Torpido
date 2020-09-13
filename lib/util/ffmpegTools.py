@@ -1,5 +1,7 @@
 import subprocess
 
+from lib.util.logger import Log
+
 
 def buildSplitCommand(inputFile, outputAudioFile):
     """
@@ -48,7 +50,8 @@ def split(inputFile, outputAudioFile):
 
     run.stdout.close()
     if run.wait():
-        raise Exception(f"[ERROR] The splitting process has caused an error : {run.stderr.readlines}")
+        Log.e("The splitting process has caused an error.")
+        return None
 
 
 # def buildMergeCommand(videoFile, audioFile, outputFile):
@@ -175,16 +178,17 @@ def merge(videoFile, audioFile, outputFile, timestamps):
     :return yields a value but looked for exceptions only
     :exception ffmpeg error
     """
-    print(f"[TIMESTAMPS] time stamps : {timestamps}")
+    # print(f"[TIMESTAMPS] time stamps : {timestamps}")
     command = buildMergeCommand_2(videoFile, audioFile, outputFile, timestamps)
+    print(command)
     run = subprocess.Popen(args=command,
                            shell=True,
                            stdout=subprocess.PIPE,
-                           universal_newlines=True,
-                           )
+                           universal_newlines=True)
     for stdout in iter(run.stdout.readline, ""):
         yield stdout
 
     run.stdout.close()
     if run.wait():
-        raise Exception(f"[ERROR] The merging process has caused an error.")
+        Log.e(f"The merging process has caused an error.")
+        return None

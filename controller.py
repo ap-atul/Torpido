@@ -1,11 +1,13 @@
 import gc
 import os
+import time
 from multiprocessing import Process
 
 from lib.auditory import Auditory
 from lib.io import FFMPEG
 from lib.textual import Textual
 from lib.util.cache import Cache
+from lib.util.logger import Log
 from lib.util.timestampTool import getTimestamps
 from lib.util.validate import checkIfVideo
 from lib.visual import Visual
@@ -22,6 +24,8 @@ ___________                 .__    .___
 _______________________________________________
 
 """)
+
+time.sleep(4)
 """
 Controller class will control all the functions to perform
 it will link all the libs together and work each process by process
@@ -53,14 +57,14 @@ class Controller:
         :return: None
         """
         if not os.path.isfile(inputFile):
-            print(f"[ERROR] Video file does not exists.")
+            Log.e(f"Video file does not exists.")
             return
 
         if not checkIfVideo(inputFile):
             return
 
         if self.ffmpeg.splitVideoAudio(inputFile):
-            print("[INFO] Splitting the file")
+            Log.d("Splitting the file")
 
         self.videoFile = inputFile
         self.outputFile = self.ffmpeg.getOutputFileNamePath()
@@ -88,7 +92,7 @@ class Controller:
         visualProcess.join()
         textualProcess.join()
 
-        print(f"[INFO] Garbage collecting .. {gc.collect()}")
+        Log.d(f"Garbage collecting .. {gc.collect()}")
         self.completedProcess()
 
     def completedProcess(self):
@@ -100,14 +104,38 @@ class Controller:
         """
         timestamps = getTimestamps()
         if len(timestamps) == 0:
-            print("[INFO] There are not good enough portions to cut. Try changing the config")
+            Log.w("There are not good enough portions to cut. Try changing the config")
             return
 
         if self.ffmpeg.mergeAudioVideo(timestamps):
-            print("Merging the final output video ...............")
+            Log.d("Merged the final output video ...............")
 
         self.ffmpeg.cleanUp()
 
 
+# objgraph.show_growth(limit=5)
 control = Controller()
-control.startProcessing("examples/output/example_01.mp4", True)
+import tracemalloc
+tracemalloc.start()
+# print(" ************** GETTING GRAPH DATA *********")
+# print(objgraph.show_growth(limit=5))
+snapshot1 = tracemalloc.take_snapshot()
+control.startProcessing("/home/atul/Videos/Gretel.mkv", True)
+snapshot2 = tracemalloc.take_snapshot()
+# def run_objgraph(type):
+#     objgraph.show_backrefs(type,max_depth=20,
+#          filename='/home/atul/Desktop/graphs/backrefs_%s_%d.png' % (type, os.getpid()))
+#     roots = objgraph.get_leaking_objects()
+#     print("************** LEAKING *****************")
+#     print(objgraph.show_most_common_types(objects=roots))
+#     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+#     objgraph.show_refs(roots[:3], refcounts=True,
+#     	filename='/home/atul/Desktop/graphs/leaking_backrefs_%s_%d.png' % (type, os.getpid()))
+
+# run_objgraph('dict')
+top_stats = snapshot2.compare_to(snapshot1, 'lineno')
+
+print("[ Top 10 differences ]")
+for stat in top_stats[:10]:
+    print(stat)
+

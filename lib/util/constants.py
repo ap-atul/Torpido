@@ -18,7 +18,7 @@ CACHE_AUDIO_INFO = "CACHE_AUDIO_INFO"
 
 # ******************* RANKS ****************************
 # ranking for motion in video
-RANK_MOTION = 2
+RANK_MOTION = 5
 
 # ranking for blur in video
 RANK_BLUR = 1
@@ -34,13 +34,13 @@ MIN_RANK_OUT_VIDEO = 3
 
 # ******************* VIDEO PART *************************
 # video width to keep while processing
-VIDEO_WIDTH = 200
+VIDEO_WIDTH = 500
 
 # threshold for video reading motion
 MOTION_THRESHOLD = 50
 
 # threshold for blur detection
-BLUR_THRESHOLD = 200
+BLUR_THRESHOLD = 500
 
 # ranking dir
 RANK_DIR = "model/"
@@ -77,7 +77,7 @@ SILENCE_THRESHOlD = 0.005
 TEXT_MIN_CONFIDENCE = 0.5
 
 # text detection is slow so some frames are skipped (sec)
-TEXT_SKIP_FRAMES = 5
+TEXT_SKIP_FRAMES = 20
 
 # text detection model directory
 TEXT_EAST_MODEL_PATH = "model/frozen_east_text_detection.pb"
@@ -99,4 +99,4 @@ OUT_VIDEO_FILE = "_edited_by_torpido.mp4"
 IN_AUDIO_FILE = "_audio.wav"
 
 # supported video file formats
-SUPPORTED_VIDEO_FILES = [".mp4", ".mkv", ".mov", ".flv", ".avi", ".ogg"]
+SUPPORTED_VIDEO_FILES = [".mp4", ".webm", ".mkv", ".mov", ".flv", ".avi", ".ogg"]

@@ -1,3 +1,4 @@
+import gc
 import os
 
 import numpy as np
@@ -5,16 +6,28 @@ import pywt
 import soundfile
 from joblib import dump
 from matplotlib import pyplot as plt
-from statsmodels.robust import mad
 
 from lib.util.cache import Cache
 from lib.util.constants import *
+from lib.util.logger import Log
 from lib.util.noiseProfiler import NoiseProfiler
 
 """
 Audio de noising process: this class will read the audio file and using
 wavelet transforms a threshold will be added to each window with certain level
 """
+
+
+def mad(array):
+    """
+    Median Absolute Deviation: a "Robust" version of standard deviation.
+    Indices variability of the sample.
+    https://en.wikipedia.org/wiki/Median_absolute_deviation
+
+    :param array : input data from signal
+    """
+    arr = np.ma.array(array).compressed()
+    return np.median(np.abs(arr - np.median(arr)))
 
 
 class Auditory:
@@ -26,7 +39,7 @@ class Auditory:
         self.clean = None
         self.info = None
         self.energy = None
-        self.audioRankPath = os.path.join(RANK_DIR, RANK_OUT_AUDIO)
+        self.audioRankPath = os.path.join(os.getcwd(), RANK_DIR, RANK_OUT_AUDIO)
         self.silenceThreshold = SILENCE_THRESHOlD
         self.cache = Cache()
 
@@ -39,7 +52,7 @@ class Auditory:
         :return: None
         """
         if os.path.isfile(inputFile) is False:
-            print(f"[ERROR] File {inputFile} does not exists")
+            Log.e(f"File {inputFile} does not exists")
             return
 
         self.fileName = inputFile
@@ -49,7 +62,7 @@ class Auditory:
         self.rate = self.info.samplerate
         self.clean = np.array([])
         self.energy = []
-        print(f"Audio duration is {self.info.duration} ..................")
+        Log.i(f"Audio duration is {self.info.duration}.")
 
         for block in soundfile.blocks(self.fileName, int(self.rate * self.info.duration * AUDIO_BLOCK_PER)):
             if len(block.shape) > 1:
@@ -69,12 +82,14 @@ class Auditory:
 
         soundfile.write(inputFile, np.array(self.clean, dtype=float), self.rate)
         dump(self.energy, self.audioRankPath)
-        print("[INFO] Audio de noised successfully")
-        print(f"[INFO] Audio ranking length {len(self.energy)}")
-        print("[INFO] Audio ranking saved .............")
+        Log.i("Audio de noised successfully")
+        Log.d(f"Audio ranking length {len(self.energy)}")
+        Log.d("Audio ranking saved .............")
 
         if plot:
             self.plotSignals()
+
+        Log.d(f"Garbage collected :: {gc.collect()}")
 
     def getEnergyRMS(self, block):
         """
@@ -114,4 +129,4 @@ class Auditory:
 
         noiseSignal = NoiseProfiler(data).getNoiseDataPredicted()
         soundfile.write(os.path.join(filePath, "noise.wav"), noiseSignal, rate)
-        print("[INFO] Noise file generated.")
+        Log.i("Noise file generated.")

@@ -7,6 +7,7 @@ from joblib import dump
 
 from lib.util.cache import Cache
 from lib.util.constants import *
+from lib.util.logger import Log
 from lib.util.videoReader import VideoGet
 
 """
@@ -18,8 +19,8 @@ this dictionary is then saved in a joblib file defined in constants.py
 
 class Visual:
     def __init__(self):
-        self.motionRankPath = os.path.join(RANK_DIR, RANK_OUT_MOTION)
-        self.blurRankPath = os.path.join(RANK_DIR, RANK_OUT_BLUR)
+        self.motionRankPath = os.path.join(os.getcwd(), RANK_DIR, RANK_OUT_MOTION)
+        self.blurRankPath = os.path.join(os.getcwd(), RANK_DIR, RANK_OUT_BLUR)
         self.blurThreshold = BLUR_THRESHOLD
         self.fps = None
         self.frameCount = None
@@ -62,7 +63,7 @@ class Visual:
         """
 
         if os.path.isfile(inputFile) is False:
-            print(f"[ERROR] File {inputFile} does not exists")
+            Log.e(f"File {inputFile} does not exists")
             return
 
         # maintaining the motion and blur frames list
@@ -74,7 +75,7 @@ class Visual:
 
         if videoGetter.Q.qsize() == 0:
             time.sleep(1)
-            print("[INFO] Waiting for the buffer to fill up.")
+            Log.d(f"Waiting for the buffer to fill up.")
 
         fps = myClip.get(cv2.CAP_PROP_FPS)
         totalFrames = myClip.get(cv2.CAP_PROP_FRAME_COUNT)
@@ -85,11 +86,11 @@ class Visual:
         self.setVideoFrameCount()
 
         # printing some info
-        print("[INFO] Total count of video frames ::", totalFrames)
-        print("[INFO] Video fps ::", fps)
-        print("[INFO] Bit rate ::", cv2.CAP_PROP_BITRATE)
-        print("[INFO] Video format ::", cv2.CAP_PROP_FORMAT)
-        print("[INFO] Video four cc :: ", cv2.CAP_PROP_FOURCC)
+        Log.d(f"Total count of video frames :: {totalFrames}")
+        Log.i(f"Video fps :: {fps}")
+        Log.i(f"Bit rate :: {cv2.CAP_PROP_BITRATE}")
+        Log.i(f"Video format :: {cv2.CAP_PROP_FORMAT}")
+        Log.i(f"Video four cc :: {cv2.CAP_PROP_FOURCC}")
 
         threshold = float(MOTION_THRESHOLD)
 
@@ -169,8 +170,8 @@ class Visual:
         # saving all processed stuffs
         dump(motionNormalize, self.motionRankPath)
         dump(blurNormalize, self.blurRankPath)
-        print(f"[INFO] Visual rank length {len(motionNormalize)}  {len(blurNormalize)}")
-        print("[INFO] Visual ranking saved .............")
+        Log.d(f"Visual rank length {len(motionNormalize)}  {len(blurNormalize)}")
+        Log.d(f"Visual ranking saved .............")
 
     def setVideoFps(self):
         """

@@ -1,0 +1,7 @@
+soundfile
+matplotlib
+python-opencv
+imutils
+joblib
+pywt
+numpy

@@ -6,6 +6,7 @@ import numpy as np
 from joblib import dump
 
 from lib.util.constants import *
+from lib.util.logger import Log
 from lib.util.videoReader import VideoGet
 
 """
@@ -31,11 +32,11 @@ class Textual:
         self.WIDTH = 320
         self.HEIGHT = 320
         self.skipFrames = TEXT_SKIP_FRAMES
-        self.textRankPath = os.path.join(RANK_DIR, RANK_OUT_TEXT)
+        self.textRankPath = os.path.join(os.getcwd(), RANK_DIR, RANK_OUT_TEXT)
 
         # initializing the model
         # reading the model in the memory
-        self.net = cv2.dnn.readNet(TEXT_EAST_MODEL_PATH)
+        self.net = cv2.dnn.readNet(os.getcwd(), TEXT_EAST_MODEL_PATH)
 
         # adding output layers to the model
         self.layerNames = ["feature_fusion/Conv_7/Sigmoid",
@@ -52,7 +53,7 @@ class Textual:
         """
 
         if os.path.isfile(inputFile) is False:
-            print(f"[ERROR] File {inputFile} does not exists")
+            Log.e(f"File {inputFile} does not exists")
             return
 
         videoGetter = VideoGet(str(inputFile)).start()
@@ -60,7 +61,7 @@ class Textual:
 
         if videoGetter.Q.qsize() == 0:
             time.sleep(0.5)
-            print("[INFO] Waiting for the buffer to fill up.")
+            Log.d("Waiting for the buffer to fill up.")
 
         self.fps = myClip.get(cv2.CAP_PROP_FPS)
         self.frameCount = myClip.get(cv2.CAP_PROP_FRAME_COUNT)
@@ -93,7 +94,7 @@ class Textual:
                 (scores, geometry) = self.net.forward(self.layerNames)
                 end = time.time()
 
-                print(f"[INFO] Text detection took :: {end - start} s")
+                Log.d(f"Text detection took :: {end - start} s")
 
                 (numRows, numCols) = scores.shape[2:4]
                 confidences = []
@@ -151,5 +152,5 @@ class Textual:
 
         # saving all processed stuffs
         dump(textNormalize, self.textRankPath)
-        print(f"[INFO] Textual rank length {len(textNormalize)}")
-        print("[INFO] Textual ranking saved .............")
+        Log.d(f"Textual rank length {len(textNormalize)}")
+        Log.d("Textual ranking saved .............")

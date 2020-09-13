@@ -6,6 +6,7 @@ import cv2
 import imutils
 
 from lib.util.constants import VIDEO_WIDTH
+from lib.util.logger import Log
 
 
 class VideoGet:
@@ -56,7 +57,11 @@ class VideoGet:
         get the frame from the queue
         :return: frame
         """
-        return self.Q.get()
+        try:
+            data = self.Q.get(True, 3)
+        except:
+            data = None
+        return data
 
     def getCapture(self):
         """
@@ -78,5 +83,5 @@ class VideoGet:
         :return: none
         """
         self.stopped = True
-        gc.collect()
+        Log.d(f"Garbage collected :: {gc.collect()}")
         self.stream.release()
