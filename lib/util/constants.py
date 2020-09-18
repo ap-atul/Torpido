@@ -77,7 +77,7 @@ SILENCE_THRESHOlD = 0.005
 TEXT_MIN_CONFIDENCE = 0.5
 
 # text detection is slow so some frames are skipped (sec)
-TEXT_SKIP_FRAMES = 20
+TEXT_SKIP_FRAMES = 10
 
 # text detection model directory
 TEXT_EAST_MODEL_PATH = "model/frozen_east_text_detection.pb"
@@ -95,8 +95,11 @@ MODEL_NAME = "views_predict_model.joblib"
 # output video file name extension
 OUT_VIDEO_FILE = "_edited_by_torpido.mp4"
 
-# input audio name to process and later to merge
+# input audio name to process
 IN_AUDIO_FILE = "_audio.wav"
+
+# output audio name processes and cleaned
+OUT_AUDIO_FILE = "_audio_de_noised.wav"
 
 # supported video file formats
 SUPPORTED_VIDEO_FILES = [".mp4", ".webm", ".mkv", ".mov", ".flv", ".avi", ".ogg"]

@@ -27,6 +27,7 @@ class Visual:
         self.motion = None
         self.blur = None
         self.cache = Cache()
+        self.videoGetter = None
 
     def detectBlur(self, image):
         """
@@ -70,10 +71,10 @@ class Visual:
         self.motion = list()
         self.blur = list()
 
-        videoGetter = VideoGet(str(inputFile)).start()
-        myClip = videoGetter.stream
+        self.videoGetter = VideoGet(str(inputFile)).start()
+        myClip = self.videoGetter.stream
 
-        if videoGetter.Q.qsize() == 0:
+        if self.videoGetter.Q.qsize() == 0:
             time.sleep(1)
             Log.d(f"Waiting for the buffer to fill up.")
 
@@ -95,11 +96,11 @@ class Visual:
         threshold = float(MOTION_THRESHOLD)
 
         count = 0
-        firstFrame = videoGetter.read()
+        firstFrame = self.videoGetter.read()
         firstFrameProcessed = True
 
-        while videoGetter.more():
-            frame = videoGetter.read()
+        while self.videoGetter.more():
+            frame = self.videoGetter.read()
 
             if frame is None:
                 break
@@ -138,7 +139,7 @@ class Visual:
 
         # clearing memory
         myClip.release()
-        videoGetter.stop()
+        self.videoGetter.stop()
         cv2.destroyAllWindows()
 
         # calling the normalization of ranking
@@ -171,7 +172,7 @@ class Visual:
         dump(motionNormalize, self.motionRankPath)
         dump(blurNormalize, self.blurRankPath)
         Log.d(f"Visual rank length {len(motionNormalize)}  {len(blurNormalize)}")
-        Log.d(f"Visual ranking saved .............")
+        Log.i(f"Visual ranking saved .............")
 
     def setVideoFps(self):
         """
@@ -186,3 +187,10 @@ class Visual:
         :return: None
         """
         self.cache.writeDataToCache(CACHE_FRAME_COUNT, self.frameCount)
+
+    def __del__(self):
+        del self.cache
+        if self.videoGetter is not None:
+            del self.videoGetter
+
+        Log.d("Cleaning up.")

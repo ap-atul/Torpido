@@ -1,3 +1,4 @@
+tqdm
 soundfile
 matplotlib
 python-opencv

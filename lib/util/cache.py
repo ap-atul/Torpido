@@ -41,7 +41,7 @@ class Cache:
             data[key] = value
             dump(data, self.fileName)
 
-        Log.d(f"[CACHE] : {key} -> {value} is stored")
+        Log.d(f"[CACHE] : {key} is stored")
 
     def readDataFromCache(self, key):
         """

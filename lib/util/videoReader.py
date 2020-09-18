@@ -20,7 +20,7 @@ class VideoGet:
         initialize with the input file to read
         :param src: string, input file
         """
-        self.Q = Queue()
+        self.Q = Queue(maxsize=1024)
         self.stream = cv2.VideoCapture(src)
         self.stopped = False
 
@@ -85,3 +85,6 @@ class VideoGet:
         self.stopped = True
         Log.d(f"Garbage collected :: {gc.collect()}")
         self.stream.release()
+
+    def __del__(self):
+        del self.Q

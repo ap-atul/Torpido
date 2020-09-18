@@ -1,7 +1,8 @@
 import gc
 import os
 
-from lib.util.constants import OUT_VIDEO_FILE, IN_AUDIO_FILE
+from lib.progress.progress import Progress
+from lib.util.constants import OUT_VIDEO_FILE, IN_AUDIO_FILE, OUT_AUDIO_FILE
 from lib.util.ffmpegTools import split, merge
 from lib.util.logger import Log
 
@@ -18,7 +19,9 @@ class FFMPEG:
         self.inputFilePath = None
         self.outputVideoFileName = None
         self.inputAudioFileName = None
+        self.outputAudioFileName = None
         self.outputFilePath = None
+        self.progressBar = None
 
     def getInputFileNamePath(self):
         """
@@ -48,6 +51,15 @@ class FFMPEG:
             return os.path.join(self.outputFilePath, self.inputAudioFileName)
         return None
 
+    def getOutputAudioFileNamePath(self):
+        """
+        returns the output audio file name generated from input
+        :return: string, audio file name with path
+        """
+        if self.outputAudioFileName is not None:
+            return os.path.join(self.outputFilePath, self.outputAudioFileName)
+        return None
+
     def splitVideoAudio(self, inputFile):
         """
         function to start the splitting video into audio and
@@ -66,17 +78,25 @@ class FFMPEG:
         self.inputFileName = os.path.basename(inputFile)
         self.outputVideoFileName = os.path.splitext(self.inputFileName)[0] + OUT_VIDEO_FILE
         self.inputAudioFileName = os.path.splitext(self.inputFileName)[0] + IN_AUDIO_FILE
+        self.outputAudioFileName = os.path.splitext(self.inputFileName)[0] + OUT_AUDIO_FILE
 
         # call ffmpeg tool to do the splitting
         try:
-            Log.d("Splitting the video file.")
-            for _ in split(inputFile,
-                           os.path.join(self.outputFilePath, self.inputAudioFileName)):
-                pass
+            Log.i("Splitting the video file.")
+            self.progressBar = Progress()
+            for log in split(inputFile,
+                             os.path.join(self.outputFilePath, self.inputAudioFileName)):
+                self.progressBar.displayProgress(log)
+
         except ChildProcessError:
             Log.e("Splitting the input file has caused an error.")
+            self.progressBar.clear()
             return False
-        return True
+
+        finally:
+            self.progressBar.complete()
+            print("----------------------------------------------------------")
+            return True
 
     def mergeAudioVideo(self, timestamps):
         """
@@ -85,28 +105,40 @@ class FFMPEG:
         :param timestamps: list of timestamps containing list (start and end)
         :return: boolean, true for success
         """
-        if self.inputFileName is None or self.inputAudioFileName is None:
+        if self.inputFileName is None or self.outputAudioFileName is None:
             Log.e("Files not found for merging")
             return False
 
         # call ffmpeg tool to merge the files
         try:
-            Log.d("Writing the output video file.")
-            for _ in merge(os.path.join(self.outputFilePath, self.inputFileName),
-                           os.path.join(self.outputFilePath, self.inputAudioFileName),
-                           os.path.join(self.outputFilePath, self.outputVideoFileName), timestamps):
-                pass
+            self.progressBar = Progress()
+            Log.i("Writing the output video file.")
+            for log in merge(os.path.join(self.outputFilePath, self.inputFileName),
+                             os.path.join(self.outputFilePath, self.outputAudioFileName),
+                             os.path.join(self.outputFilePath, self.outputVideoFileName), timestamps):
+                self.progressBar.displayProgress(log)
+
         except ChildProcessError:
             Log.e("Merging the files has caused an error.")
+            self.progressBar.clear()
             return False
-        return True
+
+        finally:
+            self.progressBar.complete()
+            print("----------------------------------------------------------")
+            return True
 
     def cleanUp(self):
         """
-        delete the audio file generated
+        delete the audio files generated
         :return: None
         """
         if os.path.isfile(os.path.join(self.outputFilePath, self.inputAudioFileName)):
             os.unlink(os.path.join(self.outputFilePath, self.inputAudioFileName))
-            Log.d("Clean up completed.")
+
+        if os.path.isfile(os.path.join(self.outputFilePath, self.outputAudioFileName)):
+            os.unlink(os.path.join(self.outputFilePath, self.outputAudioFileName))
+
+        del self.progressBar
         Log.d(f"Garbage collected :: {gc.collect()}")
+        Log.d("Clean up completed.")

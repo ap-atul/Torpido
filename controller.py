@@ -13,19 +13,19 @@ from lib.util.validate import checkIfVideo
 from lib.visual import Visual
 
 print("""\033[93m
+  _                   _     _       
+ | |_ ___  _ __ _ __ (_) __| | ___  
+ | __/ _ \| '__| '_ \| |/ _` |/ _ \ 
+ | || (_) | |  | |_) | | (_| | (_) |
+  \__\___/|_|  | .__/|_|\__,_|\___/ 
+               |_|                  
 
-___________                 .__    .___              
-\__    ___/________________ |__| __| _/____          
-  |    | /  _ \_  __ \____ \|  |/ __ |/  _ \         
-  |    |(  <_> )  | \/  |_> >  / /_/ (  <_> )        
-  |____| \____/|__|  |   __/|__\____ |\____/         
-                     |__|           \/
-                \033[37;41m Video editing made fun ;) \033[0m
+         \033[37;41m Video editing made fun ;) \033[0m
 _______________________________________________
 
 """)
 
-time.sleep(4)
+time.sleep(1)
 """
 Controller class will control all the functions to perform
 it will link all the libs together and work each process by process
@@ -40,6 +40,10 @@ class Controller:
         self.videoFile = None
         self.outputFile = None
         self.audioFile = None
+        self.deNoisedAudioFile = None
+        self.audioProcess = None
+        self.visualProcess = None
+        self.textualProcess = None
         self.visual = Visual()
         self.auditory = Auditory()
         self.textual = Textual()
@@ -64,11 +68,12 @@ class Controller:
             return
 
         if self.ffmpeg.splitVideoAudio(inputFile):
-            Log.d("Splitting the file")
+            pass
 
         self.videoFile = inputFile
         self.outputFile = self.ffmpeg.getOutputFileNamePath()
         self.audioFile = self.ffmpeg.getInputAudioFileNamePath()
+        self.deNoisedAudioFile = self.ffmpeg.getOutputAudioFileNamePath()
 
         # starting the sub processes
         self.startModules(display)
@@ -80,17 +85,17 @@ class Controller:
         :param display: bool, plotting and video play
         :return: None
         """
-        audioProcess = Process(target=self.auditory.startProcessing, args=(self.audioFile, display))
-        visualProcess = Process(target=self.visual.startProcessing, args=(self.videoFile, display))
-        textualProcess = Process(target=self.textual.startProcessing, args=(self.videoFile, display))
+        self.audioProcess = Process(target=self.auditory.startProcessing, args=(self.audioFile, self.deNoisedAudioFile))
+        self.visualProcess = Process(target=self.visual.startProcessing, args=(self.videoFile, display))
+        # self.textualProcess = Process(target=self.textual.startProcessing, args=(self.videoFile, display))
 
-        audioProcess.start()
-        visualProcess.start()
-        textualProcess.start()
+        self.audioProcess.start()
+        self.visualProcess.start()
+        # self.textualProcess.start()
 
-        audioProcess.join()
-        visualProcess.join()
-        textualProcess.join()
+        self.audioProcess.join()
+        self.visualProcess.join()
+        # self.textualProcess.join()
 
         Log.d(f"Garbage collecting .. {gc.collect()}")
         self.completedProcess()
@@ -112,30 +117,42 @@ class Controller:
 
         self.ffmpeg.cleanUp()
 
+    def __del__(self):
+        if self.visualProcess is not None:
+            self.visualProcess.terminate()
+        if self.audioProcess is not None:
+            self.audioProcess.terminate()
+        if self.textualProcess is not None:
+            self.textualProcess.terminate()
+        Log.d("Terminating the processes")
 
-# objgraph.show_growth(limit=5)
-control = Controller()
-import tracemalloc
-tracemalloc.start()
-# print(" ************** GETTING GRAPH DATA *********")
-# print(objgraph.show_growth(limit=5))
-snapshot1 = tracemalloc.take_snapshot()
-control.startProcessing("/home/atul/Videos/Gretel.mkv", True)
-snapshot2 = tracemalloc.take_snapshot()
-# def run_objgraph(type):
-#     objgraph.show_backrefs(type,max_depth=20,
-#          filename='/home/atul/Desktop/graphs/backrefs_%s_%d.png' % (type, os.getpid()))
-#     roots = objgraph.get_leaking_objects()
-#     print("************** LEAKING *****************")
-#     print(objgraph.show_most_common_types(objects=roots))
-#     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-#     objgraph.show_refs(roots[:3], refcounts=True,
-#     	filename='/home/atul/Desktop/graphs/leaking_backrefs_%s_%d.png' % (type, os.getpid()))
 
-# run_objgraph('dict')
-top_stats = snapshot2.compare_to(snapshot1, 'lineno')
+def call():
+    # objgraph.show_growth(limit=5)
+    control = Controller()
+    # import tracemalloc
+    # tracemalloc.start()
+    # print(" ************** GETTING GRAPH DATA *********")
+    # print(objgraph.show_growth(limit=5))
+    # snapshot1 = tracemalloc.take_snapshot()
+    control.startProcessing("/home/atul/Videos/testNow/Gretel.mkv", True)
+    # snapshot2 = tracemalloc.take_snapshot()
+    # def run_objgraph(type):
+    #     objgraph.show_backrefs(type,max_depth=20,
+    #          filename='/home/atul/Desktop/graphs/backrefs_%s_%d.png' % (type, os.getpid()))
+    #     roots = objgraph.get_leaking_objects()
+    #     print("************** LEAKING *****************")
+    #     print(objgraph.show_most_common_types(objects=roots))
+    #     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+    #     objgraph.show_refs(roots[:3], refcounts=True,
+    #     	filename='/home/atul/Desktop/graphs/leaking_backrefs_%s_%d.png' % (type, os.getpid()))
 
-print("[ Top 10 differences ]")
-for stat in top_stats[:10]:
-    print(stat)
+    # run_objgraph('dict')
+    # top_stats = snapshot2.compare_to(snapshot1, 'lineno')
 
+    # print("[ Top 10 differences ]")
+    # for stat in top_stats[:10]:
+    #     print(stat)
+
+
+call()

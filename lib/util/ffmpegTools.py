@@ -44,6 +44,7 @@ def split(inputFile, outputAudioFile):
     command = buildSplitCommand(inputFile, outputAudioFile)
     run = subprocess.Popen(args=command,
                            stdout=subprocess.PIPE,
+                           stderr=subprocess.STDOUT,
                            universal_newlines=True)
     for stdout in iter(run.stdout.readline, ""):
         yield stdout
@@ -54,57 +55,13 @@ def split(inputFile, outputAudioFile):
         return None
 
 
-# def buildMergeCommand(videoFile, audioFile, outputFile):
-#     """
-#     create a list of command line arguments and file names that
-#     will be merged, the ffmpeg tool with named arguments
-#     :param videoFile: string, input video stream
-#     :param audioFile: string, input audio stream
-#     :param outputFile: string, output file name
-#     :return: list, command line
-#
-#     -y : yes to overwrite if name exists, cases when processing
-#         is done on same files again, even after cleanup
-#
-#     -i : input file, stream of the input video
-#
-#     -c:v & -c:a : select the video and audio stream only, since we are
-#         replacing the original's video' audio stream.
-#
-#     -map 0:v:0 : map the first file's video stream to first output file
-#     -map 1:a:0 : map the second file's audio stream to first output file
-#
-#     -shortest : the length of output file would be same to the length of
-#             smaller length of the input file
-#
-#     ex: ffmpeg -y -i video.mkv -i audio.wav -c:v copy -c:a aac  -map 0:v:0 -map 1:a:0 -shortest merged.mp4
-#     """
-#     return [
-#         'ffmpeg',
-#         '-y',
-#         '-i',
-#         str(videoFile),
-#         '-i',
-#         str(audioFile),
-#         '-c:v',
-#         'copy',
-#         '-c:a',
-#         'aac',
-#         '-map',
-#         '0:v:0',
-#         '-map',
-#         ' 1:a:0',
-#         '-shortest',
-#         str(outputFile)
-#     ]
-
-
-def buildMergeCommand_2(videoFile, audioFile, outputFile, timestamps):
+def buildMergeCommand(videoFile, audioFile, outputFile, timestamps):
     """
     Building a complex filter
     command line to clip portions based on the timestamps, the copies used
     to trim some portion depend on the length of the timestamps since that
     will define the number of the trims
+
     :param videoFile: str, original video
     :param audioFile: str, de noised audio
     :param outputFile: str, output video to generate
@@ -136,11 +93,11 @@ def buildMergeCommand_2(videoFile, audioFile, outputFile, timestamps):
     filterString += '; '
 
     for i in range(len(timestamps)):
-        starttime = timestamps[i][0]
-        endtime = timestamps[i][1]
+        startTime = timestamps[i][0]
+        endTime = timestamps[i][1]
         filterString += '[vc%d]' % i
         filterString += 'trim=start=%f:duration=%f,setpts=PTS-STARTPTS[v%d]; ' \
-                        % (starttime, (endtime - starttime), int(i))
+                        % (startTime, (endTime - startTime), int(i))
 
     filterString += '[1:a]asplit=' + str(len(timestamps))
     for i in range(len(timestamps)):
@@ -148,11 +105,11 @@ def buildMergeCommand_2(videoFile, audioFile, outputFile, timestamps):
     filterString += '; '
 
     for i in range(len(timestamps)):
-        starttime = timestamps[i][0]
-        endtime = timestamps[i][1]
+        startTime = timestamps[i][0]
+        endTime = timestamps[i][1]
         filterString += '[ac%d]' % i
         filterString += 'atrim=start=%f:duration=%f,asetpts=PTS-STARTPTS[a%d]; ' \
-                        % (starttime, (endtime - starttime), int(i))
+                        % (startTime, (endTime - startTime), int(i))
 
     for i in range(len(timestamps)):
         filterString += '[v%d][a%d]' % (i, i)
@@ -179,11 +136,12 @@ def merge(videoFile, audioFile, outputFile, timestamps):
     :exception ffmpeg error
     """
     # print(f"[TIMESTAMPS] time stamps : {timestamps}")
-    command = buildMergeCommand_2(videoFile, audioFile, outputFile, timestamps)
-    print(command)
+    command = buildMergeCommand(videoFile, audioFile, outputFile, timestamps)
+    # print(command)
     run = subprocess.Popen(args=command,
                            shell=True,
                            stdout=subprocess.PIPE,
+                           stderr=subprocess.STDOUT,
                            universal_newlines=True)
     for stdout in iter(run.stdout.readline, ""):
         yield stdout

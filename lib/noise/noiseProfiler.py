@@ -6,8 +6,8 @@ import math
 import matplotlib.pyplot as plt
 import numpy
 
-from lib.util import waveletHelper, windowBundle
-from lib.util.linkedList import LinkedList
+from lib.noise import windowBundle, waveletHelper
+from lib.noise.linkedList import LinkedList
 
 
 class NoiseProfiler:

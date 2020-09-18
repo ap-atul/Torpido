@@ -28,6 +28,7 @@ class Textual:
         self.fps = None
         self.frameCount = None
         self.textRanks = None
+        self.videoGetter = None
         self.minConfidence = TEXT_MIN_CONFIDENCE
         self.WIDTH = 320
         self.HEIGHT = 320
@@ -56,10 +57,10 @@ class Textual:
             Log.e(f"File {inputFile} does not exists")
             return
 
-        videoGetter = VideoGet(str(inputFile)).start()
-        myClip = videoGetter.stream
+        self.videoGetter = VideoGet(str(inputFile)).start()
+        myClip = self.videoGetter.stream
 
-        if videoGetter.Q.qsize() == 0:
+        if self.videoGetter.Q.qsize() == 0:
             time.sleep(0.5)
             Log.d("Waiting for the buffer to fill up.")
 
@@ -71,8 +72,8 @@ class Textual:
         count = 0
         self.textRanks = []
 
-        while videoGetter.more():
-            frame = videoGetter.read()
+        while self.videoGetter.more():
+            frame = self.videoGetter.read()
 
             if frame is None:
                 break
@@ -123,7 +124,7 @@ class Textual:
 
         # clearing the memory
         myClip.release()
-        videoGetter.stop()
+        self.videoGetter.stop()
         cv2.destroyAllWindows()
 
         # calling the normalization of ranking
@@ -153,4 +154,10 @@ class Textual:
         # saving all processed stuffs
         dump(textNormalize, self.textRankPath)
         Log.d(f"Textual rank length {len(textNormalize)}")
-        Log.d("Textual ranking saved .............")
+        Log.i("Textual ranking saved .............")
+
+    def __del__(self):
+        del self.net
+        del self.layerNames
+        del self.videoGetter
+        Log.d("Cleaning up.")
