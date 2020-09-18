@@ -3,9 +3,9 @@ from queue import Queue
 from threading import Thread
 
 import cv2
-import imutils
 
 from lib.util.constants import VIDEO_WIDTH
+from lib.util.image import resize
 from lib.util.logger import Log
 
 
@@ -49,7 +49,7 @@ class VideoGet:
                     self.stop()
                     return
 
-                frame = imutils.resize(frame, width=VIDEO_WIDTH)
+                frame = resize(frame, width=VIDEO_WIDTH)
                 self.Q.put(frame)
 
     def read(self):

@@ -90,12 +90,9 @@ class Textual:
                 #  making the image blob
                 blob = cv2.dnn.blobFromImage(frame, 1.0, (W, H), (123.68, 116.78, 103.94),
                                              swapRB=True, crop=False)
-                start = time.time()
+
                 self.net.setInput(blob)
                 (scores, geometry) = self.net.forward(self.layerNames)
-                end = time.time()
-
-                Log.d(f"Text detection took :: {end - start} s")
 
                 (numRows, numCols) = scores.shape[2:4]
                 confidences = []
@@ -112,6 +109,7 @@ class Textual:
                 # print(f"Average confidence :: {np.mean(confidences)}")
                 if len(confidences) > 0 and np.mean(confidences) > 0.5:
                     self.textRanks.extend([RANK_TEXT] * int(self.skipFrames))
+                    Log.d("Text detected.")
                 else:
                     self.textRanks.extend([0] * int(self.skipFrames))
 

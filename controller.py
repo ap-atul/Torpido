@@ -12,20 +12,24 @@ from lib.util.timestampTool import getTimestamps
 from lib.util.validate import checkIfVideo
 from lib.visual import Visual
 
-print("""\033[93m
+
+def logo():
+    print("""\033[93m
   _                   _     _       
  | |_ ___  _ __ _ __ (_) __| | ___  
  | __/ _ \| '__| '_ \| |/ _` |/ _ \ 
  | || (_) | |  | |_) | | (_| | (_) |
   \__\___/|_|  | .__/|_|\__,_|\___/ 
-               |_|                  
+	           |_|                  
 
-         \033[37;41m Video editing made fun ;) \033[0m
+	     \033[37;41m Video editing made fun ;) \033[0m
 _______________________________________________
 
 """)
 
-time.sleep(1)
+    time.sleep(1)
+
+
 """
 Controller class will control all the functions to perform
 it will link all the libs together and work each process by process
@@ -60,6 +64,7 @@ class Controller:
         :param display: bool, display video and audio plots
         :return: None
         """
+        logo()
         if not os.path.isfile(inputFile):
             Log.e(f"Video file does not exists.")
             return
@@ -87,15 +92,15 @@ class Controller:
         """
         self.audioProcess = Process(target=self.auditory.startProcessing, args=(self.audioFile, self.deNoisedAudioFile))
         self.visualProcess = Process(target=self.visual.startProcessing, args=(self.videoFile, display))
-        # self.textualProcess = Process(target=self.textual.startProcessing, args=(self.videoFile, display))
+        self.textualProcess = Process(target=self.textual.startProcessing, args=(self.videoFile, display))
 
         self.audioProcess.start()
         self.visualProcess.start()
-        # self.textualProcess.start()
+        self.textualProcess.start()
 
         self.audioProcess.join()
         self.visualProcess.join()
-        # self.textualProcess.join()
+        self.textualProcess.join()
 
         Log.d(f"Garbage collecting .. {gc.collect()}")
         self.completedProcess()
@@ -109,9 +114,10 @@ class Controller:
         """
         timestamps = getTimestamps()
         if len(timestamps) == 0:
-            Log.w("There are not good enough portions to cut. Try changing the config")
+            Log.w("There are not good enough portions to cut. Try changing the configurations.")
             return
 
+        Log.i(f"Clipping a total of {len(timestamps)} sub portions.")
         if self.ffmpeg.mergeAudioVideo(timestamps):
             Log.d("Merged the final output video ...............")
 
@@ -154,5 +160,4 @@ def call():
     # for stat in top_stats[:10]:
     #     print(stat)
 
-
-call()
+# call()

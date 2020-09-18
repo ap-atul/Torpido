@@ -11,6 +11,7 @@ class Log:
     modes['INFO'] = '\033[94m'
     modes['WARN'] = '\033[93m'
     printing = True
+    onlyInfo = False
 
     def log(self, mode='INFO'):
         """
@@ -19,7 +20,16 @@ class Log:
         :param mode: str
         :return: None
         """
+        if Log.onlyInfo:
+            if mode is "INFO":
+                print(f"{Log.modes[mode]}[{mode}] {self}", flush=True)
+                return
+
         print(f"{Log.modes[mode]}[{mode}] {self}", flush=True)
+
+    @staticmethod
+    def setOnlyInfo(which):
+        Log.onlyInfo = which
 
     @staticmethod
     def setPrint(mode=True):
