@@ -11,7 +11,22 @@ from lib.noise.linkedList import LinkedList
 
 
 class NoiseProfiler:
-    """Basic de noise wrapper for keeping store of the settings"""
+    """
+    Basic de noise wrapper for keeping store of the settings
+
+    Attributes
+    ----------
+    timeWindow : float
+        max time window
+    sampleRate : int, default=44100
+        sample rate of audio in frequency
+    percentileLevel : int, default=95
+        percent satisfies
+    wlevels : int, default=4
+        max wavelet levels
+    dbName : str, default='db8'
+        name of wavelet to use
+    """
 
     def __init__(self, x, timeWindow=0.1, sampleRate=44100, percentileLevel=95, wlevels=4, dbName='db8'):
         self.x = x
@@ -37,6 +52,9 @@ class NoiseProfiler:
         print("Noise profiler finished")
 
     def cleanUp(self):
+        """
+        cleaning up
+        """
         self.windows = None
         self.sortedWindows = None
         self.noiseData = None
@@ -45,30 +63,21 @@ class NoiseProfiler:
         self.signalWindows = None
         self.noiseWavelets = None
 
-    def drawOriginalVsNoiseAndSingal(self):
-        self.threshold = self.extractRMSthresholdFromWindows(
-            self.percentileLevel)
-        self.extractSignalAndNoiseWindows(self.threshold)
-
-        noiseData = self.getDataOrZeroFromPartialWindows(
-            self.windows, self.noiseWindows)
-        signalData = self.getDataOrZeroFromPartialWindows(
-            self.windows, self.signalWindows)
-
-        rmsEnvelope = self.getWindowsRMSasEnvelope()
-
-        plt.figure(1)
-        plt.subplot(211)
-        plt.plot(self.x)
-        plt.subplot(211)
-        plt.plot(rmsEnvelope)
-        plt.plot(-1 * rmsEnvelope)
-        plt.subplot(212)
-        plt.plot(signalData)
-        plt.plot(noiseData)
-        plt.show()
-
     def __getNodesWindowData(self, nodes):
+        """
+        window data based on the nodes
+
+        Parameters
+        ----------
+        nodes : Node
+            input nodes
+
+        Returns
+        -------
+        object
+            data from the nodes
+
+        """
         data = []
         for node in nodes:
             window = node.data
@@ -77,6 +86,21 @@ class NoiseProfiler:
         return data
 
     def __getNodeCircularPrediction(self, node, n):
+        """
+        Returns predicted value for the node
+
+        Parameters
+        ----------
+        node : Node
+            data point
+        n : int
+            index of data point
+
+        Returns
+        -------
+        object
+            links of nodes
+        """
         prevNode = node.getPrevWithValidData()
         nextNode = node.getNextWithValidData()
         if prevNode is None:
@@ -86,6 +110,22 @@ class NoiseProfiler:
         return self.__getPastCircularNodes(prevNode, n)
 
     def __getFutureCircularNodes(self, initialNode, n):
+        """
+        Returns predicted values for the nodes
+
+        Parameters
+        ----------
+        initialNode : object
+            current node
+        n : int
+            index of the node
+
+        Returns
+        -------
+        object
+            links of the nodes
+
+        """
         ret = []
         count = 0
         current = initialNode
@@ -101,6 +141,22 @@ class NoiseProfiler:
                 current = initialNode
 
     def __getPastCircularNodes(self, initialNode, n):
+        """
+        Returns previous nodes
+
+        Parameters
+        ----------
+        initialNode : object
+            initial node
+        n : int
+            index of the node
+
+        Returns
+        -------
+        list
+            list of nodes
+
+        """
         ret = []
         count = 0
         current = initialNode
@@ -116,6 +172,14 @@ class NoiseProfiler:
                 current = initialNode
 
     def getNoiseDataPredicted(self):
+        """
+        Calculates noise profile by parsing the input signal
+
+        Returns
+        -------
+        object
+            noise signal extracted
+        """
         self.threshold = self.extractRMSthresholdFromWindows(
             self.percentileLevel)
         self.extractSignalAndNoiseWindows(self.threshold)
@@ -149,6 +213,20 @@ class NoiseProfiler:
         return noiseDataPredicted
 
     def extractRMSthresholdFromWindows(self, percentileLevel):
+        """
+        Get threshold for the Energy of the signal
+
+        Parameters
+        ----------
+        percentileLevel : float
+            threshold satisfying value
+
+        Returns
+        -------
+        float
+            updated threshold
+
+        """
         if self.threshold is not None:
             return self.threshold
 
@@ -162,10 +240,16 @@ class NoiseProfiler:
         return self.threshold
 
     def getWindowsRMSasEnvelope(self):
+        """
+        Returns the energy for the signal
+
+        Returns
+        -------
+        list
+            energy list
+
+        """
         envelope = numpy.array([])
-        """
-        :type self.windows: list[windowBundle]
-        """
         for window in self.windows:
             windowEnvelope = window.getRMS() * numpy.ones(len(window.data))
             envelope = numpy.concatenate([envelope, windowEnvelope])
@@ -173,6 +257,9 @@ class NoiseProfiler:
         return envelope
 
     def extractWindows(self):
+        """
+        Get windows from the parsed signals
+        """
         xLength = len(self.x)
         nWindows = math.ceil(xLength / self.windowSamples)
         for i in range(0, nWindows):
@@ -188,6 +275,14 @@ class NoiseProfiler:
             self.windows.append(window)
 
     def extractSignalAndNoiseWindows(self, rmsThreshold):
+        """
+        parse the signal and generate windows
+
+        Parameters
+        ----------
+        rmsThreshold : float
+            threshold
+        """
         if self.noiseWindows is not None and self.signalWindows is not None:
             return
 
@@ -204,19 +299,10 @@ class NoiseProfiler:
                 self.signalLinked.append(window)
                 self.noiseLinked.append(None)
 
-    def getDataOrZeroFromPartialWindows(self, allWindows, partialWindows):
-        data = []
-        idx = 0
-        for window in allWindows:
-            if idx < len(partialWindows) and window == partialWindows[idx]:
-                data.extend(window.data)
-                idx += 1
-            else:
-                data.extend(numpy.zeros(self.windowSamples))
-
-        return data
-
     def plotWavelets(self):
+        """
+        plot the wavelets
+        """
         wtBandsLength = 0
         for window in self.windows:
             windowWaveletData = list()

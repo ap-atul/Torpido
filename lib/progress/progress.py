@@ -10,21 +10,38 @@ the time and duration in the logs
 
 
 class Progress:
+    """
+    Progress creation and initialization of the progress bar and extractor
+
+    Attributes
+    ----------
+    progressBar : object
+        tqdm progress bar
+    totalProgress : int
+        maintaining the current progress
+    extractor : object
+        extractor object to read the stdout logs and parse them
+    """
+
     def __init__(self):
-        """
-        initializes the progress bar and extractor
-        """
         self.progressBar = tqdm(total=100)
         self.totalProgress = 0
         self.extractor = StdExtractor()
 
     def displayProgress(self, log, displayLog=False):
         """
-        extracts time and duration to update the progress
-        bar.
-        :param log: string, stdout log
-        :param displayLog: bool, to print the log
-        :return: None
+        Gets extracted time and duration from stdExtractor and updates the progress bar
+
+        Parameters
+        ----------
+        log : str
+            current log from the subprocess stdout
+        displayLog : bool
+            if True then all logs will be flushed in the console
+
+        Returns
+        -------
+
         """
         duration, time = self.extractor.extractTimeDuration(log)
 
@@ -41,11 +58,18 @@ class Progress:
     @staticmethod
     def getCurrentProgress(duration, time):
         """
-        current progress is calculated with duration and current
-        time
-        :param duration: Time object, original time
-        :param time: Time object, current time
-        :return: int, percent completed
+        Caluclates the progress percentage from duration and time object of the Time class
+
+        Parameters
+        ----------
+        duration : Time
+            Time object of total duration of original clip
+        time : Time
+            Time object of current duration of decoded clip
+
+        Returns
+        -------
+
         """
         durationInSec = duration.getTimeInSec()
         if durationInSec == 0:
@@ -55,22 +79,19 @@ class Progress:
 
     def complete(self):
         """
-        explicitly complete the bar
-        :return: none
+        explicitly complete the progress bar
         """
         self.progressBar.update(100)
 
     def clear(self):
         """
-        on error clear the percent on the progress bar
-        :return: None
+        On occurrence of any error clear the progress bar
         """
         self.progressBar.clear()
 
     def __del__(self):
         """
         clean up
-        :return: None
         """
         self.progressBar.close()
         del self.progressBar
