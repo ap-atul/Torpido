@@ -1,27 +1,49 @@
+"""
+This file will read the ranking for each section, parse it and
+create timestamps in seconds that can be used to clip the video
+using ffmpeg.
+
+    1. Reading the ranks and parsing them to timestamps
+    2. Padding the time ranks to generate the timestamps
+    3. Validating the timestamps
+
+"""
+
 import os
 
 from joblib import load
 
 from lib.util.constants import *
-
-"""
-This file will read the ranking for each section, parse it and
-create timestamps in seconds that can be used to clip the video
-using ffmpeg.
-1. Reading the ranks and parsing them to timestamps
-2. Padding the time ranks to generate the timestamps
-3. Validating the timestamps
-"""
+from lib.util.logger import Log
 
 
 def readTheRankings():
     """
-    read the ranking using the joblib files and calculate
+    Reads the ranking using the joblib files and calculate
     the final sum ranks
     TODO: padding if required
 
-    :return: list, sum of all ranks
+    Returns
+    -------
+    list
+        list of the sum of all ranks
     """
+    if os.path.isfile(os.path.join(RANK_DIR, RANK_OUT_MOTION)) is False:
+        Log.e("Motion Ranking does not exists")
+        return
+
+    if os.path.isfile(os.path.join(RANK_DIR, RANK_OUT_BLUR)) is False:
+        Log.e("Blur Ranking does not exists")
+        return
+
+    if os.path.isfile(os.path.join(RANK_DIR, RANK_OUT_TEXT)) is False:
+        Log.e("Text Ranking does not exists")
+        return
+
+    if os.path.isfile(os.path.join(RANK_DIR, RANK_OUT_AUDIO)) is False:
+        Log.e("Audio Ranking does not exists")
+        return
+
     motionFile = os.path.join(RANK_DIR, RANK_OUT_MOTION)
     blurFile = os.path.join(RANK_DIR, RANK_OUT_BLUR)
     textFile = os.path.join(RANK_DIR, RANK_OUT_TEXT)
@@ -41,10 +63,18 @@ def readTheRankings():
 
 def trimByRank(ranks):
     """
-    convert the ranks of each sec to timestamp in the video
-    formula : sec / fps = duration (sec)
-    :param ranks: input ranks for all the secs in the video
-    :return:
+    Parse the ranks to generate timestamps. Ranks are per sec so the start rank will be start
+    timestamp for trimming
+
+    Parameters
+    ----------
+    ranks : iterable
+        ranks of the video
+
+    Returns
+    --------
+    timestamps : list
+        timestamps parsed from the ranks
     """
     timestamps = []
     start = None
@@ -77,8 +107,16 @@ def trimByRank(ranks):
 
 
 def getTimestamps():
-    sumRank = readTheRankings()
-    timestamps = trimByRank(sumRank)
+    """
+    Returns parsed timestamps from the ranking of all 4 processing
+
+    Returns
+    -------
+    list
+        timestamps list containing start and emd timestamps
+
+    """
+    timestamps = trimByRank(readTheRankings())
 
     finalTimestamp = []
     for clip in timestamps:

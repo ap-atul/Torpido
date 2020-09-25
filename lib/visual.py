@@ -1,3 +1,9 @@
+"""
+This file reads the video and gives ranking to frames
+that have motion in it, saves in the dictionary with frame numbers
+this dictionary is then saved in a joblib file defined in constants.py
+"""
+
 import os
 import time
 
@@ -10,18 +16,42 @@ from lib.util.constants import *
 from lib.util.logger import Log
 from lib.util.videoReader import VideoGet
 
-"""
-This file reads the video and gives ranking to frames
-that have motion in it, saves in the dictionary with frame numbers
-this dictionary is then saved in a joblib file defined in constants.py
-"""
-
 
 class Visual:
+    """
+    Class to perform Visual Processing on the input video file. Motion and Blur detections
+    are used to calculate the rank. The ranks are per frame, so later the ranks are
+    normalized to sec
+
+    Attributes
+    ----------
+    motionRankPath : str
+        file to store the motion rank
+    blurRankPath : str
+        file to store the blur rank
+    blurThreshold : int
+        threshold to rank the blur feature
+    motionThreshold : int
+        threshold to rank the motion feature
+    fps : float
+        input video fps
+    frameCount : int
+        number of frames
+    motion : list
+        list of the ranks for the motion feature
+    blur : list
+        list of the ranks for the blur feature
+    cache : Cache
+        cache object to store the data
+    videoGetter : VideoGet
+        video reader object to read the video and save it in thread
+    """
+
     def __init__(self):
         self.motionRankPath = os.path.join(os.getcwd(), RANK_DIR, RANK_OUT_MOTION)
         self.blurRankPath = os.path.join(os.getcwd(), RANK_DIR, RANK_OUT_BLUR)
         self.blurThreshold = BLUR_THRESHOLD
+        self.motionThreshold = MOTION_THRESHOLD
         self.fps = None
         self.frameCount = None
         self.motion = None
@@ -35,8 +65,10 @@ class Visual:
         It highlights regions of an image containing rapid intensity changes, much like the Sobel and Scharr operators.
         And then calculates the variance (squared SD), then check if the variance satisfies the Threshold value/
 
-        :param image: input image array
-        :return: true / false blur (opposite : returns true(1) if image is not blur)
+        Parameters
+        ---------
+        image : array
+            frame from the video file
         """
         # (h, w) = image.shape
         # (cX, cY) = (int(w / 2.0), int(h / 2.0))
@@ -57,10 +89,15 @@ class Visual:
 
     def startProcessing(self, inputFile, display=False):
         """
-        file to run the motion detection and blur detection
-        :param display: display the video while processing
-        :param inputFile: input file path
-        :return: None
+        Function to run the processing on the Video file. Motion and Blur features are
+        detected and based on that ranking is set
+
+        Parameters
+        ----------
+        inputFile : str
+            input video file
+        display : bool
+            True to display the video while processing
         """
 
         if os.path.isfile(inputFile) is False:
@@ -93,8 +130,6 @@ class Visual:
         Log.i(f"Video format :: {cv2.CAP_PROP_FORMAT}")
         Log.i(f"Video four cc :: {cv2.CAP_PROP_FOURCC}")
 
-        threshold = float(MOTION_THRESHOLD)
-
         count = 0
         firstFrame = self.videoGetter.read()
         firstFrameProcessed = True
@@ -118,7 +153,7 @@ class Visual:
                 firstFrameProcessed = False
 
             frameDelta = cv2.absdiff(firstFrame, frame)
-            thresh = cv2.threshold(frameDelta, threshold, 255, cv2.THRESH_BINARY)[1]
+            thresh = cv2.threshold(frameDelta, self.motionThreshold, 255, cv2.THRESH_BINARY)[1]
 
             threshSum = thresh.sum()
             if threshSum > 0:
@@ -147,17 +182,18 @@ class Visual:
 
     def timedRankingNormalize(self):
         """
-        since ranking is added to frames, since frames are duration * fps
+        Since ranking is added to frames, since frames are duration * fps
         and audio frame system is different since frame are duration * rate
         so we need to generalize the ranking system
         sol: ranking sec of the video and audio, for than taking mean of the
         frames to generate rank for video.
-        since ranking is 0 or 1, the mean will be different and we get more versatile
+
+        Since ranking is 0 or 1, the mean will be different and we get more versatile
         results.
 
-        we will read both the list and slice the video to get 1 sec of frames(1 * fps) and get
+        We will read both the list and slice the video to get 1 sec of frames(1 * fps) and get
         mean/average as the rank for the 1 sec
-        :return: None
+
         """
         motionNormalize = []
         blurNormalize = []
@@ -176,19 +212,20 @@ class Visual:
 
     def setVideoFps(self):
         """
-        function to set the original video fps to cache
-        :return: None
+        Function to set the original video fps to cache
         """
         self.cache.writeDataToCache(CACHE_FPS, self.fps)
 
     def setVideoFrameCount(self):
         """
-        function to set the original video frame count to cache
-        :return: None
+        Function to set the original video frame count to cache
         """
         self.cache.writeDataToCache(CACHE_FRAME_COUNT, self.frameCount)
 
     def __del__(self):
+        """
+        Clean ups
+        """
         del self.cache
         if self.videoGetter is not None:
             del self.videoGetter

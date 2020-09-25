@@ -8,35 +8,62 @@ is linear O(n)
 
 
 class SmartQueue:
-    def __init__(self):
-        """
-        initializing the list for bigger video may
-        need to create a max size default
-        """
+    """
+    List to use as a Queue to store the frames from the video read by the thread
+    waiting to be processed. Using custom queue implementation to increase the computation
+    speed and to get around the locks of the default queue
+
+    Attributes
+    ----------
+    Q : list
+        list is used to create a queue
+    maxSize : int
+        size of the queue
+
+    Examples
+    --------
+    Similar to Queue functions are named same way
+    """
+    def __init__(self, maxSize=1024):
+        self.maxSize = maxSize
         self.Q = list()
 
     def put(self, data):
         """
-        insert data to the queue/ list
-        :param data: any object
-        :return: none
+        Insert data in the queue
+
+        Parameters
+        ----------
+        data : object
+            any object can be inserted
+
         """
         self.Q.append(data)
 
     def get(self, index=0):
         """
-        return the index 0 data from
-        queue, if remove was used the queue
-        becomes reversed
-        :param index:
-        :return:
+        Removes and returns the first inserted data
+
+        Parameters
+        ----------
+        index : optional, default=0
+            since the list works in LIFO manner so removing from index 0
+
+        Returns
+        -------
+        object
+            return item at index
         """
         return self.Q.pop(index)
 
     def empty(self):
         """
-        empty check
-        :return: bool
+        If the queue is empty
+
+        Returns
+        -------
+        bool
+            True if empty
         """
         if self.Q.__len__() == 0:
             return True
@@ -44,14 +71,25 @@ class SmartQueue:
 
     def qsize(self):
         """
-        :return: lengths of the size of queue
+        Check the size of the queue
+
+        Returns
+        -------
+        int
+            size of the queue
+
         """
         return self.Q.__len__()
 
     def full(self):
         """
-        currently no size is defined, so the queue
-        is always not full
-        :return: bool
+        If the queue is full
+
+        Returns
+        -------
+        bool
+            True if full
         """
+        if self.Q.__len__() == self.maxSize:
+            return True
         return False

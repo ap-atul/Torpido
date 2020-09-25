@@ -1,3 +1,9 @@
+"""
+This file contains function to separate out video and audio using ffmpeg.
+It consists of two functions to split and merge video and audio
+using ffmpeg.
+"""
+
 import gc
 import os
 
@@ -6,14 +12,30 @@ from lib.util.constants import OUT_VIDEO_FILE, IN_AUDIO_FILE, OUT_AUDIO_FILE
 from lib.util.ffmpegTools import split, merge
 from lib.util.logger import Log
 
-"""
-This file contains function to separate out video and audio using ffmpeg.
-It consists of two functions to split and merge video and audio
-using ffmpeg.
-"""
-
 
 class FFMPEG:
+    """
+    FFMPEG helper function to make use of the subprocess module to run command
+    to trim and split video files. The std out logs are parsed to generate a progress
+    bar to show the progress of the command that is being executed.
+
+    Attributes
+    ----------
+    inputFileName : str
+        input video file name
+    inputFilePath : str
+        input video file name
+    outputVideoFileName : str
+        output video file name
+    inputAudioFileName : str
+        original splitted audio file name
+    outputAudioFileName : str
+        de-noised audio file name
+    outputFilePath : str
+        same as the input file path
+    progressBar : tqdm
+        object of tqdm to display a progress bar
+    """
     def __init__(self):
         self.inputFileName = None
         self.inputFilePath = None
@@ -25,8 +47,12 @@ class FFMPEG:
 
     def getInputFileNamePath(self):
         """
-        return file name that was used for processing
-        :return: string, file path with name
+        Returns file name that was used for processing
+
+        Returns
+        --------
+        str
+            final name and path of the input video file
         """
         if self.inputFileName is not None:
             return os.path.join(self.inputFilePath, self.inputFileName)
@@ -34,9 +60,13 @@ class FFMPEG:
 
     def getOutputFileNamePath(self):
         """
-        returns output file name generated from input
+        Returns output file name generated from input
         file name
-        :return: string, file path with name
+
+        Returns
+        -------
+        str
+            output file name and path of the video file
         """
         if self.outputVideoFileName is not None:
             return os.path.join(self.outputFilePath, self.outputVideoFileName)
@@ -44,8 +74,12 @@ class FFMPEG:
 
     def getInputAudioFileNamePath(self):
         """
-        returns the output audio file name generated from input
-        :return: string, audio file name with path
+        Returns name and path of the input audio file that is split from the input video file
+
+        Returns
+        -------
+        str
+            input audio file name and path ready to de-noise
         """
         if self.inputAudioFileName is not None:
             return os.path.join(self.outputFilePath, self.inputAudioFileName)
@@ -53,8 +87,12 @@ class FFMPEG:
 
     def getOutputAudioFileNamePath(self):
         """
-        returns the output audio file name generated from input
-        :return: string, audio file name with path
+        Returns the output audio file name and path that is de-noised
+
+        Returns
+        -------
+        str
+            returns the output audio file
         """
         if self.outputAudioFileName is not None:
             return os.path.join(self.outputFilePath, self.outputAudioFileName)
@@ -62,12 +100,21 @@ class FFMPEG:
 
     def splitVideoAudio(self, inputFile):
         """
-        function to start the splitting video into audio and
-        video.
-        NOTE: there is no video created the input video is
-        processed.
-        :param inputFile: file path of input video to process
-        :return: boolean, true if success, false if exception/error
+        Function to split the input video file into audio file using FFmpeg. Progress bar is
+        updated as the command is run
+
+        Note : No new video file is created, only audio file is created
+
+        Parameters
+        ----------
+        inputFile : str
+            input video file
+
+        Returns
+        -------
+        bool
+            returns True if success else Error
+
         """
         if os.path.isfile(inputFile) is False:
             Log.e("File does not exists")
@@ -100,10 +147,19 @@ class FFMPEG:
 
     def mergeAudioVideo(self, timestamps):
         """
-        function to call the merging on video and audio streams
-        and create an output file with generated name
-        :param timestamps: list of timestamps containing list (start and end)
-        :return: boolean, true for success
+        Function to merge the processed files using FFmpeg. The timestamps are used the trim
+        the original video file and the audio stream is replaced with the de-noised audio
+        file created by `Auditory`
+
+        Parameters
+        ----------
+        timestamps : list
+            list of start and end timestamps
+
+        Returns
+        -------
+        bool
+            True id success else error is raised
         """
         if self.inputFileName is None or self.outputAudioFileName is None:
             Log.e("Files not found for merging")
@@ -130,8 +186,8 @@ class FFMPEG:
 
     def cleanUp(self):
         """
-        delete the audio files generated
-        :return: None
+        Deleted the audio files created while audio processing.
+        Minor clean ups.
         """
         if os.path.isfile(os.path.join(self.outputFilePath, self.inputAudioFileName)):
             os.unlink(os.path.join(self.outputFilePath, self.inputAudioFileName))

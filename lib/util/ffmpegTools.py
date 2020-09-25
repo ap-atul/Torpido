@@ -1,3 +1,8 @@
+"""
+Utility functions to run subprocess with generated FFmpeg queries.
+Function to build the commands live here.
+"""
+
 import subprocess
 
 from lib.util.logger import Log
@@ -5,22 +10,33 @@ from lib.util.logger import Log
 
 def buildSplitCommand(inputFile, outputAudioFile):
     """
-    create a list for each bit of the command line to run
+    Creates a list for each bit of the command line to run
     since it is a list the command line is secure and can
     run with file names that are not formatted correctly.
     or doesn't need any explicit formatting.
-    :param inputFile: string, input video file
-    :param outputAudioFile: string, name of output audio file
-    :return: list, command line
 
-    -y : yes to overwrite if name exists, cases when processing
-        is done on same files again, even after cleanup
+    Parameters
+    ----------
+    inputFile : str
+        input video file name and path
+    outputAudioFile : str
+        output audio file name and path
 
-    -i : input file, stream of the input video
+    Returns
+    ---------
+    _CMD
+        command line to pass to the subprocess
 
-    can add codec options later on (may be)
+    Examples
+    ----------
+    The command created spits the video file into an audio file, The file paths
+    are kept same. The command goes like this
 
-    ex: ffmpeg -i video.mkv audio.wav
+    `ffmpeg -y -i input.mkv output.wav`
+
+        '-y' : FFmpeg option for 'yes override'. Override the output file it exists
+        '-i' : FFmpeg option for 'input file'. Input file can be multiple
+
     """
     return [
         'ffmpeg',
@@ -33,13 +49,22 @@ def buildSplitCommand(inputFile, outputAudioFile):
 
 def split(inputFile, outputAudioFile):
     """
-    split the input video file into audio. Using the same input file
-    for processing, since copying the video stream also does the audio
+    Splits the input video file into audio for Audio Processing.
 
-    :param inputFile: string, input video file name path
-    :param outputAudioFile: string, output audio path name
-    :return: yields continuous output from command line, raises
-    :exception: ffmpeg error
+    Helper function to run the generated command line with subprocess the stdout log is yielded to generate
+    the progress bar. Look into `io` for details
+
+    Parameters
+    ----------
+    inputFile : str
+        name of the input video file
+    outputAudioFile : str
+        name of the output audio file
+
+    Yields
+    -------
+    str
+        yields std out logs in string
     """
     command = buildSplitCommand(inputFile, outputAudioFile)
     run = subprocess.Popen(args=command,
@@ -62,13 +87,27 @@ def buildMergeCommand(videoFile, audioFile, outputFile, timestamps):
     to trim some portion depend on the length of the timestamps since that
     will define the number of the trims
 
-    :param videoFile: str, original video
-    :param audioFile: str, de noised audio
-    :param outputFile: str, output video to generate
-    :param timestamps: lol, start and end (in secs)
-    :return: str , command build (list didn't work so string)
+    Parameters
+    ----------
+    videoFile : str
+        original input video file
+    audioFile : str
+        processed audio file (de-noised)
+    outputFile : str
+        final output video file edited by Torpido
+    timestamps : iterable
+        start and end timestamps of the video clips to trim
 
-    Example command line: (clipping two portions)
+    Returns
+    -------
+    str
+        generated string from the complex filter built
+
+    Examples
+    --------
+    The command line has following structure
+
+    `
     ffmpeg -y -i input.mkv -i input.wav -filter_complex
     "[0:v]split=2[vc1][vc2];
     [vc1]trim=start=304:duration=10.567,setpts=PTS-STARTPTS[v1];
@@ -78,6 +117,20 @@ def buildMergeCommand(videoFile, audioFile, outputFile, timestamps):
     [ac2]atrim=start=304:duration=10,asetpts=PTS-STARTPTS[a2];
     [v1][a1][v2][a2]concat=n=2:v=1:a=1[video][audio]"
     -map "[video]" -map "[audio]" output_new.mkv
+    `
+
+        '-y' :              FFmpeg option for 'yes override'. Override the output file it exists
+        '-i' :              FFmpeg option for 'input file'. Input file to the command can be multiple
+        '-filter_complex' : create a complex filter
+        'split' :           split option of filter to split the video stream into n ; here n=2
+        'trim' :            trim option of filter to trim the video stream with
+                            start= and duration=, also setpts:presentation points
+        'asplit' :          audio stream split
+        'atrim' :           audio stream trim
+        'concat' :          concatenate input stream to output v=1:a=1 one video and one audio streams
+        'map' :             map the labels of stream to the output file
+        '[]' :              labels for each stream
+
     """
     filterString = 'ffmpeg' + \
                    ' -y' + \
@@ -126,14 +179,24 @@ def buildMergeCommand(videoFile, audioFile, outputFile, timestamps):
 
 def merge(videoFile, audioFile, outputFile, timestamps):
     """
-    this function is much more complicated than current signature
-    we need to make the implementation later on, for now this is it
-    :param timestamps: ranks -> time stamps converts
-    :param outputFile: string, output video file
-    :param videoFile: string, video stream
-    :param audioFile: string, audio  stream (de-noised)
-    :return yields a value but looked for exceptions only
-    :exception ffmpeg error
+    Generate the command for complex filter according to the timestamps and encode the output video. Merge the
+    input video file and replace the audio stream with the de-noised audio stream
+
+    Parameters
+    ----------
+    videoFile : str
+        input video file
+    audioFile : str
+        de-noised audio file
+    outputFile : str
+        final output video file
+    timestamps : list
+        list of clip time stamps with start and end times
+
+    Yields
+    -------
+    str
+        continous std out logs
     """
     # print(f"[TIMESTAMPS] time stamps : {timestamps}")
     command = buildMergeCommand(videoFile, audioFile, outputFile, timestamps)

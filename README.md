@@ -2,6 +2,7 @@
 Improved version of Video Editing Automation
 Goal : To automate the video editing process
 
+* For more details documentation refer ```docs/```
 ---
 
 ## Project Structure

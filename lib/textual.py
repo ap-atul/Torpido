@@ -1,3 +1,12 @@
+"""
+This file is for calculating the textual ranking for the video
+,the textual ranking is done by detecting text in the video.
+Text detection is achieved by using EAST Text Detection model
+of OpenCV, this model can detect text and return confidences and
+geometry for the sections that contain the text.
+If mixed with text extraction it can give text from the image.
+"""
+
 import os
 import time
 
@@ -9,22 +18,39 @@ from lib.util.constants import *
 from lib.util.logger import Log
 from lib.util.videoReader import VideoGet
 
-"""
-This file is for calculating the textual ranking for the video
-,the textual ranking is done by detecting text in the video.
-Text detection is achieved by using EAST Text Detection model
-of OpenCV, this model can detect text and return confidences and
-geometry for the sections that contain the text.
-If mixed with text extraction it can give text from the image.
-"""
-
 
 class Textual:
+    """
+    Class to perform Textual analysis on the input video file. This class creates its own
+    video reader and handles the frame independent of the `Visual`. The EAST model of the
+    OpenCV is used to detect text in the video.
+
+    Since, the model is very slow depend-ing on the system its running. So some of the frames
+    are skipped `TEXT_SKIP_FRAMES` determines the no of frames to skip
+
+    Attributes
+    ----------
+    fps : float
+        video fps
+    frameCount : int
+        number of frames in the video
+    textRanks : list
+        list of the ranks
+    videoGetter : VideoGet
+        object of the video get to read the video through thread
+    minConfidence : int
+        minimum confidence to determine if the video contains text
+    WIDTH : int, default=320
+        the east model requires the frame to be size of multiple of 32x32
+    HEIGHT : int, default=320
+        height of the frame
+    skipFrames : int
+        no of frames to skip
+    textRankPath : str
+        constants file defines where to store the ranks
+    """
+
     def __init__(self):
-        """
-        initializing the constants and model
-        loading the model in the memory
-        """
         self.fps = None
         self.frameCount = None
         self.textRanks = None
@@ -45,12 +71,15 @@ class Textual:
 
     def startProcessing(self, inputFile, display=False):
         """
-        processing the input video file, performing text detection only on the
-        frames that satisfies the skipped, then getting the confidence of all
-        sections and taking the mean and then saving the ranks for the video.
-        :param inputFile: string, input video file
-        :param display: bool, true to display the video while processing
-        :return: None
+        Function to perform the Textual Processing on the input video file.
+        The video can be displayed as the processing is going on.
+
+        Parameters
+        ----------
+        inputFile : str
+            input video file
+        display : bool
+            True to display the video while processing
         """
 
         if os.path.isfile(inputFile) is False:
@@ -130,9 +159,10 @@ class Textual:
 
     def timedRankingNormalize(self):
         """
-        since ranking is added to frames, since frames are duration * fps
+        Since ranking is added to frames, since frames are duration * fps
         and audio frame system is different since frame are duration * rate
         so we need to generalize the ranking system
+
         sol: ranking sec of the video and audio, for than taking mean of the
         frames to generate rank for video.
         since ranking is 0 or 1, the mean will be different and we get more versatile
@@ -140,7 +170,6 @@ class Textual:
 
         we will read the list and slice the video to get 1 sec of frames and get
         mean/average as the rank for the 1 sec
-        :return: None
         """
         textNormalize = []
         for i in range(0, int(self.frameCount), int(self.fps)):
@@ -155,6 +184,9 @@ class Textual:
         Log.i("Textual ranking saved .............")
 
     def __del__(self):
+        """
+        clean ups
+        """
         del self.net
         del self.layerNames
         del self.videoGetter

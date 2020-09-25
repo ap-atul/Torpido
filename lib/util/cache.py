@@ -1,3 +1,9 @@
+"""
+A simple cache storage helper to store minimal amount of data
+in the dictionary, if data exists it will return the val or
+None
+"""
+
 import os
 
 from joblib import dump, load
@@ -5,28 +11,34 @@ from joblib import dump, load
 from lib.util.constants import *
 from lib.util.logger import Log
 
-"""
-A simple cache storage helper to store minimal amount of data
-in the dictionary, if data exists it will return the val or
-None
-"""
-
 
 class Cache:
+    """
+    Stores a dictionary asa file using joblib. Key-value pair of any object type can be saved.
+
+    Attributes
+    ----------
+    fileName : str
+        file path and name for the cache file to store the data
+    """
+
     def __init__(self):
-        """
-        create the folder path for the cache to store
-        """
         if os.path.isdir(os.path.join(os.getcwd(), CACHE_DIR)) is False:
             os.mkdir(os.path.join(os.getcwd(), CACHE_DIR))
         self.fileName = os.path.join(os.getcwd(), CACHE_DIR, CACHE_NAME)
 
     def writeDataToCache(self, key, value):
         """
-        write to cache based on the key and value
-        :param key: the key to store
-        :param value: the mapped value
-        :return: None
+        Write the kay-value in the Cache file. If the file exists it would append the data to the dict object. Once data
+        is written Log is printed using `Log` class
+
+        Parameters
+        ----------
+        key : str
+            Key value for the object to store
+        value : object
+            Value to store any object can be store
+
         """
         if os.path.isfile(self.fileName):
             try:
@@ -45,10 +57,18 @@ class Cache:
 
     def readDataFromCache(self, key):
         """
-        check if the data is in the cache,
-        if not None is returned
-        :param key: key to get from cache
-        :return: value for the key
+        Read value for the key in cache if cache does not exists or cache file itself is not present the Log is
+        printed stating that Cache does not exists
+
+        Parameters
+        ----------
+        key : str
+            Key of the data to look for
+
+        Returns
+        -------
+        object
+            if exists cache else None
         """
         if os.path.isfile(self.fileName):
             data = load(self.fileName)

@@ -1,12 +1,12 @@
-from tqdm import tqdm
-
-from lib.progress.stdExtractor import StdExtractor
-
 """
-This file defines the progress base from tqdm 
+This file defines the progress base from tqdm
 and updates it according to the FFmpeg  logs based on
 the time and duration in the logs
 """
+
+from tqdm import tqdm
+
+from lib.progress.stdExtractor import StdExtractor
 
 
 class Progress:
@@ -58,7 +58,7 @@ class Progress:
     @staticmethod
     def getCurrentProgress(duration, time):
         """
-        Caluclates the progress percentage from duration and time object of the Time class
+        Calculates the progress percentage from duration and time object of the Time class
 
         Parameters
         ----------
@@ -69,7 +69,8 @@ class Progress:
 
         Returns
         -------
-
+        float
+            Time in secs
         """
         durationInSec = duration.getTimeInSec()
         if durationInSec == 0:

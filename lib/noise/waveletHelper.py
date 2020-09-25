@@ -1,3 +1,7 @@
+"""
+Extract wavelet coefficients from the signal
+"""
+
 import pywt
 
 

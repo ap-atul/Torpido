@@ -1,9 +1,9 @@
-import re
-
 """
-This file extracts the time and duration from the FFmpeg 
+This file extracts the time and duration from the FFmpeg
 stdout logs on command execution
 """
+
+import re
 
 
 class Time:
@@ -20,6 +20,7 @@ class Time:
     second : int
         second in time series
     """
+
     def __init__(self):
         self.hour = None
         self.minute = None
@@ -57,6 +58,7 @@ class StdExtractor:
     time : Time
         Time object of current output clip
     """
+
     def __init__(self):
         self.duration = None
         self.time = None

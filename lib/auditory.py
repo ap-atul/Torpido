@@ -1,3 +1,8 @@
+"""
+Audio de noising process: this class will read the audio file and using
+wavelet transforms a threshold will be added to each window with certain level
+"""
+
 import gc
 import os
 
@@ -11,11 +16,6 @@ from lib.util.cache import Cache
 from lib.util.constants import *
 from lib.util.logger import Log
 
-"""
-Audio de noising process: this class will read the audio file and using
-wavelet transforms a threshold will be added to each window with certain level
-"""
-
 
 def mad(array):
     """
@@ -23,13 +23,40 @@ def mad(array):
     Indices variability of the sample.
     https://en.wikipedia.org/wiki/Median_absolute_deviation
 
-    :param array : input data from signal
+    Parameters
+    ----------
+    array : numpy array
+        input data from signal
     """
     array = np.ma.array(array).compressed()
     return np.median(np.abs(array - np.median(array)))
 
 
 class Auditory:
+    """
+    Audio de noising is done using Wavelet Transform on the input audio signal. The functions read
+    the input audio signal in small portions and append the de-noised signal to the output audio
+    file that is later merged with the input video file
+
+    Attributes
+    ----------
+    fileName : str
+        input audio file
+    rate : int
+        sample rate of the audio signal in frequency
+    plot : bool
+        plot the signal
+    info : object
+        sound file object having the info of the audio file
+    energy : list
+        list of the ranks for the audio signal
+    audioRankPath : str
+        directory to store the rank of the audio
+    silenceThreshold : int
+        threshold value to determine the rank
+    cache : Cache
+        object of the cache to store the audio file info
+    """
     def __init__(self):
         self.fileName = None
         self.rate = None
@@ -43,12 +70,25 @@ class Auditory:
 
     def startProcessing(self, inputFile, outputFile, plot=False):
         """
-        this function calculates the de noised signal based on the wavelets
-        default wavelet is = db4, mode = per and thresh method = soft
-        :param outputFile: (str) de noised file name
-        :param inputFile: (str) name of the file
-        :param plot: (bool) to plot the signal
-        :return: None
+        Calculates the de noised signal based on the wavelets
+        default wavelet is = db4, mode = per and thresh method = soft.
+
+        The input audio is read in small portions de-noised and appended to the
+        audio file in same manner. Also it supports multiple channels and the
+        size of the input audio file and output audio files are same so no
+        data loss.
+
+        Prints some debug and info Logs
+
+        Parameters
+        ----------
+        inputFile : str
+            input audio file
+        outputFile : str
+            output audio file
+        plot : bool
+            True to plot the audio signal
+
         """
         if os.path.isfile(inputFile) is False:
             Log.e(f"File {inputFile} does not exists")
@@ -93,8 +133,16 @@ class Auditory:
         satisfies some threshold the ranking can be affected and audio portion
         can be ranked
         RMS -> square root of mean of squared data
-        :param block: array, input signal
-        :return: float, energy in dB
+
+        Parameters
+        ----------
+        block : array
+            input signal block
+
+        Returns
+        -------
+        int
+            rank for the portion which is then set for all the portion of data
         """
         if np.sqrt(np.mean(block ** 2)) > self.silenceThreshold:
             return RANK_AUDIO
@@ -107,17 +155,15 @@ class Auditory:
         """
         plotting the cleaned and original signals
         TODO: Plotting the audio signal efficiently
-        :return:
         """
         pass
 
     def getNoiseFromAudio(self):
         """
-        this method is not completely related, all it does it
-        using wavelet transform remove the noise signals and
-        save to a file name: noise.wav
-        Note :: It is very heavy on the memory
-        :return: None
+        Parsed the input audio signal all at once and generates an
+        noise profile or the signal and saved to the file
+
+        Writes the noise signal to the file names 'noise.wav'
         """
         data, rate = soundfile.read(self.fileName)
         filePath = os.path.dirname(self.fileName)
@@ -127,5 +173,8 @@ class Auditory:
         Log.i("Noise file generated.")
 
     def __del__(self):
+        """
+        clean up
+        """
         del self.cache
         Log.d("Cleaning up.")
