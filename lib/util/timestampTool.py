@@ -112,7 +112,7 @@ def getTimestamps():
 
     Returns
     -------
-    list
+    list of list
         timestamps list containing start and emd timestamps
 
     """

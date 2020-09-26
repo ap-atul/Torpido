@@ -4,9 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
 <meta name="generator" content="pdoc 0.9.1" />
-<title>lib.util.image API documentation</title>
-<meta name="description" content="Utility functions to resize the frame from the video or normal image into specified width the increase the
-processing speed on the operations on the …" />
+<title>lib.util API documentation</title>
+<meta name="description" content="" />
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/sanitize.min.css" integrity="sha256-PK9q560IAAa6WVRRh76LtCaI8pjTJ2z11v0miyNNjrs=" crossorigin>
 <link rel="preload stylesheet" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/10up-sanitize.css/11.0.1/typography.min.css" integrity="sha256-7l/o7C8jubJiy74VsKTidCy1yBkRtiUGbVkYBylBqUg=" crossorigin>
 <link rel="stylesheet preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/github.min.css" crossorigin>
@@ -20,161 +19,70 @@ processing speed on the operations on the …" />
 <main>
 <article id="content">
 <header>
-<h1 class="title">Module <code>lib.util.image</code></h1>
+<h1 class="title">Namespace <code>lib.util</code></h1>
 </header>
 <section id="section-intro">
-<p>Utility functions to resize the frame from the video or normal image into specified width the increase the
-processing speed on the operations on the frames.</p>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">&#34;&#34;&#34;
-Utility functions to resize the frame from the video or normal image into specified width the increase the
-processing speed on the operations on the frames.
-&#34;&#34;&#34;
-
-import cv2
-
-
-def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
-    &#34;&#34;&#34;
-    Resize the image according the width with open cv&#39;s Interpolator. Height is automatically
-    calculated based on the ratio of the original width of the frame
-
-    Parameters
-    ----------
-    image : numpy array
-        input image original from input video
-    width : int
-        width of the output frame
-    height : int , optional
-        the height is automatically calculated based on the ratios
-    inter : int
-        Interpolator to use
-
-    Returns
-    -------
-    resized : numpy array
-        output resized image
-    &#34;&#34;&#34;
-    # initialize the dimensions of the image to be resized and
-    # grab the image size
-    dim = None
-    (h, w) = image.shape[:2]
-
-    # if both the width and height are None, then return the
-    # original image
-    if width is None and height is None:
-        return image
-
-    # check to see if the width is None
-    if width is None:
-        # calculate the ratio of the height and construct the
-        # dimensions
-        r = height / float(h)
-        dim = (int(w * r), height)
-
-    # otherwise, the height is None
-    else:
-        # calculate the ratio of the width and construct the
-        # dimensions
-        r = width / float(w)
-        dim = (width, int(h * r))
-
-    # resize the image
-    resized = cv2.resize(image, dim, interpolation=inter)
-
-    # return the resized image
-    return resized</code></pre>
-</details>
 </section>
 <section>
-</section>
-<section>
-</section>
-<section>
-<h2 class="section-title" id="header-functions">Functions</h2>
+<h2 class="section-title" id="header-submodules">Sub-modules</h2>
 <dl>
-<dt id="lib.util.image.resize"><code class="name flex">
-<span>def <span class="ident">resize</span></span>(<span>image, width=None, height=None, inter=3)</span>
-</code></dt>
+<dt><code class="name"><a title="lib.util.cache" href="cache.html">lib.util.cache</a></code></dt>
 <dd>
-<div class="desc"><p>Resize the image according the width with open cv's Interpolator. Height is automatically
-calculated based on the ratio of the original width of the frame</p>
-<h2 id="parameters">Parameters</h2>
-<dl>
-<dt><strong><code>image</code></strong> :&ensp;<code>numpy array</code></dt>
-<dd>input image original from input video</dd>
-<dt><strong><code>width</code></strong> :&ensp;<code>int</code></dt>
-<dd>width of the output frame</dd>
-<dt><strong><code>height</code></strong> :&ensp;<code>int</code> , optional</dt>
-<dd>the height is automatically calculated based on the ratios</dd>
-<dt><strong><code>inter</code></strong> :&ensp;<code>int</code></dt>
-<dd>Interpolator to use</dd>
-</dl>
-<h2 id="returns">Returns</h2>
-<dl>
-<dt><strong><code>resized</code></strong> :&ensp;<code>numpy array</code></dt>
-<dd>output resized image</dd>
-</dl></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
-    &#34;&#34;&#34;
-    Resize the image according the width with open cv&#39;s Interpolator. Height is automatically
-    calculated based on the ratio of the original width of the frame
-
-    Parameters
-    ----------
-    image : numpy array
-        input image original from input video
-    width : int
-        width of the output frame
-    height : int , optional
-        the height is automatically calculated based on the ratios
-    inter : int
-        Interpolator to use
-
-    Returns
-    -------
-    resized : numpy array
-        output resized image
-    &#34;&#34;&#34;
-    # initialize the dimensions of the image to be resized and
-    # grab the image size
-    dim = None
-    (h, w) = image.shape[:2]
-
-    # if both the width and height are None, then return the
-    # original image
-    if width is None and height is None:
-        return image
-
-    # check to see if the width is None
-    if width is None:
-        # calculate the ratio of the height and construct the
-        # dimensions
-        r = height / float(h)
-        dim = (int(w * r), height)
-
-    # otherwise, the height is None
-    else:
-        # calculate the ratio of the width and construct the
-        # dimensions
-        r = width / float(w)
-        dim = (width, int(h * r))
-
-    # resize the image
-    resized = cv2.resize(image, dim, interpolation=inter)
-
-    # return the resized image
-    return resized</code></pre>
-</details>
+<div class="desc"><p>A simple cache storage helper to store minimal amount of data
+in the dictionary, if data exists it will return the val or
+None</p></div>
+</dd>
+<dt><code class="name"><a title="lib.util.constants" href="constants.html">lib.util.constants</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="lib.util.ffmpegTools" href="ffmpegTools.html">lib.util.ffmpegTools</a></code></dt>
+<dd>
+<div class="desc"><p>Utility functions to run subprocess with generated FFmpeg queries.
+Function to build the commands live here.</p></div>
+</dd>
+<dt><code class="name"><a title="lib.util.image" href="image.html">lib.util.image</a></code></dt>
+<dd>
+<div class="desc"><p>Utility functions to resize the frame from the video or normal image into specified width the increase the
+processing speed on the operations on the …</p></div>
+</dd>
+<dt><code class="name"><a title="lib.util.logger" href="logger.html">lib.util.logger</a></code></dt>
+<dd>
+<div class="desc"><p>Main logger class to print to console based on the modes selected or passed. Utility modes support ASCII color formats …</p></div>
+</dd>
+<dt><code class="name"><a title="lib.util.smartQueue" href="smartQueue.html">lib.util.smartQueue</a></code></dt>
+<dd>
+<div class="desc"><p>Smart queue: A simple queue to store the frames read from the
+VideoCapture open cv'
+This one has no blocking writes and reads which makes it more
+…</p></div>
+</dd>
+<dt><code class="name"><a title="lib.util.timestampTool" href="timestampTool.html">lib.util.timestampTool</a></code></dt>
+<dd>
+<div class="desc"><p>This file will read the ranking for each section, parse it and
+create timestamps in seconds that can be used to clip the video
+using ffmpeg …</p></div>
+</dd>
+<dt><code class="name"><a title="lib.util.validate" href="validate.html">lib.util.validate</a></code></dt>
+<dd>
+<div class="desc"><p>Utility function to check if the input file belongs to one of the supported
+formats and can be processed readily if not we will raise errors</p></div>
+</dd>
+<dt><code class="name"><a title="lib.util.videoReader" href="videoReader.html">lib.util.videoReader</a></code></dt>
+<dd>
+<div class="desc"></div>
+</dd>
+<dt><code class="name"><a title="lib.util.watcher" href="watcher.html">lib.util.watcher</a></code></dt>
+<dd>
+<div class="desc"><p>Module to watch the CPU and RAM usage as a part of showing the
+current usage by the product.
+Not using any modules&hellip; But running some commands on the …</p></div>
 </dd>
 </dl>
+</section>
+<section>
+</section>
+<section>
 </section>
 <section>
 </section>
@@ -187,12 +95,21 @@ calculated based on the ratio of the original width of the frame</p>
 <ul id="index">
 <li><h3>Super-module</h3>
 <ul>
-<li><code><a title="lib.util" href="index.html">lib.util</a></code></li>
+<li><code><a title="lib" href="../index.html">lib</a></code></li>
 </ul>
 </li>
-<li><h3><a href="#header-functions">Functions</a></h3>
-<ul class="">
-<li><code><a title="lib.util.image.resize" href="#lib.util.image.resize">resize</a></code></li>
+<li><h3><a href="#header-submodules">Sub-modules</a></h3>
+<ul>
+<li><code><a title="lib.util.cache" href="cache.html">lib.util.cache</a></code></li>
+<li><code><a title="lib.util.constants" href="constants.html">lib.util.constants</a></code></li>
+<li><code><a title="lib.util.ffmpegTools" href="ffmpegTools.html">lib.util.ffmpegTools</a></code></li>
+<li><code><a title="lib.util.image" href="image.html">lib.util.image</a></code></li>
+<li><code><a title="lib.util.logger" href="logger.html">lib.util.logger</a></code></li>
+<li><code><a title="lib.util.smartQueue" href="smartQueue.html">lib.util.smartQueue</a></code></li>
+<li><code><a title="lib.util.timestampTool" href="timestampTool.html">lib.util.timestampTool</a></code></li>
+<li><code><a title="lib.util.validate" href="validate.html">lib.util.validate</a></code></li>
+<li><code><a title="lib.util.videoReader" href="videoReader.html">lib.util.videoReader</a></code></li>
+<li><code><a title="lib.util.watcher" href="watcher.html">lib.util.watcher</a></code></li>
 </ul>
 </li>
 </ul>

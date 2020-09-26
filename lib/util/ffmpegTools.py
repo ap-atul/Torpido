@@ -182,6 +182,14 @@ def merge(videoFile, audioFile, outputFile, timestamps):
     Generate the command for complex filter according to the timestamps and encode the output video. Merge the
     input video file and replace the audio stream with the de-noised audio stream
 
+    Notes
+    ------
+    For using `string` as a command line it is very necessary to add shell=True in the Popen
+    function argument or it won't work
+
+    Use `stderr=subprocess.STDOUT` to stop printing the command output even though nothing
+    is printing
+
     Parameters
     ----------
     videoFile : str

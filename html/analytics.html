@@ -82,7 +82,8 @@ class Analytics:
 
         return clf
 
-    def predict(self, duration):
+    @staticmethod
+    def predict(duration):
         # &#39;duration&#39;, &#39;comments&#39;, &#39;likes&#39;, &#39;dislikes&#39;
         X = np.array([[duration, 100, 10000, 100]])
         clf = load(os.path.join(MODEL_DIR, MODEL_NAME))
@@ -152,12 +153,33 @@ class Analytics:
 
         return clf
 
-    def predict(self, duration):
+    @staticmethod
+    def predict(duration):
         # &#39;duration&#39;, &#39;comments&#39;, &#39;likes&#39;, &#39;dislikes&#39;
         X = np.array([[duration, 100, 10000, 100]])
         clf = load(os.path.join(MODEL_DIR, MODEL_NAME))
         return clf.predict(X)</code></pre>
 </details>
+<h3>Static methods</h3>
+<dl>
+<dt id="lib.analytics.Analytics.predict"><code class="name flex">
+<span>def <span class="ident">predict</span></span>(<span>duration)</span>
+</code></dt>
+<dd>
+<div class="desc"></div>
+<details class="source">
+<summary>
+<span>Expand source code</span>
+</summary>
+<pre><code class="python">@staticmethod
+def predict(duration):
+    # &#39;duration&#39;, &#39;comments&#39;, &#39;likes&#39;, &#39;dislikes&#39;
+    X = np.array([[duration, 100, 10000, 100]])
+    clf = load(os.path.join(MODEL_DIR, MODEL_NAME))
+    return clf.predict(X)</code></pre>
+</details>
+</dd>
+</dl>
 <h3>Methods</h3>
 <dl>
 <dt id="lib.analytics.Analytics.pre_process"><code class="name flex">
@@ -181,22 +203,6 @@ class Analytics:
 
     ndf.to_csv(self.outputCSV, sep=&#39;,&#39;, index=False, header=names)
     print(&#39;[INFO] File processed......&#39;)</code></pre>
-</details>
-</dd>
-<dt id="lib.analytics.Analytics.predict"><code class="name flex">
-<span>def <span class="ident">predict</span></span>(<span>self, duration)</span>
-</code></dt>
-<dd>
-<div class="desc"></div>
-<details class="source">
-<summary>
-<span>Expand source code</span>
-</summary>
-<pre><code class="python">def predict(self, duration):
-    # &#39;duration&#39;, &#39;comments&#39;, &#39;likes&#39;, &#39;dislikes&#39;
-    X = np.array([[duration, 100, 10000, 100]])
-    clf = load(os.path.join(MODEL_DIR, MODEL_NAME))
-    return clf.predict(X)</code></pre>
 </details>
 </dd>
 <dt id="lib.analytics.Analytics.train"><code class="name flex">

@@ -90,20 +90,20 @@ class Node:
 
 
 class LinkedList:
+    &#34;&#34;&#34;
+    Linked list custom implementation to avoid lock and priorities
+
+    Attributes
+    ----------
+    first : object, default=None
+        initial object
+    last : object, default=None
+        tail object
+    __list : list
+        all nodes
+    &#34;&#34;&#34;
 
     def __init__(self):
-        &#34;&#34;&#34;
-        Linked list custom implementation to avoid lock and priorities
-
-        Attributes
-        ----------
-        first : object, default=None
-            initial object
-        last : object, default=None
-            tail object
-        _list : list
-            all nodes
-        &#34;&#34;&#34;
         self.first = None  # head
         self.last = None  # tail
         self.__list = None
@@ -167,7 +167,7 @@ class LinkedList:
 <dd>initial object</dd>
 <dt><strong><code>last</code></strong> :&ensp;<code>object</code>, default=<code>None</code></dt>
 <dd>tail object</dd>
-<dt><strong><code>_list</code></strong> :&ensp;<code>list</code></dt>
+<dt><strong><code>__list</code></strong> :&ensp;<code>list</code></dt>
 <dd>all nodes</dd>
 </dl></div>
 <details class="source">
@@ -175,20 +175,20 @@ class LinkedList:
 <span>Expand source code</span>
 </summary>
 <pre><code class="python">class LinkedList:
+    &#34;&#34;&#34;
+    Linked list custom implementation to avoid lock and priorities
+
+    Attributes
+    ----------
+    first : object, default=None
+        initial object
+    last : object, default=None
+        tail object
+    __list : list
+        all nodes
+    &#34;&#34;&#34;
 
     def __init__(self):
-        &#34;&#34;&#34;
-        Linked list custom implementation to avoid lock and priorities
-
-        Attributes
-        ----------
-        first : object, default=None
-            initial object
-        last : object, default=None
-            tail object
-        _list : list
-            all nodes
-        &#34;&#34;&#34;
         self.first = None  # head
         self.last = None  # tail
         self.__list = None

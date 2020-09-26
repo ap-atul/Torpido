@@ -59,20 +59,20 @@ class Node:
 
 
 class LinkedList:
+    """
+    Linked list custom implementation to avoid lock and priorities
+
+    Attributes
+    ----------
+    first : object, default=None
+        initial object
+    last : object, default=None
+        tail object
+    __list : list
+        all nodes
+    """
 
     def __init__(self):
-        """
-        Linked list custom implementation to avoid lock and priorities
-
-        Attributes
-        ----------
-        first : object, default=None
-            initial object
-        last : object, default=None
-            tail object
-        _list : list
-            all nodes
-        """
         self.first = None  # head
         self.last = None  # tail
         self.__list = None

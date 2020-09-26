@@ -29,7 +29,6 @@ def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     """
     # initialize the dimensions of the image to be resized and
     # grab the image size
-    dim = None
     (h, w) = image.shape[:2]
 
     # if both the width and height are None, then return the

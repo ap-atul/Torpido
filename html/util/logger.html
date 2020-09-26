@@ -41,7 +41,7 @@ class Log:
 
     Attributes
     ----------
-    modes : dict
+    Log.modes : dict
     storing mode string and color
 
     {&#34;mode&#34; : &#34;color&#34;}
@@ -66,7 +66,7 @@ class Log:
 
         Parameters
         ----------
-        message : str
+        message : any
         input message to print
         mode : str
         mode to print. Available options:
@@ -150,11 +150,8 @@ class Log:
 <dd>
 <div class="desc"><p>Contains four variety of function each with different color</p>
 <h2 id="attributes">Attributes</h2>
-<dl>
-<dt><strong><code>modes</code></strong> :&ensp;<code>dict</code></dt>
-<dd>&nbsp;</dd>
-</dl>
-<p>storing mode string and color</p>
+<p>Log.modes : dict
+storing mode string and color</p>
 <p>{"mode" : "color"}</p>
 <h2 id="examples">Examples</h2>
 <pre><code class="python-repl">&gt;&gt;&gt; Log.e(&quot;The input file does not exists&quot;)
@@ -172,7 +169,7 @@ class Log:
 
     Attributes
     ----------
-    modes : dict
+    Log.modes : dict
     storing mode string and color
 
     {&#34;mode&#34; : &#34;color&#34;}
@@ -197,7 +194,7 @@ class Log:
 
         Parameters
         ----------
-        message : str
+        message : any
         input message to print
         mode : str
         mode to print. Available options:
@@ -377,7 +374,7 @@ def i(message):
 <div class="desc"><p>Logs input message with color defined by the mode and a tag of that mode.</p>
 <h2 id="parameters">Parameters</h2>
 <dl>
-<dt><strong><code>message</code></strong> :&ensp;<code>str</code></dt>
+<dt><strong><code>message</code></strong> :&ensp;<code>any</code></dt>
 <dd>&nbsp;</dd>
 <dt>input message to print</dt>
 <dt><strong><code>mode</code></strong> :&ensp;<code>str</code></dt>
@@ -399,7 +396,7 @@ def log(message, mode=&#39;INFO&#39;):
 
     Parameters
     ----------
-    message : str
+    message : any
     input message to print
     mode : str
     mode to print. Available options:

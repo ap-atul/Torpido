@@ -63,7 +63,8 @@ class NoiseProfiler:
         self.signalWindows = None
         self.noiseWavelets = None
 
-    def __getNodesWindowData(self, nodes):
+    @staticmethod
+    def __getNodesWindowData(nodes):
         """
         window data based on the nodes
 
@@ -109,7 +110,8 @@ class NoiseProfiler:
         # working with the previous period of silence
         return self.__getPastCircularNodes(prevNode, n)
 
-    def __getFutureCircularNodes(self, initialNode, n):
+    @staticmethod
+    def __getFutureCircularNodes(initialNode, n):
         """
         Returns predicted values for the nodes
 
@@ -140,7 +142,8 @@ class NoiseProfiler:
             else:
                 current = initialNode
 
-    def __getPastCircularNodes(self, initialNode, n):
+    @staticmethod
+    def __getPastCircularNodes(initialNode, n):
         """
         Returns previous nodes
 

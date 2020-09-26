@@ -54,7 +54,8 @@ class Analytics:
 
         return clf
 
-    def predict(self, duration):
+    @staticmethod
+    def predict(duration):
         # 'duration', 'comments', 'likes', 'dislikes'
         X = np.array([[duration, 100, 10000, 100]])
         clf = load(os.path.join(MODEL_DIR, MODEL_NAME))

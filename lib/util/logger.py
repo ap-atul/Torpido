@@ -11,7 +11,7 @@ class Log:
 
     Attributes
     ----------
-    modes : dict
+    Log.modes : dict
     storing mode string and color
 
     {"mode" : "color"}
@@ -36,7 +36,7 @@ class Log:
 
         Parameters
         ----------
-        message : str
+        message : any
         input message to print
         mode : str
         mode to print. Available options:

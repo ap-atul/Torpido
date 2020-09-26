@@ -10,6 +10,7 @@ from lib.util.cache import Cache
 from lib.util.logger import Log
 from lib.util.timestampTool import getTimestamps
 from lib.util.validate import checkIfVideo
+from lib.util.watcher import Watcher
 from lib.visual import Visual
 
 
@@ -39,6 +40,14 @@ object would be shared in functions
 
 
 class Controller:
+    """
+    Main bridge between the UI and all the modules exists for the job.
+    Following the MVC architecture.
+
+    Inheriting from the QPySignal to create signal slots to display texts
+    and to make the working of the UI not blocking
+    """
+
     def __init__(self):
         self.fps = None
         self.videoFile = None
@@ -53,16 +62,34 @@ class Controller:
         self.textual = Textual()
         self.ffmpeg = FFMPEG()
         self.cache = Cache()
+        self.watcher = Watcher()
 
     def startProcessing(self, inputFile, display=False):
         """
-        starting the main processed on the input video file,
-        this function will launch sub processes that does the main
-        rank
-        Shifted from Threading to Processing ------------------
-        :param inputFile: str, input video file
-        :param display: bool, display video and audio plots
-        :return: None
+        Process the input file call splitting function to split the input video file into
+        audio and create 3 processes each for feature ranking, After completion of all the
+        processes (waiting). Call the completed process method the start the timestamp
+        extraction from the ranks
+
+        Parameters
+        ----------
+        inputFile : str
+            input video file (validating if its in supported format)
+        display : bool
+            True to display the video while processing
+
+        Notes
+        ------
+        Using Multi-processing instead of Multi-threading to avoid resources sharing,
+        resources like Queue that is used to reading the video using Thread. Threads
+        shared the Queue and caused skipping of lots of frames and messing with the
+        ranking system completely.
+
+        Difference between Threading and Processing
+
+            - Threading share data and variables without asking
+            - Processing won't to that unless told so
+
         """
         logo()
         if not os.path.isfile(inputFile):
@@ -85,11 +112,19 @@ class Controller:
 
     def startModules(self, display):
         """
-        creating multiple processes for each work load
-        each of them is independent and share nothing
-        :param display: bool, plotting and video play
-        :return: None
+        Creating 3 processes using the Process class of the multi-processing module.
+        FFmpeg separated files are referenced from the Controller public variables
+
+        Introducing private vars soon.
+
+        Parameters
+        ----------
+        display : bool
+            to display the video while processing
+
         """
+        self.watcher.start()  # starting the watcher
+
         self.audioProcess = Process(target=self.auditory.startProcessing, args=(self.audioFile, self.deNoisedAudioFile))
         self.visualProcess = Process(target=self.visual.startProcessing, args=(self.videoFile, display))
         self.textualProcess = Process(target=self.textual.startProcessing, args=(self.videoFile, display))
@@ -102,16 +137,19 @@ class Controller:
         self.visualProcess.join()
         self.textualProcess.join()
 
+        # running the final pass
         Log.d(f"Garbage collecting .. {gc.collect()}")
         self.completedProcess()
 
     def completedProcess(self):
         """
-        final merging on the processed video and audio files
-        the names are generated programmatically, so only thing
-        input is the timestamps (clip time stamps)
-        :return: None
+        Calls the merging function to merge the processed audio and the input
+        video file. Once completed final video is outputted and the audio files
+        generated are deleted as a part of the clean up process. Along with it
+        the garbage collection module does some clean ups too.
         """
+        self.watcher.end()  # ending the watcher
+
         timestamps = getTimestamps()
         if len(timestamps) == 0:
             Log.w("There are not good enough portions to cut. Try changing the configurations.")
@@ -124,6 +162,9 @@ class Controller:
         self.ffmpeg.cleanUp()
 
     def __del__(self):
+        """
+        clean up
+        """
         if self.visualProcess is not None:
             self.visualProcess.terminate()
         if self.audioProcess is not None:

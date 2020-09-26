@@ -1,3 +1,5 @@
+pandas
+sklearn
 tqdm
 soundfile
 matplotlib
