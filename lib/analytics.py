@@ -16,7 +16,7 @@ class Analytics:
 
     def pre_process(self):
         df = pd.read_csv(self.inputCSV)
-        names = ['duration', 'comments', 'likes', 'dislikes', 'views']
+        names = ['__duration', 'comments', 'likes', 'dislikes', 'views']
 
         ndf = pd.DataFrame({names[0]: df['duration_sec'],
                             names[1]: df['comment_count'],
@@ -56,7 +56,7 @@ class Analytics:
 
     @staticmethod
     def predict(duration):
-        # 'duration', 'comments', 'likes', 'dislikes'
+        # '__duration', 'comments', 'likes', 'dislikes'
         X = np.array([[duration, 100, 10000, 100]])
         clf = load(os.path.join(MODEL_DIR, MODEL_NAME))
         return clf.predict(X)

@@ -4,7 +4,7 @@ create timestamps in seconds that can be used to clip the video
 using ffmpeg.
 
     1. Reading the ranks and parsing them to timestamps
-    2. Padding the time ranks to generate the timestamps
+    2. Padding the __time ranks to generate the timestamps
     3. Validating the timestamps
 
 """

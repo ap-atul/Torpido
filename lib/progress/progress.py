@@ -15,18 +15,18 @@ class Progress:
 
     Attributes
     ----------
-    progressBar : object
+    __progressBar : object
         tqdm progress bar
-    totalProgress : int
+    __totalProgress : int
         maintaining the current progress
-    extractor : object
+    __extractor : object
         extractor object to read the stdout logs and parse them
     """
 
     def __init__(self):
-        self.progressBar = tqdm(total=100)
-        self.totalProgress = 0
-        self.extractor = StdExtractor()
+        self.__progressBar = tqdm(total=100)
+        self.__totalProgress = 0
+        self.__extractor = StdExtractor()
 
     def displayProgress(self, log, displayLog=False):
         """
@@ -43,13 +43,13 @@ class Progress:
         -------
 
         """
-        duration, time = self.extractor.extractTimeDuration(log)
+        duration, time = self.__extractor.extractTimeDuration(log)
 
         if time is not None:
             currentProgress = self.getCurrentProgress(duration, time)
-            if currentProgress > self.totalProgress:
-                self.progressBar.update(currentProgress - self.totalProgress)
-                self.totalProgress = currentProgress
+            if currentProgress > self.__totalProgress:
+                self.__progressBar.update(currentProgress - self.__totalProgress)
+                self.__totalProgress = currentProgress
 
         # display log is true then it will print if errors
         elif displayLog:
@@ -82,18 +82,18 @@ class Progress:
         """
         explicitly complete the progress bar
         """
-        self.progressBar.update(100)
+        self.__progressBar.update(100)
 
     def clear(self):
         """
         On occurrence of any error clear the progress bar
         """
-        self.progressBar.clear()
+        self.__progressBar.clear()
 
     def __del__(self):
         """
         clean up
         """
-        self.progressBar.close()
-        del self.progressBar
-        del self.extractor
+        self.__progressBar.close()
+        del self.__progressBar
+        del self.__extractor

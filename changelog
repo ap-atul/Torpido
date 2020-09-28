@@ -4,6 +4,19 @@ NOTE:
 	for 10 min video with 60fps : 27GB data
 	storing only 1024 frames = 1.2 GB
 
+Log 13:
+    - fixed watcher improved accuracy and performance
+
+Log 12:
+    - added watcher to monitor the CPU and RAM usage
+    - add private variables to some files
+    - mem leaks fixed, trace malloc
+
+Log 11:
+    - performance improvement
+    - imutils no more in dependency
+    - documented all the code with numpy docstring style
+    - generated html docs with pdoc
 
 Log 10:
     - implemented logger and progress

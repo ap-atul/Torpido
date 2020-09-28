@@ -51,7 +51,7 @@ RANK_OUT_BLUR = "blur_ranking.joblib"
 
 
 # ******************* AUDIO PART *************************
-# reading 5 percent of audio file at a time
+# reading 5 percent of audio file at a __time
 AUDIO_BLOCK_PER = 0.5
 
 # window level in the wavelet level

@@ -4,7 +4,7 @@ A class to keep:
     1) the window's raw data
     2) the window's max(abs(data))
 
-To be utilized to later extract the level that was surpassed the x% of the time
+To be utilized to later extract the level that was surpassed the x% of the __time
 """
 import math
 

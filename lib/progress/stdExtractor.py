@@ -13,18 +13,18 @@ class Time:
 
     Attributes
     ---------
-    hour : int
+    __hour : int
         hour in time series
-    minute : int
+    __minute : int
         minute in time series
-    second : int
+    __second : int
         second in time series
     """
 
     def __init__(self):
-        self.hour = None
-        self.minute = None
-        self.second = None
+        self.__hour = None
+        self.__minute = None
+        self.__second = None
 
     def getTimeInSec(self):
         """
@@ -33,17 +33,17 @@ class Time:
         Returns
         -------
         int
-            time in secs
+            __time in secs
         """
-        return (self.hour * 60 * 60) + (self.minute * 60) + self.second
+        return (self.__hour * 60 * 60) + (self.__minute * 60) + self.__second
 
     def __del__(self):
         """
         clean up
         """
-        del self.hour
-        del self.minute
-        del self.second
+        del self.__hour
+        del self.__minute
+        del self.__second
 
 
 class StdExtractor:
@@ -53,15 +53,15 @@ class StdExtractor:
 
     Attributes
     ----------
-    duration : Time
+    __duration : Time
         Time object of original clip
-    time : Time
+    __time : Time
         Time object of current output clip
     """
 
     def __init__(self):
-        self.duration = None
-        self.time = None
+        self.__duration = None
+        self.__time = None
 
     def extractTimeDuration(self, line):
         """
@@ -77,9 +77,9 @@ class StdExtractor:
         tuple
             Time object of duration and time
         """
-        return self.extractDuration(line), self.extractTime(line)
+        return self.__extractDuration(line), self.__extractTime(line)
 
-    def extractTime(self, line):
+    def __extractTime(self, line):
         """
         Searching for time clause in the FFmpeg logs
 
@@ -92,20 +92,20 @@ class StdExtractor:
 
         Returns
         -------
-        time : Time
+        __time : Time
             Time object of output clip
         """
-        exp = re.compile(r'time=(\d+):(\d+):(\d+)')
+        exp = re.compile(r'__time=(\d+):(\d+):(\d+)')
         exp = exp.search(line)
         if exp:
-            self.time = Time()
-            self.time.hour = int(exp.group(1))
-            self.time.minute = int(exp.group(2))
-            self.time.second = int(exp.group(3))
+            self.__time = Time()
+            self.__time.__hour = int(exp.group(1))
+            self.__time.__minute = int(exp.group(2))
+            self.__time.__second = int(exp.group(3))
 
-        return self.time
+        return self.__time
 
-    def extractDuration(self, line):
+    def __extractDuration(self, line):
         """
         Searching for duration clause in FFmpeg logs
         since duration is displayed only once it is set
@@ -118,25 +118,25 @@ class StdExtractor:
 
         Returns
         -------
-        duration : Time
+        __duration : Time
             Time object of input clip
         """
-        if self.duration is not None:
-            return self.duration
+        if self.__duration is not None:
+            return self.__duration
 
         exp = re.compile(r'Duration: (\d{2}):(\d{2}):(\d{2})')
         exp = exp.search(line)
         if exp:
-            self.duration = Time()
-            self.duration.hour = int(exp.group(1))
-            self.duration.minute = int(exp.group(2))
-            self.duration.second = int(exp.group(3))
+            self.__duration = Time()
+            self.__duration.__hour = int(exp.group(1))
+            self.__duration.__minute = int(exp.group(2))
+            self.__duration.__second = int(exp.group(3))
 
-        return self.duration
+        return self.__duration
 
     def __del__(self):
         """
         cleaning up
         """
-        del self.duration
-        del self.time
+        del self.__duration
+        del self.__time

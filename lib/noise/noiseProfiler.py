@@ -17,7 +17,7 @@ class NoiseProfiler:
     Attributes
     ----------
     timeWindow : float
-        max time window
+        max __time window
     sampleRate : int, default=44100
         sample rate of audio in frequency
     percentileLevel : int, default=95

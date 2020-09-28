@@ -6,11 +6,40 @@ machine to retrieve the CPU and RAM usage manually
 
 May upgrade later to use `psutil`
 """
+import gc
+import re
 import subprocess
 import time
 from threading import Thread
 
 from lib.util.logger import Log
+
+
+def getIdleTotal(stdout):
+    """
+    Reads the stdout logs, calculates the various cpu times and creates a dictionary
+    of idle time and the total time
+
+    Parameters
+    ----------
+    stdout : str
+        output of the command from the std out logs
+
+    Returns
+    -------
+    dict
+        idle and total time of the cpu
+    """
+    stdout = stdout.replace('cpu  ', '').split(" ")
+    cpuLine = [float(i) for i in stdout[0:]]
+
+    user, nice, system, idle, io, irq, soft, steal, _, _ = cpuLine
+
+    idle = idle + io
+    nonIdle = user + nice + system + irq + soft + steal
+    total = idle + nonIdle
+
+    return {'total': total, 'idle': idle}
 
 
 class Watcher:
@@ -25,7 +54,7 @@ class Watcher:
     ---------
     CPU Usage
 
-    $ grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage }'
+    $ grep 'cpu ' /proc/stat
 
         - using grep and awk to parse the output string output of the stat command
 
@@ -38,12 +67,13 @@ class Watcher:
     """
 
     def __init__(self):
-        self.__cpuCommandLine = "grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($5)} END {print usage }'"
+        self.__cpuCommandLine = "grep 'cpu ' /proc/stat"
         self.__memCommandLine = "grep -m 3 ':' /proc/meminfo | awk '{print $2}'"
         self.__cpuThread = None
         self.__memThread = None
         self.__stopped = False
         self.__delay = 3
+        self.__exp = re.compile(r'(\d)')
 
     def start(self):
         """
@@ -59,6 +89,9 @@ class Watcher:
         Run the CPU check command till the process is explicitly told to stop using the Watcher.stop()
         function
         """
+        cpuInfo = {}
+        percent = 0
+
         while not self.__stopped:
             run = subprocess.Popen(args=self.__cpuCommandLine,
                                    stdout=subprocess.PIPE,
@@ -67,8 +100,21 @@ class Watcher:
                                    shell=True)
 
             for stdout in iter(run.stdout.readline, ""):
-                stdout = stdout.replace("\n", "")
-                Log.i(f"[ CPU :: {stdout}% ]")
+                if len(cpuInfo) == 0:
+                    cpuInfo.update(getIdleTotal(stdout))
+
+                else:
+                    current = getIdleTotal(stdout)
+                    total = current['total']
+                    prevTotal = cpuInfo['total']
+
+                    idle = current['idle']
+                    prevIdle = cpuInfo['idle']
+
+                    percent = ((total - prevTotal) - (idle - prevIdle)) / (total - prevTotal) * 100
+                    cpuInfo.update(current)
+
+                Log.i(f"[ CPU :: {round(percent)} % ]")
 
             run.stdout.close()
             if run.wait():
@@ -93,7 +139,7 @@ class Watcher:
             for stdout in iter(run.stdout.readline, ""):
                 lines.append(int(stdout))
 
-            Log.i(f"[ RAM :: {round((lines[0] - lines[2]) * 100 / lines[0])}% ]")
+            Log.i(f"[ RAM :: {round((lines[0] - lines[2]) * 100 / lines[0])} % ]")
             run.stdout.close()
             if run.wait():
                 Log.e("Can't initiate Watcher for RAM")
@@ -116,3 +162,4 @@ class Watcher:
             del self.__memThread
         if self.__cpuThread is not None:
             del self.__cpuThread
+        Log.d(f"Garbage Collected :: {gc.collect()}")
