@@ -103,3 +103,7 @@ OUT_AUDIO_FILE = "_audio_de_noised.wav"
 
 # supported video file formats
 SUPPORTED_VIDEO_FILES = [".mp4", ".webm", ".mkv", ".mov", ".flv", ".avi", ".ogg"]
+
+# ********************* WATCHER ***********************************
+# delay to check the CPU and MEM usage (in secs)
+WATCHER_DELAY = 3

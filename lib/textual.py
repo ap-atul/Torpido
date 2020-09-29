@@ -117,7 +117,10 @@ class Textual:
 
             if count % self.skipFrames == 0:
                 #  making the image blob
-                blob = cv2.dnn.blobFromImage(frame, 1.0, (W, H), (123.68, 116.78, 103.94),
+                blob = cv2.dnn.blobFromImage(frame,
+                                             1.0,
+                                             (W, H),
+                                             (123.68, 116.78, 103.94),
                                              swapRB=True, crop=False)
 
                 self.net.setInput(blob)

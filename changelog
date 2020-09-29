@@ -4,8 +4,13 @@ NOTE:
 	for 10 min video with 60fps : 27GB data
 	storing only 1024 frames = 1.2 GB
 
+Log 14:
+    - add padding and improved the overall timestamps cal
+    - watcher delay made constant
+
 Log 13:
     - fixed watcher improved accuracy and performance
+    - spectrogram plotting
 
 Log 12:
     - added watcher to monitor the CPU and RAM usage

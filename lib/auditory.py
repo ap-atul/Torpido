@@ -10,6 +10,7 @@ import numpy as np
 import pywt
 import soundfile
 from joblib import dump
+from matplotlib import pyplot as plt
 
 from lib.noise.noiseProfiler import NoiseProfiler
 from lib.util.cache import Cache
@@ -23,6 +24,8 @@ def mad(array):
     Indices variability of the sample.
     https://en.wikipedia.org/wiki/Median_absolute_deviation
 
+    Gives variance for the input signal
+
     Parameters
     ----------
     array : numpy array
@@ -30,6 +33,33 @@ def mad(array):
     """
     array = np.ma.array(array).compressed()
     return np.median(np.abs(array - np.median(array)))
+
+
+def plotSignals(inputData, cleanData):
+    """
+    Plotting the input signal and the cleaned version.
+    Not yet optimized. Heavy on memory
+
+    Spectogram plotting
+
+    Parameters
+    ----------
+    inputData : array
+        input signal original
+    cleanData : array
+        cleaned signal
+    """
+    plt.subplot(211)
+    plt.title('Spectrogram for original and cleaned signal')
+    plt.specgram(inputData, Fs=44100)
+    plt.xlabel('Time')
+    plt.ylabel('Frequency')
+
+    plt.subplot(212)
+    plt.specgram(cleanData, Fs=44100)
+    plt.xlabel('Time')
+    plt.ylabel('Frequency')
+    plt.show()
 
 
 class Auditory:
@@ -78,6 +108,8 @@ class Auditory:
         size of the input audio file and output audio files are same so no
         data loss.
 
+        Uses the VISU Shrink thresholding for the noise in the audio signal
+
         Prints some debug and info Logs
 
         Parameters
@@ -106,25 +138,28 @@ class Auditory:
             for block in soundfile.blocks(self.fileName, int(self.rate * self.info.duration * AUDIO_BLOCK_PER)):
                 # cal all coefficients
                 coefficients = pywt.wavedec(block, WAVELET, DEC_REC_MODE)
+
+                # getting the variance of the signal
                 sigma = mad(coefficients[- WAVELET_LEVEL])
 
+                # VISU Shrink thresholding by applying the universal threshold proposed by Donoho and Johnstone
                 thresh = sigma * np.sqrt(2 * np.log(len(block)))
                 coefficients[1:] = (pywt.threshold(i, value=thresh, mode=WAVE_THRESH) for i in coefficients[1:])
 
-                # writing to the output file
-                out.write(pywt.waverec(coefficients, WAVELET, mode=DEC_REC_MODE))
+                cleaned = pywt.waverec(coefficients, WAVELET, mode=DEC_REC_MODE)
+                # recreating the audio signal in original form and writing to the output file
+                out.write(cleaned)
 
                 # calculating the audio rank
                 self.energy.extend([self.getEnergyRMS(block)] * max(1, int(len(block) / self.rate)))
+
+                if plot:
+                    plotSignals(block.T[0], cleaned.T[0])
 
         dump(self.energy, self.audioRankPath)
         Log.i("Audio de noised successfully")
         Log.d(f"Audio ranking length {len(self.energy)}")
         Log.i("Audio ranking saved .............")
-
-        if plot:
-            self.plotSignals()
-
         Log.d(f"Garbage collected :: {gc.collect()}")
 
     def getEnergyRMS(self, block):
@@ -151,13 +186,6 @@ class Auditory:
     def setAudioInfo(self):
         self.cache.writeDataToCache(CACHE_AUDIO_INFO, self.info)
 
-    def plotSignals(self):
-        """
-        plotting the cleaned and original signals
-        TODO: Plotting the audio signal efficiently
-        """
-        pass
-
     def getNoiseFromAudio(self):
         """
         Parsed the input audio signal all at once and generates an
@@ -178,3 +206,7 @@ class Auditory:
         """
         del self.cache
         Log.d("Cleaning up.")
+
+
+audio = Auditory()
+audio.startProcessing("../examples/Gretel.wav", "../examples/d1.wav", plot=True)

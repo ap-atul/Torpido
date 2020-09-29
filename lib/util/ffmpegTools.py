@@ -110,12 +110,12 @@ def buildMergeCommand(videoFile, audioFile, outputFile, timestamps):
     `
     ffmpeg -y -i input.mkv -i input.wav -filter_complex
     "[0:v]split=2[vc1][vc2];
-    [vc1]trim=start=304:__duration=10.567,setpts=PTS-STARTPTS[v1];
-    [vc2]trim=start=100:__duration=10.789,setpts=PTS-STARTPTS[v2];
+    [vc1]trim=start=304:duration=10.567,setpts=PTS-STARTPTS[v1];
+    [vc2]trim=start=100:duration=10.789,setpts=PTS-STARTPTS[v2];
 
     [1:a]asplit=2[ac1][ac2];
-    [ac1]atrim=start=0:__duration=10.123,asetpts=PTS-STARTPTS[a1];
-    [ac2]atrim=start=304:__duration=10,asetpts=PTS-STARTPTS[a2];
+    [ac1]atrim=start=0:duration=10.123,asetpts=PTS-STARTPTS[a1];
+    [ac2]atrim=start=304:duration=10,asetpts=PTS-STARTPTS[a2];
 
     [v1][a1][v2][a2]concat=n=2:v=1:a=1[video][audio]"
     -map "[video]" -map "[audio]" output_new.mkv
@@ -126,7 +126,7 @@ def buildMergeCommand(videoFile, audioFile, outputFile, timestamps):
         '-filter_complex' : create a complex filter
         'split' :           split option of filter to split the video stream into n ; here n=2
         'trim' :            trim option of filter to trim the video stream with
-                            start= and __duration=, also setpts:presentation points
+                            start= and duration=, also setpts:presentation points
         'asplit' :          audio stream split
         'atrim' :           audio stream trim
         'concat' :          concatenate input stream to output v=1:a=1 one video and one audio streams
@@ -201,14 +201,14 @@ def merge(videoFile, audioFile, outputFile, timestamps):
     outputFile : str
         final output video file
     timestamps : list
-        list of clip __time stamps with start and end times
+        list of clip time stamps with start and end times
 
     Yields
     -------
     str
         continuous std out logs
     """
-    # print(f"[TIMESTAMPS] __time stamps : {timestamps}")
+    # print(f"[TIMESTAMPS] timestamps : {timestamps}")
     command = buildMergeCommand(videoFile, audioFile, outputFile, timestamps)
     # print(command)
     run = subprocess.Popen(args=command,

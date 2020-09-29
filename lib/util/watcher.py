@@ -12,6 +12,7 @@ import subprocess
 import time
 from threading import Thread
 
+from lib.util.constants import WATCHER_DELAY
 from lib.util.logger import Log
 
 
@@ -72,7 +73,7 @@ class Watcher:
         self.__cpuThread = None
         self.__memThread = None
         self.__stopped = False
-        self.__delay = 3
+        self.__delay = WATCHER_DELAY
         self.__exp = re.compile(r'(\d)')
 
     def start(self):

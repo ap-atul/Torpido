@@ -4,24 +4,46 @@ create timestamps in seconds that can be used to clip the video
 using ffmpeg.
 
     1. Reading the ranks and parsing them to timestamps
-    2. Padding the __time ranks to generate the timestamps
+    2. Padding the time ranks to generate the timestamps
     3. Validating the timestamps
+    4. Returning a list of list containing (start -> end) time stamps
 
 """
 
 import os
 
+import numpy as np
 from joblib import load
 
 from lib.util.constants import *
 from lib.util.logger import Log
 
 
+def addPadding(rankList: list, length):
+    """
+    Function to add padding to the ranks if there length is lower than that of the
+    required length
+    Average of the rank is added as the padding data, mostly data is below 1
+
+    Parameters
+    ----------
+    rankList : list
+        feature rank list
+    length : int
+        required length
+    """
+    rankList.extend([np.average(rankList)] * int(length - len(rankList)))
+
+
 def readTheRankings():
     """
     Reads the ranking using the joblib files and calculate
     the final sum ranks
-    TODO: padding if required
+
+    Getting the ranking length for the ranks for the features from max
+    of all the ranks length
+
+    Padding the ranks, so that every feature has equal range
 
     Returns
     -------
@@ -44,21 +66,29 @@ def readTheRankings():
         Log.e("Audio Ranking does not exists")
         return
 
+    # reading the saved ranking from the joblib files
     motionFile = os.path.join(RANK_DIR, RANK_OUT_MOTION)
     blurFile = os.path.join(RANK_DIR, RANK_OUT_BLUR)
     textFile = os.path.join(RANK_DIR, RANK_OUT_TEXT)
     audioFile = os.path.join(RANK_DIR, RANK_OUT_AUDIO)
+
     motionRank = load(motionFile)
     blurRank = load(blurFile)
     textRank = load(textFile)
     audioRank = load(audioFile)
 
-    minRank = min(len(motionRank), len(blurRank),
-                  len(audioRank), len(textRank))
+    maxRank = int(max(len(motionRank), len(blurRank),
+                      len(audioRank), len(textRank)))
+
+    # padding the ranks of each feature
+    addPadding(motionRank, maxRank)
+    addPadding(blurRank, maxRank)
+    addPadding(audioRank, maxRank)
+    addPadding(textRank, maxRank)
 
     return [motionRank[i] + blurRank[i] +
             textRank[i] + audioRank[i]
-            for i in range(minRank)]
+            for i in range(maxRank)]
 
 
 def trimByRank(ranks):
