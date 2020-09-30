@@ -1,0 +1,85 @@
+NOTE:
+	opencv dtype : uint8 1 byte for one value
+	for image with 500*500pxs *3 rgb = 750kb
+	for 10 min video with 60fps : 27GB data
+	storing only 1024 frames = 1.2 GB
+
+Log 14:
+    - add padding and improved the overall timestamps cal
+    - watcher delay made constant
+
+Log 13:
+    - fixed watcher improved accuracy and performance
+    - spectrogram plotting
+
+Log 12:
+    - added watcher to monitor the CPU and RAM usage
+    - add private variables to some files
+    - mem leaks fixed, trace malloc
+
+Log 11:
+    - performance improvement
+    - imutils no more in dependency
+    - documented all the code with numpy docstring style
+    - generated html docs with pdoc
+
+Log 10:
+    - implemented logger and progress
+    - improved audio de-noising (block processing true)
+    - improved the mem usage
+    - de noising of multiple channels with audio appending to file (lots of mem usage reduced)
+    - clean ups
+
+Lg 9:
+	- implemented the ffmpeg progress and 
+	fixed high mem usage
+	- implementing the cpu and mem usage graph
+	- testing on some videos and finalizing the ranks
+
+Log 8:
+	- mem leaks and unnecessary data
+	- found mem leaks and fixed them
+	- using trace malloc and garbage collector
+	- created logger
+	- implemented the gc logic
+
+Log 7:
+	- controller class created with threads
+	- now using processes instead of threads
+	- workflow fixed and implemented
+	- sample tests can be performed
+	- logo added and some more improvements
+
+Log 6:
+	- fixed audio, video, audio ranks
+	- changed constants and connected more constants
+	- created final stitching script in ffmpeg
+	- improved videoReader performance 
+	- fixed bug with skipping frames
+	- added validator to check the input file
+	- added some debug info and checks
+
+Log 5:
+	- fixed ranking system
+	- created silence detection
+	- create normalization for all the rankings
+
+Log 4:
+	- implemented cache system
+	- created the ffmpegTools with subprocesses
+	- basic commands and connected with io.py
+
+Log 3:
+	- improved Visual Class
+	- built Auditory with de noising
+	- using Wavelet, discarding fft sample done
+	- actually block processing
+	- previous implementation not recorded
+	- created constants
+	- implemented audio parsers and noise profile generator
+
+Log 2:
+	- updated the Blur to use Laplacian
+
+Log 1:
+	- created Visual with Motion and Blur(fft)
