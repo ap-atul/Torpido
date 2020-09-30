@@ -3,6 +3,7 @@ Improved version of Video Editing Automation
 Goal : To automate the video editing process
 
 * For more details documentation refer ```docs/```
+* For dev logs refer [DEV LOGS](https://github.com/AP-Atul/Torpido/blob/master/logs)
 ---
 
 ## Project Structure
