@@ -19,6 +19,13 @@
 -------------------------------------------------------------------------------------------------
 # Logs
 
+### Log 13, 01-10
+```AP```
+* Completed the Feasibility report
+* Completed the Mathematical Model report
+* Minor communication
+
+----------------------------------------
 ### Log 12, 30-09
 ```SC```
 * Updated the README.md for the project
