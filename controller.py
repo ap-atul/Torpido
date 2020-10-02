@@ -175,6 +175,7 @@ class Controller:
 
 
 def call():
+    print("Calling this")
     # objgraph.show_growth(limit=5)
     control = Controller()
     # import tracemalloc
@@ -182,7 +183,7 @@ def call():
     # print(" ************** GETTING GRAPH DATA *********")
     # print(objgraph.show_growth(limit=5))
     # snapshot1 = tracemalloc.take_snapshot()
-    control.startProcessing("/home/atul/Videos/testNow/Gretel.mkv", True)
+    control.startProcessing("", True)
     # snapshot2 = tracemalloc.take_snapshot()
     # def run_objgraph(type):
     #     objgraph.show_backrefs(type,max_depth=20,

@@ -19,6 +19,13 @@
 -------------------------------------------------------------------------------------------------
 # Logs
 
+### Log 14, 02-10
+```AP```
+* Fixed Textual
+* Improved performance
+* Add one more function to image util
+
+----------------------------------------
 ### Log 13, 01-10
 ```AP```
 * Completed the Feasibility report

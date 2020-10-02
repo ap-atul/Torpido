@@ -206,7 +206,3 @@ class Auditory:
         """
         del self.cache
         Log.d("Cleaning up.")
-
-
-audio = Auditory()
-audio.startProcessing("../examples/Gretel.wav", "../examples/d1.wav", plot=True)

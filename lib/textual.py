@@ -14,6 +14,7 @@ import cv2
 import numpy as np
 from joblib import dump
 
+from lib.util import image
 from lib.util.constants import *
 from lib.util.logger import Log
 from lib.util.videoReader import VideoGet
@@ -63,11 +64,14 @@ class Textual:
 
         # initializing the model
         # reading the model in the memory
-        self.net = cv2.dnn.readNet(os.getcwd(), TEXT_EAST_MODEL_PATH)
+        self.net = cv2.dnn.readNet(TEXT_EAST_MODEL_PATH)
+
+        # adding output layer to only return confidence for text
+        self.textDetectLayerName = ["feature_fusion/Conv_7/Sigmoid"]
 
         # adding output layers to the model
-        self.layerNames = ["feature_fusion/Conv_7/Sigmoid",
-                           "feature_fusion/concat_3"]
+        self.textDisplayLayerNames = ["feature_fusion/Conv_7/Sigmoid",
+                                      "feature_fusion/concat_3"]
 
     def startProcessing(self, inputFile, display=False):
         """
@@ -107,50 +111,40 @@ class Textual:
             if frame is None:
                 break
 
-            original = frame
             # resizing the frame to a multiple of 32 x 32
-            (W, H) = 320, 320
+            # resizing the frame
+            original = frame
+            (H, W) = frame.shape[:2]
+            rW = W / float(self.WIDTH)
+            rH = H / float(self.HEIGHT)
+            frame = cv2.resize(frame, (W, H))
             count += 1
 
-            # resizing the frame
-            frame = cv2.resize(frame, (W, H))
-
             if count % self.skipFrames == 0:
+                detectedText = False
+
                 #  making the image blob
                 blob = cv2.dnn.blobFromImage(frame,
                                              1.0,
-                                             (W, H),
+                                             (self.WIDTH, self.HEIGHT),
                                              (123.68, 116.78, 103.94),
                                              swapRB=True, crop=False)
 
-                self.net.setInput(blob)
-                (scores, geometry) = self.net.forward(self.layerNames)
+                # run text detection
+                if display:
+                    if self.__runTextDetectDisplay(blob, (rW, rH), original):
+                        detectedText = True
+                else:
+                    if self.__runTextDetect(blob):
+                        detectedText = True
 
-                (numRows, numCols) = scores.shape[2:4]
-                confidences = []
-
-                # try to optimize this part
-                for y in range(0, numRows):
-                    scoresData = scores[0, 0, y]
-                    for x in range(0, numCols):
-                        if scoresData[x] < self.minConfidence:
-                            continue
-                        confidences.append(scoresData[x])
-
-                # check if the confidence satisfies the threshold
-                # print(f"Average confidence :: {np.mean(confidences)}")
-                if len(confidences) > 0 and np.mean(confidences) > 0.5:
+                # if text is detected
+                if detectedText:
                     self.textRanks.extend([RANK_TEXT] * int(self.skipFrames))
                     Log.d("Text detected.")
                 else:
                     self.textRanks.extend([0] * int(self.skipFrames))
-
-            if display:
-                cv2.imshow("Text Detection", original)
-                key = cv2.waitKey(1) & 0xFF
-
-                if key == ord("q"):
-                    break
+                    Log.d("No text detected.")
 
         # clearing the memory
         myClip.release()
@@ -159,6 +153,128 @@ class Textual:
 
         # calling the normalization of ranking
         self.timedRankingNormalize()
+
+    def __runTextDetect(self, blob):
+        """
+        Function to detect only text and no display. Gets the scores and calculates if the image
+        contains any text
+
+        Parameters
+        ----------
+        blob : blob
+            blob of the image
+
+        Returns
+        -------
+        bool
+            True denotes text detected
+        """
+        self.net.setInput(blob)
+        scores = self.net.forward(self.textDetectLayerName)
+        numRows, numCols = np.asarray(scores).shape[3: 5]
+        confidences = []
+
+        # since image is 320x320 the output is 80x80 (scores)
+        for x in range(0, numRows):
+            scoreData = scores[0][0][0][x]
+            for y in range(0, numCols):
+                if scoreData[y] < self.minConfidence:
+                    continue
+
+                confidences.append(scoreData[y])
+
+        # if confidences contain some value
+        if len(confidences) > 1:
+            return True
+        return False
+
+    def __runTextDetectDisplay(self, blob, rSize, original):
+        """
+        Function to detect text using layer for getting the rectangles
+        to display on the frame
+
+        Parameters
+        ----------
+        blob : blob
+            blob of the image
+        rSize : tuple
+            real sizes of the images
+        original : image array
+            un-resized image to display
+
+        Returns
+        -------
+        bool
+            True denotes text detected
+        """
+        # running the model
+        self.net.setInput(blob=blob)
+        scores, geometry = self.net.forward(self.textDisplayLayerNames)
+
+        numRows, numCols = scores.shape[2:4]
+        rect = []
+        confidences = []
+
+        # since image is 320x320 the output is 80x80 (scores)
+        for y in range(0, numRows):
+            scoresData = scores[0, 0, y]
+            xData0 = geometry[0, 0, y]
+            xData1 = geometry[0, 1, y]
+            xData2 = geometry[0, 2, y]
+            xData3 = geometry[0, 3, y]
+            anglesData = geometry[0, 4, y]
+
+            for x in range(0, numCols):
+                # if our score does not have sufficient probability, ignore it
+                if scoresData[x] < self.minConfidence:
+                    continue
+
+                # compute the offset factor as our resulting feature maps will
+                # be 4x smaller than the input image
+                (offsetX, offsetY) = (x * 4, y * 4)
+
+                # extract the rotation angle for the prediction and then
+                # compute the sin and cosine
+                angle = anglesData[x]
+                cos = np.cos(angle)
+                sin = np.sin(angle)
+
+                # use the geometry volume to derive the width and height of
+                # the bounding box
+                h = xData0[x] + xData2[x]
+                w = xData1[x] + xData3[x]
+
+                # compute both the starting and ending (x, y)-coordinates for
+                # the text prediction bounding box
+                endX = int(offsetX + (cos * xData1[x]) + (sin * xData2[x]))
+                endY = int(offsetY - (sin * xData1[x]) + (cos * xData2[x]))
+                startX = int(endX - w)
+                startY = int(endY - h)
+
+                # add the bounding box coordinates and probability score to
+                # our respective lists
+                rect.append((startX, startY, endX, endY))
+                confidences.append(scoresData[x])
+
+        # compressing the boxes or rectangles
+        boxes = image.non_max_suppression(np.array(rect), probs=confidences)
+
+        rW, rH = rSize
+        for startX, startY, endX, endY in boxes:
+            startX = int(startX * rW)
+            startY = int(startY * rH)
+            endX = int(endX * rW)
+            endY = int(endY * rH)
+
+            # draw the bounding box on the image
+            cv2.rectangle(original, (startX, startY), (endX, endY), (0, 255, 0), 2)
+
+        cv2.imshow("Text Detection", original)
+        cv2.waitKey(1) & 0xFF
+
+        if len(confidences) > 0:
+            return True
+        return False
 
     def timedRankingNormalize(self):
         """
@@ -191,6 +307,5 @@ class Textual:
         clean ups
         """
         del self.net
-        del self.layerNames
         del self.videoGetter
         Log.d("Cleaning up.")
