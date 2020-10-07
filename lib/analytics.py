@@ -11,8 +11,8 @@ from lib.util.constants import MODEL_DIR, MODEL_NAME
 
 class Analytics:
     def __init__(self):
-        self.inputCSV = 'examples/kaggle_yt.csv'
-        self.outputCSV = 'examples/youtube_data.csv'
+        self.inputCSV = '../examples/kaggle_yt.csv'
+        self.outputCSV = '../examples/youtube_data.csv'
 
     def pre_process(self):
         df = pd.read_csv(self.inputCSV)
@@ -59,4 +59,4 @@ class Analytics:
         # '__duration', 'comments', 'likes', 'dislikes'
         X = np.array([[duration, 100, 10000, 100]])
         clf = load(os.path.join(MODEL_DIR, MODEL_NAME))
-        return clf.predict(X)
+        print(clf.predict(X))

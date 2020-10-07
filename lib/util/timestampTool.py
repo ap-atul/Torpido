@@ -72,11 +72,14 @@ def readTheRankings():
     textFile = os.path.join(RANK_DIR, RANK_OUT_TEXT)
     audioFile = os.path.join(RANK_DIR, RANK_OUT_AUDIO)
 
+    # loading the read files
     motionRank = load(motionFile)
     blurRank = load(blurFile)
     textRank = load(textFile)
     audioRank = load(audioFile)
 
+    # max length for ranking
+    # NOTE: FFmpeg does not get bothered by greater values, not lower though
     maxRank = int(max(len(motionRank), len(blurRank),
                       len(audioRank), len(textRank)))
 
@@ -129,6 +132,7 @@ def trimByRank(ranks):
             end = None
             start = None
             prev_end = 0
+
     if start is not None and end is None:
         end = len(ranks)
         timestamps.append([start, end])
@@ -149,6 +153,8 @@ def getTimestamps():
     timestamps = trimByRank(readTheRankings())
 
     finalTimestamp = []
+
+    # validating if there are 2 values in list
     for clip in timestamps:
         if len(clip) % 2 == 0:
             finalTimestamp.append(clip)

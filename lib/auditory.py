@@ -40,7 +40,7 @@ def plotSignals(inputData, cleanData):
     Plotting the input signal and the cleaned version.
     Not yet optimized. Heavy on memory
 
-    Spectogram plotting
+    Spectrogram plotting
 
     Parameters
     ----------
@@ -70,33 +70,33 @@ class Auditory:
 
     Attributes
     ----------
-    fileName : str
+    __fileName : str
         input audio file
-    rate : int
+    __rate : int
         sample rate of the audio signal in frequency
-    plot : bool
+    __plot : bool
         plot the signal
-    info : object
+    __info : object
         sound file object having the info of the audio file
-    energy : list
+    __energy : list
         list of the ranks for the audio signal
-    audioRankPath : str
+    __audioRankPath : str
         directory to store the rank of the audio
-    silenceThreshold : int
+    __silenceThreshold : int
         threshold value to determine the rank
-    cache : Cache
+    __cache : Cache
         object of the cache to store the audio file info
     """
     def __init__(self):
-        self.fileName = None
-        self.rate = None
-        self.data = None
-        self.plot = False
-        self.info = None
-        self.energy = None
-        self.audioRankPath = os.path.join(os.getcwd(), RANK_DIR, RANK_OUT_AUDIO)
-        self.silenceThreshold = SILENCE_THRESHOlD
-        self.cache = Cache()
+        self.__fileName = None
+        self.__rate = None
+        self.__data = None
+        self.__plot = False
+        self.__info = None
+        self.__energy = None
+        self.__audioRankPath = os.path.join(os.getcwd(), RANK_DIR, RANK_OUT_AUDIO)
+        self.__silenceThreshold = SILENCE_THRESHOlD
+        self.__cache = Cache()
 
     def startProcessing(self, inputFile, outputFile, plot=False):
         """
@@ -126,16 +126,15 @@ class Auditory:
             Log.e(f"File {inputFile} does not exists")
             return
 
-        self.fileName = inputFile
+        self.__fileName = inputFile
+        self.__info = soundfile.info(self.__fileName)
+        self.__setAudioInfo()
+        self.__rate = self.__info.samplerate
+        self.__energy = []
+        Log.i(f"Audio duration is {self.__info.duration}.")
 
-        self.info = soundfile.info(self.fileName)
-        self.setAudioInfo()
-        self.rate = self.info.samplerate
-        self.energy = []
-        Log.i(f"Audio duration is {self.info.duration}.")
-
-        with soundfile.SoundFile(outputFile, mode="w", samplerate=self.rate, channels=self.info.channels) as out:
-            for block in soundfile.blocks(self.fileName, int(self.rate * self.info.duration * AUDIO_BLOCK_PER)):
+        with soundfile.SoundFile(outputFile, mode="w", samplerate=self.__rate, channels=self.__info.channels) as out:
+            for block in soundfile.blocks(self.__fileName, int(self.__rate * self.__info.duration * AUDIO_BLOCK_PER)):
                 # cal all coefficients
                 coefficients = pywt.wavedec(block, WAVELET, DEC_REC_MODE)
 
@@ -151,18 +150,18 @@ class Auditory:
                 out.write(cleaned)
 
                 # calculating the audio rank
-                self.energy.extend([self.getEnergyRMS(block)] * max(1, int(len(block) / self.rate)))
+                self.__energy.extend([self.__getEnergyRMS(block)] * max(1, int(len(block) / self.__rate)))
 
                 if plot:
                     plotSignals(block.T[0], cleaned.T[0])
 
-        dump(self.energy, self.audioRankPath)
+        dump(self.__energy, self.__audioRankPath)
         Log.i("Audio de noised successfully")
-        Log.d(f"Audio ranking length {len(self.energy)}")
+        Log.d(f"Audio ranking length {len(self.__energy)}")
         Log.i("Audio ranking saved .............")
         Log.d(f"Garbage collected :: {gc.collect()}")
 
-    def getEnergyRMS(self, block):
+    def __getEnergyRMS(self, block):
         """
         RMS = Root Mean Square to calculate the signal data to the dB, if signal
         satisfies some threshold the ranking can be affected and audio portion
@@ -179,22 +178,22 @@ class Auditory:
         int
             rank for the portion which is then set for all the portion of data
         """
-        if np.sqrt(np.mean(block ** 2)) > self.silenceThreshold:
+        if np.sqrt(np.mean(block ** 2)) > self.__silenceThreshold:
             return RANK_AUDIO
         return 0
 
-    def setAudioInfo(self):
-        self.cache.writeDataToCache(CACHE_AUDIO_INFO, self.info)
+    def __setAudioInfo(self):
+        self.__cache.writeDataToCache(CACHE_AUDIO_INFO, self.__info)
 
-    def getNoiseFromAudio(self):
+    def __getNoiseFromAudio(self):
         """
         Parsed the input audio signal all at once and generates an
         noise profile or the signal and saved to the file
 
         Writes the noise signal to the file names 'noise.wav'
         """
-        data, rate = soundfile.read(self.fileName)
-        filePath = os.path.dirname(self.fileName)
+        data, rate = soundfile.read(self.__fileName)
+        filePath = os.path.dirname(self.__fileName)
 
         noiseSignal = NoiseProfiler(data).getNoiseDataPredicted()
         soundfile.write(os.path.join(filePath, "noise.wav"), noiseSignal, rate)
@@ -204,5 +203,5 @@ class Auditory:
         """
         clean up
         """
-        del self.cache
+        del self.__cache
         Log.d("Cleaning up.")

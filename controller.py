@@ -16,17 +16,17 @@ from lib.visual import Visual
 
 def logo():
     print("""\033[93m
-  _                   _     _       
- | |_ ___  _ __ _ __ (_) __| | ___  
- | __/ _ \| '__| '_ \| |/ _` |/ _ \ 
- | || (_) | |  | |_) | | (_| | (_) |
-  \__\___/|_|  | .__/|_|\__,_|\___/ 
-	           |_|                  
-
-	     \033[37;41m Video editing made fun ;) \033[0m
-_______________________________________________
-
-""")
+      _                   _     _       
+     | |_ ___  _ __ _ __ (_) __| | ___  
+     | __/ _ \| '__| '_ \| |/ _` |/ _ \ 
+     | || (_) | |  | |_) | | (_| | (_) |
+      \__\___/|_|  | .__/|_|\__,_|\___/ 
+                   |_|                  
+    
+             \033[37;41m Video editing made fun ;) \033[0m
+    _______________________________________________
+    
+    """)
 
     time.sleep(1)
 
@@ -49,20 +49,20 @@ class Controller:
     """
 
     def __init__(self):
-        self.fps = None
-        self.videoFile = None
-        self.outputFile = None
-        self.audioFile = None
-        self.deNoisedAudioFile = None
-        self.audioProcess = None
-        self.visualProcess = None
-        self.textualProcess = None
-        self.visual = Visual()
-        self.auditory = Auditory()
-        self.textual = Textual()
-        self.ffmpeg = FFMPEG()
-        self.cache = Cache()
-        self.watcher = Watcher()
+        self.__fps = None
+        self.__videoFile = None
+        self.__outputFile = None
+        self.__audioFile = None
+        self.__deNoisedAudioFile = None
+        self.__audioProcess = None
+        self.__visualProcess = None
+        self.__textualProcess = None
+        self.__visual = Visual()
+        self.__auditory = Auditory()
+        self.__textual = Textual()
+        self.__ffmpeg = FFMPEG()
+        self.__cache = Cache()
+        self.__watcher = Watcher()
 
     def startProcessing(self, inputFile, display=False):
         """
@@ -99,18 +99,18 @@ class Controller:
         if not checkIfVideo(inputFile):
             return
 
-        if self.ffmpeg.splitVideoAudio(inputFile):
+        if self.__ffmpeg.splitVideoAudio(inputFile):
             pass
 
-        self.videoFile = inputFile
-        self.outputFile = self.ffmpeg.getOutputFileNamePath()
-        self.audioFile = self.ffmpeg.getInputAudioFileNamePath()
-        self.deNoisedAudioFile = self.ffmpeg.getOutputAudioFileNamePath()
+        self.__videoFile = inputFile
+        self.__outputFile = self.__ffmpeg.getOutputFileNamePath()
+        self.__audioFile = self.__ffmpeg.getInputAudioFileNamePath()
+        self.__deNoisedAudioFile = self.__ffmpeg.getOutputAudioFileNamePath()
 
         # starting the sub processes
-        self.startModules(display)
+        self.__startModules(display)
 
-    def startModules(self, display):
+    def __startModules(self, display):
         """
         Creating 3 processes using the Process class of the multi-processing module.
         FFmpeg separated files are referenced from the Controller public variables
@@ -123,32 +123,33 @@ class Controller:
             to display the video while processing
 
         """
-        self.watcher.start()  # starting the watcher
+        self.__watcher.start()  # starting the watcher
 
-        self.audioProcess = Process(target=self.auditory.startProcessing, args=(self.audioFile, self.deNoisedAudioFile))
-        self.visualProcess = Process(target=self.visual.startProcessing, args=(self.videoFile, display))
-        self.textualProcess = Process(target=self.textual.startProcessing, args=(self.videoFile, display))
+        self.__audioProcess = Process(target=self.__auditory.startProcessing,
+                                      args=(self.__audioFile, self.__deNoisedAudioFile))
+        self.__visualProcess = Process(target=self.__visual.startProcessing, args=(self.__videoFile, display))
+        self.__textualProcess = Process(target=self.__textual.startProcessing, args=(self.__videoFile, display))
 
-        self.audioProcess.start()
-        self.visualProcess.start()
-        self.textualProcess.start()
+        self.__audioProcess.start()
+        self.__visualProcess.start()
+        self.__textualProcess.start()
 
-        self.audioProcess.join()
-        self.visualProcess.join()
-        self.textualProcess.join()
+        self.__audioProcess.join()
+        self.__visualProcess.join()
+        self.__textualProcess.join()
 
         # running the final pass
         Log.d(f"Garbage collecting .. {gc.collect()}")
-        self.completedProcess()
+        self.__completedProcess()
 
-    def completedProcess(self):
+    def __completedProcess(self):
         """
         Calls the merging function to merge the processed audio and the input
         video file. Once completed final video is outputted and the audio files
         generated are deleted as a part of the clean up process. Along with it
         the garbage collection module does some clean ups too.
         """
-        self.watcher.end()  # ending the watcher
+        self.__watcher.end()  # ending the watcher
 
         timestamps = getTimestamps()
         if len(timestamps) == 0:
@@ -156,21 +157,21 @@ class Controller:
             return
 
         Log.i(f"Clipping a total of {len(timestamps)} sub portions.")
-        if self.ffmpeg.mergeAudioVideo(timestamps):
+        if self.__ffmpeg.mergeAudioVideo(timestamps):
             Log.d("Merged the final output video ...............")
 
-        self.ffmpeg.cleanUp()
+        self.__ffmpeg.cleanUp()
 
     def __del__(self):
         """
         clean up
         """
-        if self.visualProcess is not None:
-            self.visualProcess.terminate()
-        if self.audioProcess is not None:
-            self.audioProcess.terminate()
-        if self.textualProcess is not None:
-            self.textualProcess.terminate()
+        if self.__visualProcess is not None:
+            self.__visualProcess.terminate()
+        if self.__audioProcess is not None:
+            self.__audioProcess.terminate()
+        if self.__textualProcess is not None:
+            self.__textualProcess.terminate()
         Log.d("Terminating the processes")
 
 

@@ -17,7 +17,7 @@ class VideoGet:
 
     Attributes
     ----------
-    Q : queue
+    __Q : queue
         python queue for storing the frames that are to be processed
     stream : video capture
         open cv stream object that read the video in frames
@@ -32,7 +32,7 @@ class VideoGet:
     """
 
     def __init__(self, src):
-        self.Q = Queue(maxsize=1024)
+        self.__Q = Queue(maxsize=1024)
         self.stream = cv2.VideoCapture(src)
         self.stopped = False
 
@@ -40,10 +40,10 @@ class VideoGet:
         """
         Create the thread
         """
-        Thread(target=self.get, args=()).start()
+        Thread(target=self.__get, args=()).start()
         return self
 
-    def get(self):
+    def __get(self):
         """
         Reads the frame from the stream, much faster
         in the thread
@@ -52,7 +52,7 @@ class VideoGet:
             if self.stopped:
                 return
 
-            if not self.Q.full():
+            if not self.__Q.full():
                 (grabbed, frame) = self.stream.read()
 
                 if not grabbed:
@@ -60,7 +60,7 @@ class VideoGet:
                     return
 
                 frame = resize(frame, width=VIDEO_WIDTH)
-                self.Q.put(frame)
+                self.__Q.put(frame)
 
     def read(self):
         """
@@ -72,7 +72,7 @@ class VideoGet:
             returns the frame to process, if timeout(queue lock) occurs None is returned
         """
         try:
-            data = self.Q.get(True, 3)
+            data = self.__Q.get(True, 3)
         except:
             data = None
         return data
@@ -87,6 +87,17 @@ class VideoGet:
             stream of the video
         """
         return self.stream
+
+    def getQueueSize(self):
+        """
+        Returns the size of the queue
+
+        Returns
+        -------
+        int
+            size of the queue
+        """
+        return self.__Q.qsize()
 
     def more(self):
         """
@@ -103,4 +114,4 @@ class VideoGet:
         self.stream.release()
 
     def __del__(self):
-        del self.Q
+        del self.__Q

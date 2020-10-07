@@ -8,7 +8,7 @@ import gc
 import os
 
 from lib.progress.progress import Progress
-from lib.util.constants import OUT_VIDEO_FILE, IN_AUDIO_FILE, OUT_AUDIO_FILE
+from lib.util.constants import *
 from lib.util.ffmpegTools import split, merge
 from lib.util.logger import Log
 
@@ -21,29 +21,29 @@ class FFMPEG:
 
     Attributes
     ----------
-    inputFileName : str
+    __inputFileName : str
         input video file name
-    inputFilePath : str
+    __inputFilePath : str
         input video file name
-    outputVideoFileName : str
+    __outputVideoFileName : str
         output video file name
-    inputAudioFileName : str
-        original splitted audio file name
-    outputAudioFileName : str
+    __inputAudioFileName : str
+        original splatted audio file name
+    __outputAudioFileName : str
         de-noised audio file name
-    outputFilePath : str
+    __outputFilePath : str
         same as the input file path
-    progressBar : tqdm
+    __progressBar : tqdm
         object of tqdm to display a progress bar
     """
     def __init__(self):
-        self.inputFileName = None
-        self.inputFilePath = None
-        self.outputVideoFileName = None
-        self.inputAudioFileName = None
-        self.outputAudioFileName = None
-        self.outputFilePath = None
-        self.progressBar = None
+        self.__inputFileName = None
+        self.__inputFilePath = None
+        self.__outputVideoFileName = None
+        self.__inputAudioFileName = None
+        self.__outputAudioFileName = None
+        self.__outputFilePath = None
+        self.__progressBar = None
 
     def getInputFileNamePath(self):
         """
@@ -54,8 +54,8 @@ class FFMPEG:
         str
             final name and path of the input video file
         """
-        if self.inputFileName is not None:
-            return os.path.join(self.inputFilePath, self.inputFileName)
+        if self.__inputFileName is not None:
+            return os.path.join(self.__inputFilePath, self.__inputFileName)
         return None
 
     def getOutputFileNamePath(self):
@@ -68,8 +68,8 @@ class FFMPEG:
         str
             output file name and path of the video file
         """
-        if self.outputVideoFileName is not None:
-            return os.path.join(self.outputFilePath, self.outputVideoFileName)
+        if self.__outputVideoFileName is not None:
+            return os.path.join(self.__outputFilePath, self.__outputVideoFileName)
         return None
 
     def getInputAudioFileNamePath(self):
@@ -81,8 +81,8 @@ class FFMPEG:
         str
             input audio file name and path ready to de-noise
         """
-        if self.inputAudioFileName is not None:
-            return os.path.join(self.outputFilePath, self.inputAudioFileName)
+        if self.__inputAudioFileName is not None:
+            return os.path.join(self.__outputFilePath, self.__inputAudioFileName)
         return None
 
     def getOutputAudioFileNamePath(self):
@@ -94,8 +94,8 @@ class FFMPEG:
         str
             returns the output audio file
         """
-        if self.outputAudioFileName is not None:
-            return os.path.join(self.outputFilePath, self.outputAudioFileName)
+        if self.__outputAudioFileName is not None:
+            return os.path.join(self.__outputFilePath, self.__outputAudioFileName)
         return None
 
     def splitVideoAudio(self, inputFile):
@@ -120,28 +120,29 @@ class FFMPEG:
             Log.e("File does not exists")
             return False
 
-        self.inputFilePath = os.path.dirname(inputFile)
-        self.outputFilePath = self.inputFilePath
-        self.inputFileName = os.path.basename(inputFile)
-        self.outputVideoFileName = os.path.splitext(self.inputFileName)[0] + OUT_VIDEO_FILE
-        self.inputAudioFileName = os.path.splitext(self.inputFileName)[0] + IN_AUDIO_FILE
-        self.outputAudioFileName = os.path.splitext(self.inputFileName)[0] + OUT_AUDIO_FILE
+        # storing all the references
+        self.__inputFileName = os.path.dirname(inputFile)
+        self.__outputFilePath = self.__inputFilePath
+        self.__inputFileName = os.path.basename(inputFile)
+        self.__outputVideoFileName = os.path.splitext(self.__inputFileName)[0] + OUT_VIDEO_FILE
+        self.__inputAudioFileName = os.path.splitext(self.__inputFileName)[0] + IN_AUDIO_FILE
+        self.__outputAudioFileName = os.path.splitext(self.__inputFileName)[0] + OUT_AUDIO_FILE
 
         # call ffmpeg tool to do the splitting
         try:
             Log.i("Splitting the video file.")
-            self.progressBar = Progress()
+            self.__progressBar = Progress()
             for log in split(inputFile,
-                             os.path.join(self.outputFilePath, self.inputAudioFileName)):
-                self.progressBar.displayProgress(log)
+                             os.path.join(self.__outputFilePath, self.__inputAudioFileName)):
+                self.__progressBar.displayProgress(log)
 
         except ChildProcessError:
             Log.e("Splitting the input file has caused an error.")
-            self.progressBar.clear()
+            self.__progressBar.clear()
             return False
 
         finally:
-            self.progressBar.complete()
+            self.__progressBar.complete()
             print("----------------------------------------------------------")
             return True
 
@@ -161,26 +162,26 @@ class FFMPEG:
         bool
             True id success else error is raised
         """
-        if self.inputFileName is None or self.outputAudioFileName is None:
+        if self.__inputFileName is None or self.__outputAudioFileName is None:
             Log.e("Files not found for merging")
             return False
 
         # call ffmpeg tool to merge the files
         try:
-            self.progressBar = Progress()
+            self.__progressBar = Progress()
             Log.i("Writing the output video file.")
-            for log in merge(os.path.join(self.outputFilePath, self.inputFileName),
-                             os.path.join(self.outputFilePath, self.outputAudioFileName),
-                             os.path.join(self.outputFilePath, self.outputVideoFileName), timestamps):
-                self.progressBar.displayProgress(log)
+            for log in merge(os.path.join(self.__outputFilePath, self.__inputFileName),
+                             os.path.join(self.__outputFilePath, self.__outputAudioFileName),
+                             os.path.join(self.__outputFilePath, self.__outputVideoFileName), timestamps):
+                self.__progressBar.displayProgress(log)
 
         except ChildProcessError:
             Log.e("Merging the files has caused an error.")
-            self.progressBar.clear()
+            self.__progressBar.clear()
             return False
 
         finally:
-            self.progressBar.complete()
+            self.__progressBar.complete()
             print("----------------------------------------------------------")
             return True
 
@@ -189,12 +190,34 @@ class FFMPEG:
         Deleted the audio files created while audio processing.
         Minor clean ups.
         """
-        if os.path.isfile(os.path.join(self.outputFilePath, self.inputAudioFileName)):
-            os.unlink(os.path.join(self.outputFilePath, self.inputAudioFileName))
+        # original audio split from the video file
+        if os.path.isfile(os.path.join(self.__outputFilePath, self.__inputAudioFileName)):
+            os.unlink(os.path.join(self.__outputFilePath, self.__inputAudioFileName))
 
-        if os.path.isfile(os.path.join(self.outputFilePath, self.outputAudioFileName)):
-            os.unlink(os.path.join(self.outputFilePath, self.outputAudioFileName))
+        # de-noised audio file output of Auditory
+        if os.path.isfile(os.path.join(self.__outputFilePath, self.__outputAudioFileName)):
+            os.unlink(os.path.join(self.__outputFilePath, self.__outputAudioFileName))
 
-        del self.progressBar
+        # motion ranking file
+        if os.path.isfile(os.path.join(MODEL_DIR, RANK_OUT_MOTION)):
+            os.unlink(os.path.join(MODEL_DIR, RANK_OUT_MOTION))
+
+        # blur ranking file
+        if os.path.isfile(os.path.join(MODEL_DIR, RANK_OUT_BLUR)):
+            os.unlink(os.path.join(MODEL_DIR, RANK_OUT_BLUR))
+
+        # audio ranking file
+        if os.path.isfile(os.path.join(MODEL_DIR, RANK_OUT_AUDIO)):
+            os.unlink(os.path.join(MODEL_DIR, RANK_OUT_AUDIO))
+
+        # text ranking file
+        if os.path.isfile(os.path.join(MODEL_DIR, RANK_OUT_TEXT)):
+            os.unlink(os.path.join(MODEL_DIR, RANK_OUT_TEXT))
+
+        # cache storage file
+        if os.path.isfile(os.path.join(CACHE_DIR, CACHE_NAME)):
+            os.unlink(os.path.join(CACHE_DIR, CACHE_NAME))
+
+        del self.__progressBar
         Log.d(f"Garbage collected :: {gc.collect()}")
         Log.d("Clean up completed.")

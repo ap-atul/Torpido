@@ -2,7 +2,7 @@
 Smart queue: A simple queue to store the frames read from the
 VideoCapture open cv'
 This one has no blocking writes and reads which makes it more
-faster and since list is used as a queue. The __time complexity
+faster and since list is used as a queue. The time complexity
 is linear O(n)
 """
 

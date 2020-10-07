@@ -163,4 +163,5 @@ class Watcher:
             del self.__memThread
         if self.__cpuThread is not None:
             del self.__cpuThread
+
         Log.d(f"Garbage Collected :: {gc.collect()}")

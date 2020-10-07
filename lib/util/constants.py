@@ -18,7 +18,7 @@ CACHE_AUDIO_INFO = "CACHE_AUDIO_INFO"
 
 # ******************* RANKS ****************************
 # ranking for motion in video
-RANK_MOTION = 5
+RANK_MOTION = 3
 
 # ranking for blur in video
 RANK_BLUR = 1
@@ -30,7 +30,7 @@ RANK_AUDIO = 3
 RANK_TEXT = 5
 
 # output video min rank
-MIN_RANK_OUT_VIDEO = 3
+MIN_RANK_OUT_VIDEO = 4
 
 # ******************* VIDEO PART *************************
 # video width to keep while processing
@@ -51,7 +51,7 @@ RANK_OUT_BLUR = "blur_ranking.joblib"
 
 
 # ******************* AUDIO PART *************************
-# reading 5 percent of audio file at a __time
+# reading 5 percent of audio file at a time
 AUDIO_BLOCK_PER = 0.5
 
 # window level in the wavelet level
