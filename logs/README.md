@@ -19,6 +19,14 @@
 -------------------------------------------------------------------------------------------------
 # Logs
 
+### Log 15, 07-10
+```AP```
+* Added abstraction
+* Minor changes
+* Started with class diagram
+* Started with UI design
+
+----------------------------------------
 ### Log 14, 02-10
 ```AP```
 * Fixed Textual
