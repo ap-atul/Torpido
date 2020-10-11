@@ -1,3 +1,10 @@
+"""
+Controller class will control all the functions to perform
+it will link all the libs together and work each process by process
+Since, threads and processes need to communicate, the controller
+object would be shared in functions
+"""
+
 import gc
 import os
 import time
@@ -8,7 +15,7 @@ from lib.io import FFMPEG
 from lib.textual import Textual
 from lib.util.cache import Cache
 from lib.util.logger import Log
-from lib.util.timestampTool import getTimestamps
+from lib.util.timestampTool import getTimestamps, getOutputVideoLength
 from lib.util.validate import checkIfVideo
 from lib.util.watcher import Watcher
 from lib.visual import Visual
@@ -29,14 +36,6 @@ def logo():
     """)
 
     time.sleep(1)
-
-
-"""
-Controller class will control all the functions to perform
-it will link all the libs together and work each process by process
-Since, threads and processes need to communicate, the controller 
-object would be shared in functions
-"""
 
 
 class Controller:
@@ -63,6 +62,7 @@ class Controller:
         self.__ffmpeg = FFMPEG()
         self.__cache = Cache()
         self.__watcher = Watcher()
+        self.__watcher.enable(False)
 
     def startProcessing(self, inputFile, display=False):
         """
@@ -154,12 +154,15 @@ class Controller:
         timestamps = getTimestamps()
         if len(timestamps) == 0:
             Log.w("There are not good enough portions to cut. Try changing the configurations.")
+            self.__ffmpeg.cleanUp()
             return
 
         Log.i(f"Clipping a total of {len(timestamps)} sub portions.")
+        Log.i(f"Output video length would be approx. :: {getOutputVideoLength(timestamps)}")
         if self.__ffmpeg.mergeAudioVideo(timestamps):
             Log.d("Merged the final output video ...............")
 
+        # deleting files created by processing modules
         self.__ffmpeg.cleanUp()
 
     def __del__(self):

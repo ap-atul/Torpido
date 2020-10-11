@@ -12,7 +12,7 @@ class Log:
     Attributes
     ----------
     Log.modes : dict
-    storing mode string and color
+        storing mode string and color
 
     {"mode" : "color"}
 
@@ -37,14 +37,15 @@ class Log:
         Parameters
         ----------
         message : any
-        input message to print
+            input message to print
         mode : str
-        mode to print. Available options:
+            mode to print. Available options:
 
-        'DEBUG' : green color text with tag of [DEBUG]
-        'ERROR' : red color text with tag of [ERROR]
-        'INFO' : blue color text with tag of [INFO]
-        'WARN' : yellow color text with tag of [WARN]
+            'DEBUG' : green color text with tag of [DEBUG]
+            'ERROR' : red color text with tag of [ERROR]
+            'INFO' : blue color text with tag of [INFO]
+            'WARN' : yellow color text with tag of [WARN]
+
         """
         print(f"{Log.modes[mode]}[{mode}] {message}")
 
@@ -57,8 +58,8 @@ class Log:
         Parameters
         ----------
         message : str
-        normal string to print function any fstring or
-        format strings can be possible
+            normal string to print function any fstring or
+            formatted strings can be possible
         """
         Log.log(message, mode='DEBUG')
 
@@ -71,8 +72,8 @@ class Log:
         Parameters
         ----------
         message : str
-        normal string to print function any fstring or
-        format strings can be possible
+            normal string to print function any fstring or
+            format strings can be possible
         """
         Log.log(message, mode='INFO')
 
@@ -85,8 +86,8 @@ class Log:
         Parameters
         ----------
         message : str
-        normal string to print function any fstring
-        or format strings can be possible
+            normal string to print function any fstring
+            or format strings can be possible
         """
         Log.log(message, mode='ERROR')
 
@@ -99,7 +100,7 @@ class Log:
         Parameters
         ----------
         message : str
-        normal string to print function any fstring or
-        format strings can be possible
+            normal string to print function any fstring or
+            format strings can be possible
         """
         Log.log(message, mode='WARN')

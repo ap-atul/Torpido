@@ -69,6 +69,8 @@ class FFMPEG:
             output file name and path of the video file
         """
         if self.__outputVideoFileName is not None:
+            Log.e(self.__outputVideoFileName)
+            Log.e(self.__outputFilePath)
             return os.path.join(self.__outputFilePath, self.__outputVideoFileName)
         return None
 
@@ -121,7 +123,7 @@ class FFMPEG:
             return False
 
         # storing all the references
-        self.__inputFileName = os.path.dirname(inputFile)
+        self.__inputFilePath = os.path.dirname(inputFile)
         self.__outputFilePath = self.__inputFilePath
         self.__inputFileName = os.path.basename(inputFile)
         self.__outputVideoFileName = os.path.splitext(self.__inputFileName)[0] + OUT_VIDEO_FILE
@@ -172,7 +174,8 @@ class FFMPEG:
             Log.i("Writing the output video file.")
             for log in merge(os.path.join(self.__outputFilePath, self.__inputFileName),
                              os.path.join(self.__outputFilePath, self.__outputAudioFileName),
-                             os.path.join(self.__outputFilePath, self.__outputVideoFileName), timestamps):
+                             os.path.join(self.__outputFilePath, self.__outputVideoFileName),
+                             timestamps):
                 self.__progressBar.displayProgress(log)
 
         except ChildProcessError:

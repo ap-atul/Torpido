@@ -75,15 +75,28 @@ class Watcher:
         self.__stopped = False
         self.__delay = WATCHER_DELAY
         self.__exp = re.compile(r'(\d)')
+        self.__enable = True
+
+    def enable(self, enable=True):
+        """
+        Utility function to enable and disable the watcher
+
+        Parameters
+        ----------
+        enable : bool, default=True
+            enables the watcher
+        """
+        self.__enable = enable
 
     def start(self):
         """
         Starting 2 threads that run the commands using suprocess and reads the output to the UI and Logs
         """
-        self.__cpuThread = Thread(target=self.__runCpu, args=())
-        self.__memThread = Thread(target=self.__runMem, args=())
-        self.__cpuThread.start()
-        self.__memThread.start()
+        if self.__enable:
+            self.__cpuThread = Thread(target=self.__runCpu, args=())
+            self.__memThread = Thread(target=self.__runMem, args=())
+            self.__cpuThread.start()
+            self.__memThread.start()
 
     def __runCpu(self):
         """

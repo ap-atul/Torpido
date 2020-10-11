@@ -133,6 +133,7 @@ class Auditory:
         self.__energy = []
         Log.i(f"Audio duration is {self.__info.duration}.")
 
+        # creating and opening the output audio file
         with soundfile.SoundFile(outputFile, mode="w", samplerate=self.__rate, channels=self.__info.channels) as out:
             for block in soundfile.blocks(self.__fileName, int(self.__rate * self.__info.duration * AUDIO_BLOCK_PER)):
                 # cal all coefficients

@@ -160,3 +160,41 @@ def getTimestamps():
             finalTimestamp.append(clip)
 
     return finalTimestamp
+
+
+def getOutputVideoLength(timestamps: list):
+    """
+    Calculates the output video length from the timestamps, each portion
+    length would be end - start
+
+    Parameters
+    ----------
+    timestamps : list
+        timestamps for the video to edit
+
+    Returns
+    -------
+    int
+        final video length
+
+    References
+    ----------
+
+    timestamps has list of start and end like :
+
+        [[start, end], [start, end]]
+
+    to get a length of each portion
+        end - start
+
+    to get final length
+        finalLength += end[i] - start[i] ; i: 0 -> len(timestamps)
+    """
+    videoLength = 0
+    if len(timestamps) < 0:
+        return 0
+
+    for start, end in timestamps:
+        videoLength += abs(end - start)
+
+    return videoLength
