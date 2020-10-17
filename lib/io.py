@@ -182,6 +182,9 @@ class FFMPEG:
                              timestamps):
                 self.__progressBar.displayProgress(log)
 
+            if not os.path.isfile(os.path.join(self.__outputFilePath, self.__outputVideoFileName)):
+                raise FFmpegProcessException
+
             self.__progressBar.complete()
             print("----------------------------------------------------------")
             return True

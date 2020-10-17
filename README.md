@@ -6,35 +6,15 @@ Goal : To automate the video editing process
 * For dev logs refer [DEV LOGS](https://github.com/AP-Atul/Torpido/blob/master/logs)
 ---
 
-## Project Structure
-
-    .
-    ├── ...
-    ├── lib                 
-    │   ├── utils   
-    │   │   ├── constants.py  
-    │   │   ├── video_reader.py  
-    │   ├── visual.py 
-    │   └── ...                 
-    └── ...
-
-
- * lib : contains all the libraries to handle video features (visual / auditory / textual)
- * lib/util : helper files 
- * constants : constants config for every operations
- * model : saved a trained model
- 
----
-
 ## Working
 
-1. Read a video, separate the video and audio
-2. Rank video frames
-3. Rank audio frames
-4. Create transcripts for the audio
-5. Calculate final rank by combining all ranks
-6. Select highest ranking sub sequence
-7. Stitch back video and audio and display watch ability scores
+1. Accept a video file in the input
+2. Separate the video into video and audio
+3. Perform ranking for all the features (visual, auditory, textual)
+4. Perform de-noising on the audio
+5. Finally calculate a max sub sequences from the ranks
+6. Generate a timestamps for the sequences
+7. Trim the video using the timestamps
 
 ## Features
 
@@ -43,7 +23,6 @@ Goal : To automate the video editing process
 3. Audio de noising
 4. Audio activity ranking / Silence detection
 5. Text detection ranking
-6. Transcript generation (not confirmed)
 
 ## Notes
 
@@ -67,6 +46,8 @@ Numpy has fft and ifft (much easier)
 Librosa has stft and istft (short time fourier transform)
 Opencv also has a laplacian method  (Hankel) (performs similar to FFT)
 
+## Wavelet Transform 
+Looking at performances, WT performs well and faster than SFT or FFT.
 Note: Using WWavelet Transform to de noise, since the performance with FFT was very slow and memory consumption very high.
 PyWaveletes is a great lib for using wavelets
 Defaults: wavelet : db4; level : 1; mode = soft; method: per

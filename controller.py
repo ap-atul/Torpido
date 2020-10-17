@@ -101,7 +101,7 @@ class Controller:
 
         if self.__ffmpeg.splitVideoAudio(inputFile):
             Log.d("The input video has been split successfully")
-        # something went wrong
+        # something went wrong [mostly video does not contain any audio]
         else:
             Log.e("Logging out")
             return
