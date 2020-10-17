@@ -5,6 +5,7 @@ Function to build the commands live here.
 
 import subprocess
 
+from lib.exceptions.custom import AudioStreamMissingException, FFmpegProcessException
 from lib.util.logger import Log
 
 
@@ -77,7 +78,7 @@ def split(inputFile, outputAudioFile):
     run.stdout.close()
     if run.wait():
         Log.e("The splitting process has caused an error.")
-        return None
+        raise AudioStreamMissingException
 
 
 def buildMergeCommand(videoFile, audioFile, outputFile, timestamps):
@@ -222,4 +223,4 @@ def merge(videoFile, audioFile, outputFile, timestamps):
     run.stdout.close()
     if run.wait():
         Log.e(f"The merging process has caused an error.")
-        return None
+        raise FFmpegProcessException

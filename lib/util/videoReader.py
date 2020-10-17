@@ -73,7 +73,7 @@ class VideoGet:
         """
         try:
             data = self.__Q.get(True, 3)
-        except:
+        except RuntimeError:
             data = None
         return data
 

@@ -41,13 +41,9 @@ class Cache:
 
         """
         if os.path.isfile(self.__fileName):
-            try:
-                data = load(self.__fileName)
-                data[key] = value
-                dump(data, self.__fileName)
-            except:
-                Log.e("Error reading cache")
-                return
+            data = load(self.__fileName)
+            data[key] = value
+            dump(data, self.__fileName)
         else:
             data = dict()
             data[key] = value

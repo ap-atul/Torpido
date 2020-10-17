@@ -100,7 +100,11 @@ class Controller:
             return
 
         if self.__ffmpeg.splitVideoAudio(inputFile):
-            pass
+            Log.d("The input video has been split successfully")
+        # something went wrong
+        else:
+            Log.e("Logging out")
+            return
 
         self.__videoFile = inputFile
         self.__outputFile = self.__ffmpeg.getOutputFileNamePath()
@@ -161,6 +165,8 @@ class Controller:
         Log.i(f"Output video length would be approx. :: {getOutputVideoLength(timestamps)}")
         if self.__ffmpeg.mergeAudioVideo(timestamps):
             Log.d("Merged the final output video ...............")
+        else:
+            return
 
         # deleting files created by processing modules
         self.__ffmpeg.cleanUp()

@@ -13,12 +13,19 @@
    FFmpeg will run inside subprocess module functions
 
 ### Need to build
-   - Tools : FFmpeg helper, Cache, Logging, Image resizing, etc
+   - Tools : FFmpeg helper, Cache, Logging, Image resizing, Exceptions, Non-max suppression, etc
 
 
 -------------------------------------------------------------------------------------------------
 # Logs
 
+### Log 16, 17-10
+```AP```
+* Videos with no audio stream handling, skipping such videos for now
+* Added custom exceptions
+* Code clean ups
+
+----------------------------------------
 ### Log 15, 07-10
 ```AP```
 * Added abstraction

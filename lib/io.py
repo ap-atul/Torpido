@@ -7,6 +7,7 @@ using ffmpeg.
 import gc
 import os
 
+from lib.exceptions.custom import AudioStreamMissingException, FFmpegProcessException
 from lib.progress.progress import Progress
 from lib.util.constants import *
 from lib.util.ffmpegTools import split, merge
@@ -138,15 +139,18 @@ class FFMPEG:
                              os.path.join(self.__outputFilePath, self.__inputAudioFileName)):
                 self.__progressBar.displayProgress(log)
 
-        except ChildProcessError:
-            Log.e("Splitting the input file has caused an error.")
-            self.__progressBar.clear()
-            return False
+            if not os.path.isfile(os.path.join(self.__outputFilePath, self.__inputAudioFileName)):
+                raise AudioStreamMissingException
 
-        finally:
             self.__progressBar.complete()
             print("----------------------------------------------------------")
             return True
+
+        # no audio in the video
+        except AudioStreamMissingException:
+            Log.e(AudioStreamMissingException.cause)
+            self.__progressBar.clear()
+            return False
 
     def mergeAudioVideo(self, timestamps):
         """
@@ -178,15 +182,14 @@ class FFMPEG:
                              timestamps):
                 self.__progressBar.displayProgress(log)
 
-        except ChildProcessError:
-            Log.e("Merging the files has caused an error.")
-            self.__progressBar.clear()
-            return False
-
-        finally:
             self.__progressBar.complete()
             print("----------------------------------------------------------")
             return True
+
+        except FFmpegProcessException:
+            Log.e(FFmpegProcessException.cause)
+            self.__progressBar.clear()
+            return False
 
     def cleanUp(self):
         """
