@@ -19,6 +19,15 @@
 -------------------------------------------------------------------------------------------------
 # Logs
 
+### Log 17, 21-10
+```AP```
+* Wrong error in videoGet, added Empty check
+* Added EAST_MODEL to the env var
+* Added extra validations
+* Added custom exceptions
+* Code clean ups
+
+----------------------------------------
 ### Log 16, 17-10
 ```AP```
 * Videos with no audio stream handling, skipping such videos for now
