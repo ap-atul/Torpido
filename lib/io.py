@@ -5,7 +5,6 @@ using ffmpeg.
 """
 
 import gc
-import os
 
 from lib.exceptions.custom import AudioStreamMissingException, FFmpegProcessException
 from lib.progress.progress import Progress
@@ -70,8 +69,6 @@ class FFMPEG:
             output file name and path of the video file
         """
         if self.__outputVideoFileName is not None:
-            Log.e(self.__outputVideoFileName)
-            Log.e(self.__outputFilePath)
             return os.path.join(self.__outputFilePath, self.__outputVideoFileName)
         return None
 

@@ -7,13 +7,13 @@ geometry for the sections that contain the text.
 If mixed with text extraction it can give text from the image.
 """
 
-import os
 import time
 
 import cv2
 import numpy as np
 from joblib import dump
 
+from lib.exceptions.custom import EastModelEnvironmentMissing
 from lib.util import image
 from lib.util.constants import *
 from lib.util.logger import Log
@@ -70,7 +70,10 @@ class Textual:
 
         # initializing the model
         # reading the model in the memory
-        self.__net = cv2.dnn.readNet(TEXT_EAST_MODEL_PATH)
+        if TEXT_EAST_MODEL_PATH is not None:
+            self.__net = cv2.dnn.readNet(TEXT_EAST_MODEL_PATH)
+        else:
+            raise EastModelEnvironmentMissing
 
         # adding output layer to only return confidence for text
         self.__textDetectLayerName = ["feature_fusion/Conv_7/Sigmoid"]

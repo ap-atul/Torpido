@@ -1,3 +1,4 @@
+import os
 # TODO: Making this constants a class and initializing from some config file or some ui operations
 # file to save all the constants that are to be used
 # ******************* CACHE PART *************************
@@ -31,7 +32,7 @@ RANK_AUDIO = 3
 RANK_TEXT = 5
 
 # output video min rank
-MIN_RANK_OUT_VIDEO = 4
+MIN_RANK_OUT_VIDEO = 5
 
 # ******************* VIDEO PART *************************
 # video width to keep while processing
@@ -81,7 +82,7 @@ TEXT_MIN_CONFIDENCE = 0.5
 TEXT_SKIP_FRAMES = 10
 
 # text detection model directory
-TEXT_EAST_MODEL_PATH = "model/frozen_east_text_detection.pb"
+TEXT_EAST_MODEL_PATH = os.environ['EAST_MODEL']
 
 # name of the ranking file
 RANK_OUT_TEXT = "text_ranking.joblib"

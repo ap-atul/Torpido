@@ -10,11 +10,10 @@ using ffmpeg.
 
 """
 
-import os
-
 import numpy as np
 from joblib import load
 
+from lib.exceptions.custom import RankingOfFeatureMissing
 from lib.util.constants import *
 from lib.util.logger import Log
 
@@ -52,19 +51,19 @@ def readTheRankings():
     """
     if os.path.isfile(os.path.join(RANK_DIR, RANK_OUT_MOTION)) is False:
         Log.e("Motion Ranking does not exists")
-        return
+        return None
 
     if os.path.isfile(os.path.join(RANK_DIR, RANK_OUT_BLUR)) is False:
         Log.e("Blur Ranking does not exists")
-        return
+        return None
 
     if os.path.isfile(os.path.join(RANK_DIR, RANK_OUT_TEXT)) is False:
         Log.e("Text Ranking does not exists")
-        return
+        return None
 
     if os.path.isfile(os.path.join(RANK_DIR, RANK_OUT_AUDIO)) is False:
         Log.e("Audio Ranking does not exists")
-        return
+        return None
 
     # reading the saved ranking from the joblib files
     motionFile = os.path.join(RANK_DIR, RANK_OUT_MOTION)
@@ -150,7 +149,11 @@ def getTimestamps():
         timestamps list containing start and emd timestamps
 
     """
-    timestamps = trimByRank(readTheRankings())
+    ranks = readTheRankings()
+    if ranks is not None:
+        timestamps = trimByRank(ranks)
+    else:
+        raise RankingOfFeatureMissing
 
     finalTimestamp = []
 

@@ -11,6 +11,7 @@ import time
 from multiprocessing import Process
 
 from lib.auditory import Auditory
+from lib.exceptions.custom import RankingOfFeatureMissing, EastModelEnvironmentMissing
 from lib.io import FFMPEG
 from lib.textual import Textual
 from lib.util.cache import Cache
@@ -58,11 +59,19 @@ class Controller:
         self.__textualProcess = None
         self.__visual = Visual()
         self.__auditory = Auditory()
-        self.__textual = Textual()
         self.__ffmpeg = FFMPEG()
         self.__cache = Cache()
         self.__watcher = Watcher()
+
+        # not enables currently
         self.__watcher.enable(False)
+
+        # checking for EAST MODEL env var
+        try:
+            self.__textual = Textual()
+        except EastModelEnvironmentMissing:
+            Log.e(EastModelEnvironmentMissing.cause)
+            return
 
     def startProcessing(self, inputFile, display=False):
         """
@@ -155,10 +164,14 @@ class Controller:
         """
         self.__watcher.end()  # ending the watcher
 
-        timestamps = getTimestamps()
+        try:
+            timestamps = getTimestamps()
+        except RankingOfFeatureMissing:
+            Log.e(RankingOfFeatureMissing.cause)
+            return
+
         if len(timestamps) == 0:
             Log.w("There are not good enough portions to cut. Try changing the configurations.")
-            self.__ffmpeg.cleanUp()
             return
 
         Log.i(f"Clipping a total of {len(timestamps)} sub portions.")
@@ -168,19 +181,17 @@ class Controller:
         else:
             return
 
-        # deleting files created by processing modules
-        self.__ffmpeg.cleanUp()
-
     def __del__(self):
-        """
-        clean up
-        """
+        """clean up"""
         if self.__visualProcess is not None:
             self.__visualProcess.terminate()
         if self.__audioProcess is not None:
             self.__audioProcess.terminate()
         if self.__textualProcess is not None:
             self.__textualProcess.terminate()
+
+        # deleting files created by processing modules
+        self.__ffmpeg.cleanUp()
         Log.d("Terminating the processes")
 
 

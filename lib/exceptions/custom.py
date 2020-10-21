@@ -17,3 +17,19 @@ class FFmpegProcessException(Exception):
     some other FFmpeg error, this exception would be raised
     """
     cause = "FFmpeg has some problem processing"
+
+
+class RankingOfFeatureMissing(Exception):
+    """
+    When due to some issue ranking for some feature(s) was
+    not created, then exception will be raised.
+    """
+    cause = "Rank for some feature in missing"
+
+
+class EastModelEnvironmentMissing(Exception):
+    """
+    When the model path is read and the environment variable
+    is missing or not yet set this error will be raised
+    """
+    cause = "EAST_MODEL environment variable is missing or incorrect"

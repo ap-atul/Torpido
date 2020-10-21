@@ -1,5 +1,5 @@
 import gc
-from queue import Queue
+from queue import Queue, Empty
 from threading import Thread
 
 import cv2
@@ -73,7 +73,7 @@ class VideoGet:
         """
         try:
             data = self.__Q.get(True, 3)
-        except RuntimeError:
+        except Empty:
             data = None
         return data
 

@@ -15,6 +15,7 @@ Goal : To automate the video editing process
 5. Finally calculate a max sub sequences from the ranks
 6. Generate a timestamps for the sequences
 7. Trim the video using the timestamps
+8. Requires to set the path of the EAST_MODEL as the environment variable
 
 ## Features
 
