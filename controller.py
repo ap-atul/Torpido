@@ -16,7 +16,7 @@ from lib.io import FFMPEG
 from lib.textual import Textual
 from lib.util.cache import Cache
 from lib.util.logger import Log
-from lib.util.timestampTool import getTimestamps, getOutputVideoLength
+from lib.util.timestamp import getTimestamps, getOutputVideoLength
 from lib.util.validate import checkIfVideo
 from lib.util.watcher import Watcher
 from lib.visual import Visual

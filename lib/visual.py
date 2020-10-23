@@ -4,7 +4,6 @@ that have motion in it, saves in the dictionary with frame numbers
 this dictionary is then saved in a joblib file defined in constants.py
 """
 
-import os
 import time
 
 import cv2
@@ -14,7 +13,7 @@ from joblib import dump
 from lib.util.cache import Cache
 from lib.util.constants import *
 from lib.util.logger import Log
-from lib.util.videoReader import VideoGet
+from lib.util.video_reader import VideoGet
 
 
 class Visual:

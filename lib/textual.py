@@ -17,7 +17,7 @@ from lib.exceptions.custom import EastModelEnvironmentMissing
 from lib.util import image
 from lib.util.constants import *
 from lib.util.logger import Log
-from lib.util.videoReader import VideoGet
+from lib.util.video_reader import VideoGet
 
 
 class Textual:

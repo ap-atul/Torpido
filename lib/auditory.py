@@ -4,7 +4,6 @@ wavelet transforms a threshold will be added to each window with certain level
 """
 
 import gc
-import os
 
 import numpy as np
 import pywt
@@ -12,7 +11,6 @@ import soundfile
 from joblib import dump
 from matplotlib import pyplot as plt
 
-from lib.noise.noiseProfiler import NoiseProfiler
 from lib.util.cache import Cache
 from lib.util.constants import *
 from lib.util.logger import Log
@@ -185,20 +183,6 @@ class Auditory:
 
     def __setAudioInfo(self):
         self.__cache.writeDataToCache(CACHE_AUDIO_INFO, self.__info)
-
-    def __getNoiseFromAudio(self):
-        """
-        Parsed the input audio signal all at once and generates an
-        noise profile or the signal and saved to the file
-
-        Writes the noise signal to the file names 'noise.wav'
-        """
-        data, rate = soundfile.read(self.__fileName)
-        filePath = os.path.dirname(self.__fileName)
-
-        noiseSignal = NoiseProfiler(data).getNoiseDataPredicted()
-        soundfile.write(os.path.join(filePath, "noise.wav"), noiseSignal, rate)
-        Log.i("Noise file generated.")
 
     def __del__(self):
         """
