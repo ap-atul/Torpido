@@ -11,10 +11,10 @@ import time
 from multiprocessing import Process
 
 from torpido import Auditory, FFMPEG, Textual, Visual
-from torpido.config import Cache, Log
+from torpido.config import Cache
 from torpido.exceptions import RankingOfFeatureMissing, EastModelEnvironmentMissing
-from torpido.tools import getTimestamps, getOutputVideoLength
-from torpido.util import checkIfVideo, Watcher
+from torpido.tools import Watcher, Log
+from torpido.util import checkIfVideo, getTimestamps, getOutputVideoLength
 
 
 def logo():

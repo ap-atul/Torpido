@@ -7,7 +7,7 @@ None
 from joblib import dump, load
 
 from torpido.config.constants import *
-from torpido.config.logger import Log
+from torpido.tools.logger import Log
 
 
 class Cache:
