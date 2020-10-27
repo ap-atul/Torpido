@@ -19,6 +19,15 @@
 -------------------------------------------------------------------------------------------------
 # Logs
 
+### Log 18, 27-10
+```AP```
+* Changed project folder name from lib -> torpido
+* Made directory changes
+* Organize the directory 
+* Included init s to quick import stuffs
+* Removed noise directory
+
+----------------------------------------
 ### Log 17, 21-10
 ```AP```
 * Wrong error in videoGet, added Empty check

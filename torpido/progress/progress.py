@@ -6,7 +6,7 @@ the time and duration in the logs
 
 from tqdm import tqdm
 
-from lib.progress.std_extractor import StdExtractor
+from torpido.progress.std_extractor import StdExtractor
 
 
 class Progress:

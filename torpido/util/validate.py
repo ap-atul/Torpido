@@ -5,8 +5,8 @@ formats and can be processed readily if not we will raise errors
 
 import os
 
-from lib.util.constants import SUPPORTED_VIDEO_FILES
-from lib.util.logger import Log
+from torpido.config import Log
+from torpido.config import SUPPORTED_VIDEO_FILES
 
 
 def checkIfVideo(inputFile):

@@ -1,5 +1,5 @@
 import os
-# TODO: Making this constants a class and initializing from some config file or some ui operations
+
 # file to save all the constants that are to be used
 # ******************* CACHE PART *************************
 # cache store dir

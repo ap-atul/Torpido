@@ -8,12 +8,9 @@ import time
 
 import cv2
 import numpy as np
-from joblib import dump
 
-from lib.util.cache import Cache
-from lib.util.constants import *
-from lib.util.logger import Log
-from lib.util.video_reader import VideoGet
+from torpido.config import *
+from torpido.video import VideoGet
 
 
 class Visual:

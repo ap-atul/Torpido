@@ -9,7 +9,7 @@ import re
 class Time:
     """
     Simple class to store time values extracted
-    datetime can be used from python lib
+    datetime can be used from python torpido
 
     Attributes
     ---------

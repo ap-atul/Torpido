@@ -4,9 +4,9 @@ from threading import Thread
 
 import cv2
 
-from lib.util.constants import VIDEO_WIDTH
-from lib.util.image import resize
-from lib.util.logger import Log
+from torpido.config import Log
+from torpido.config.constants import VIDEO_WIDTH
+from torpido.util import resize
 
 
 class VideoGet:

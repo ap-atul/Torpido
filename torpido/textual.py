@@ -11,13 +11,11 @@ import time
 
 import cv2
 import numpy as np
-from joblib import dump
 
-from lib.exceptions.custom import EastModelEnvironmentMissing
-from lib.util import image
-from lib.util.constants import *
-from lib.util.logger import Log
-from lib.util.video_reader import VideoGet
+from torpido.config import *
+from torpido.exceptions import EastModelEnvironmentMissing
+from torpido.util import image
+from torpido.video import VideoGet
 
 
 class Textual:

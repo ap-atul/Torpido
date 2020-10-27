@@ -8,12 +8,9 @@ import gc
 import numpy as np
 import pywt
 import soundfile
-from joblib import dump
 from matplotlib import pyplot as plt
 
-from lib.util.cache import Cache
-from lib.util.constants import *
-from lib.util.logger import Log
+from torpido.config import *
 
 
 def mad(array):

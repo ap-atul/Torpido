@@ -11,11 +11,9 @@ using ffmpeg.
 """
 
 import numpy as np
-from joblib import load
 
-from lib.exceptions.custom import RankingOfFeatureMissing
-from lib.util.constants import *
-from lib.util.logger import Log
+from torpido.config import *
+from torpido.exceptions import RankingOfFeatureMissing
 
 
 def addPadding(rankList: list, length):

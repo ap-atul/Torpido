@@ -12,8 +12,8 @@ import subprocess
 import time
 from threading import Thread
 
-from lib.util.constants import WATCHER_DELAY
-from lib.util.logger import Log
+from torpido.config import Log
+from torpido.config import WATCHER_DELAY
 
 
 def getIdleTotal(stdout):

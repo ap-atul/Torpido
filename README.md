@@ -8,14 +8,27 @@ Goal : To automate the video editing process
 
 ## Working
 
-1. Accept a video file in the input
-2. Separate the video into video and audio
-3. Perform ranking for all the features (visual, auditory, textual)
-4. Perform de-noising on the audio
-5. Finally calculate a max sub sequences from the ranks
-6. Generate a timestamps for the sequences
-7. Trim the video using the timestamps
-8. Requires to set the path of the EAST_MODEL as the environment variable
+```
+- Start
+- Accepts video from the user
+- Reads the video [All processes below are parallel]
+
+    - Processes the video stream for [Visual] :
+        - Motion ranking, no motion will be ranked 0
+        - Blur detection, blur detected ranked 0
+
+    - Processes the video stream for [Textual] :
+        - Text detection, high rank for text detected
+
+    - Processes the audio stream for [Auditory] :
+        - Audio de-noising with DWT & FWT
+        - Audio activity ranking
+
+- Calculate the sum of all ranks
+- Select slices satisfying min rank
+- Make trims to video using the ranks time stamps
+- End
+```
 
 ## Features
 
@@ -24,28 +37,6 @@ Goal : To automate the video editing process
 3. Audio de noising
 4. Audio activity ranking / Silence detection
 5. Text detection ranking
-
-## Notes
-
-## FFT : Fast fourier tranform, mostly discrete fourier transform
-* Time series to frequency domain
-
-1. Most occurring signals are maximized after a FFT on the signal on the time and frequency sequence.
-
-2. FFT: wraps the signal around the circle circumference, that rise the signals that occurs most.
-
-3. Application in audio de noising:
-- FFT will increase the power of the signal that occurs the most. Signals like talking, when in the talking audio, the most signal will be of person speaking. So FFT on such signal will give us only the speaker audio with great height.
-
-- Then shifting the signal, we eliminate the low power signal, mostly noise, then inverse FFT will takes us back to original signal, only this time there would be no, noise.
-
-4. Application in blur detection
-- Similarly, most occurring data would be image data, if it is consistent we get a good sequence on the info, if we dont then image is classified as blurry.
-
-
-Numpy has fft and ifft (much easier)
-Librosa has stft and istft (short time fourier transform)
-Opencv also has a laplacian method  (Hankel) (performs similar to FFT)
 
 ## Wavelet Transform 
 Looking at performances, WT performs well and faster than SFT or FFT.

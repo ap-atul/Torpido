@@ -4,12 +4,10 @@ in the dictionary, if data exists it will return the val or
 None
 """
 
-import os
-
 from joblib import dump, load
 
-from lib.util.constants import *
-from lib.util.logger import Log
+from torpido.config.constants import *
+from torpido.config.logger import Log
 
 
 class Cache:

@@ -5,8 +5,8 @@ Function to build the commands live here.
 
 import subprocess
 
-from lib.exceptions.custom import AudioStreamMissingException, FFmpegProcessException
-from lib.util.logger import Log
+from torpido.config import Log
+from torpido.exceptions import AudioStreamMissingException, FFmpegProcessException
 
 
 def buildSplitCommand(inputFile, outputAudioFile):

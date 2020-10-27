@@ -6,11 +6,10 @@ using ffmpeg.
 
 import gc
 
-from lib.exceptions.custom import AudioStreamMissingException, FFmpegProcessException
-from lib.progress.progress import Progress
-from lib.util.constants import *
-from lib.util.ffmpeg_tools import split, merge
-from lib.util.logger import Log
+from torpido.config import *
+from torpido.exceptions import AudioStreamMissingException, FFmpegProcessException
+from torpido.progress import Progress
+from torpido.tools import split, merge
 
 
 class FFMPEG:
