@@ -16,16 +16,78 @@
    - Tools : FFmpeg helper, Cache, Logging, Image resizing, Exceptions, Non-max suppression, etc
 
 
--------------------------------------------------------------------------------------------------
+-----------------------------------------------------------
+
 # Logs
 
-### Log 18, 27-10
+### Log 25, 07-11
+```AP```
+* Decided to use Cython for c extension
+* Added type declaration for all parts of dwt and idwt
+* Massive performance increased
+* Compressor bug found and resolved [once cal of threshold]
+* Pushed all code to repo
+
+----------------------------------------
+### Log 24, 06-11
+```AP```
+* Displayed the diagrams
+* Lots of improvements required
+* Starting new repo for wavelets to improve the performance
+* Writing c extension for the WT
+
+----------------------------------------
+### Log 23, 04-11
+```AP```
+* Gave the Review 2
+* Missing diagrams UMLs
+* Started working on the UMLs
+* Using draw.io
+* Completed few UMLs diagram
+
+----------------------------------------
+### Log 22, 30-10
+```AP```
+* Discussion on Internal Review 2
+* PPT Structure and agenda to discuss
+* Wavelet Implementation going on 
+
+----------------------------------------
+### Log 21, 30-10
+```AP```
+* Bit clean up in wavelets
+* Documentation updated
+* Ancient decomposition added
+* Other wavelets added
+* Set up file added
+* tests added to test basic stuffs
+
+----------------------------------------
+### Log 20, 27-10
 ```AP```
 * Changed project folder name from lib -> torpido
 * Made directory changes
 * Organize the directory 
 * Included init s to quick import stuffs
 * Removed noise directory
+
+----------------------------------------
+### Log 19, 24-10
+```AP```
+* Added docs to wavelet
+* Bit clean up
+* Speed improvements required
+* It works well or accurate
+
+----------------------------------------
+### Log 18, 23-10
+```AP```
+* Started implementing the Wavelets transform
+* Discussed to add the DB and Coiflet or some others
+* Main motive is to make it as fast as possible
+* Thresholding needed to be decided
+* Completed 1D and 2D wavelets
+* FWT implemented
 
 ----------------------------------------
 ### Log 17, 21-10
@@ -81,7 +143,7 @@
 * Updated the logs to Github Wiki
 
 ------------------------------------------
-### Log 9, 16-09
+### Log 10, 16-09
 ```AP```
 * Wrote to Guide regarding the synopsis
 * No updates on Synopsis
@@ -139,6 +201,12 @@
 * Created board on Trello
 * Added Notes and Todo
 * Added links to previous works and references
+
+--------------------------------------------
+### Log 2, 16-07
+```AP```
+* Short discussion on project ideas
+* Decided the domains and basic tech
 
 --------------------------------------------
 ### Log 1, 15-07
