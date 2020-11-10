@@ -223,6 +223,10 @@ class FFMPEG:
         if os.path.isfile(os.path.join(CACHE_DIR, CACHE_NAME)):
             os.unlink(os.path.join(CACHE_DIR, CACHE_NAME))
 
+        # removing the model directory
+        if os.path.isdir(MODEL_DIR):
+            os.rmdir(MODEL_DIR)
+
         del self.__progressBar
         Log.d(f"Garbage collected :: {gc.collect()}")
         Log.d("Clean up completed.")

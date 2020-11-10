@@ -32,7 +32,8 @@ class VideoGet:
     """
 
     def __init__(self, src):
-        self.__Q = Queue(maxsize=1024)
+        cv2.setUseOptimized(True)
+        self.__Q = Queue(maxsize=2048)
         self.stream = cv2.VideoCapture(src)
         self.stopped = False
 
@@ -46,7 +47,8 @@ class VideoGet:
     def __get(self):
         """
         Reads the frame from the stream, much faster
-        in the thread
+        in the thread, if queue is full wait for it to
+        be process
         """
         while True:
             if self.stopped:

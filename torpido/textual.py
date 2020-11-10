@@ -56,13 +56,14 @@ class Textual:
     """
 
     def __init__(self):
+        cv2.setUseOptimized(True)
         self.__fps = None
         self.__frameCount = None
         self.__textRanks = None
         self.__videoGetter = None
         self.__minConfidence = TEXT_MIN_CONFIDENCE
-        self.__WIDTH = 320
-        self.__HEIGHT = 320
+        self.__WIDTH = 320  # this val should be multiple of 32
+        self.__HEIGHT = 320  # same thing for this
         self.__skipFrames = TEXT_SKIP_FRAMES
         self.__textRankPath = os.path.join(os.getcwd(), RANK_DIR, RANK_OUT_TEXT)
 
@@ -76,7 +77,7 @@ class Textual:
         # adding output layer to only return confidence for text
         self.__textDetectLayerName = ["feature_fusion/Conv_7/Sigmoid"]
 
-        # adding output layers to the model
+        # adding output layers to the model with text detected boxes
         self.__textDisplayLayerNames = ["feature_fusion/Conv_7/Sigmoid",
                                         "feature_fusion/concat_3"]
 

@@ -44,6 +44,7 @@ class Visual:
     """
 
     def __init__(self):
+        cv2.setUseOptimized(True)
         self.__motionRankPath = os.path.join(os.getcwd(), RANK_DIR, RANK_OUT_MOTION)
         self.__blurRankPath = os.path.join(os.getcwd(), RANK_DIR, RANK_OUT_BLUR)
         self.__blurThreshold = BLUR_THRESHOLD
@@ -151,8 +152,8 @@ class Visual:
             frameDelta = cv2.absdiff(firstFrame, frame)
             thresh = cv2.threshold(frameDelta, self.__motionThreshold, 255, cv2.THRESH_BINARY)[1]
 
-            threshSum = thresh.sum()
-            if threshSum > 0:
+            threshMax = np.max(thresh)
+            if threshMax > 0:
                 self.__motion.append(RANK_MOTION)
             else:
                 self.__motion.append(0)
