@@ -20,6 +20,15 @@
 
 # Logs
 
+### Log 26, 12-11
+```AP```
+* Added plots to visualize the final ranks
+* Plotting to visualize the timestamps
+* Clean up
+* Bug fix in io clean
+* Analytics improvements
+
+----------------------------------------
 ### Log 25, 07-11
 ```AP```
 * Decided to use Cython for c extension
