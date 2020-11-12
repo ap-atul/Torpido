@@ -129,7 +129,6 @@ class Textual:
             count += 1
 
             if count % self.__skipFrames == 0:
-                detectedText = False
 
                 #  making the image blob
                 blob = cv2.dnn.blobFromImage(frame,
@@ -140,11 +139,9 @@ class Textual:
 
                 # run text detection
                 if display:
-                    if self.__runTextDetectDisplay(blob, (rW, rH), original):
-                        detectedText = True
+                    detectedText = self.__runTextDetectDisplay(blob, (rW, rH), original)
                 else:
-                    if self.__runTextDetect(blob):
-                        detectedText = True
+                    detectedText = self.__runTextDetect(blob)
 
                 # if text is detected
                 if detectedText:
@@ -192,7 +189,7 @@ class Textual:
                 confidences.append(scoreData[y])
 
         # if confidences contain some value
-        if len(confidences) > 1:
+        if len(confidences) > 0:
             return True
         return False
 

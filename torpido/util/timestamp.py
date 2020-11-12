@@ -86,9 +86,8 @@ def readTheRankings():
     addPadding(audioRank, maxRank)
     addPadding(textRank, maxRank)
 
-    return [motionRank[i] + blurRank[i] +
-            textRank[i] + audioRank[i]
-            for i in range(maxRank)]
+    return [motionRank, blurRank,
+            textRank, audioRank]
 
 
 def trimByRank(ranks):
@@ -147,7 +146,9 @@ def getTimestamps():
         timestamps list containing start and emd timestamps
 
     """
-    ranks = readTheRankings()
+    motion, blur, text, audio = readTheRankings()
+    ranks = [motion[i] + blur[i] + text[i] + audio[i] for i in range(len(motion))]
+
     if ranks is not None:
         timestamps = trimByRank(ranks)
     else:

@@ -11,6 +11,7 @@ import time
 from multiprocessing import Process
 
 from torpido import Auditory, FFMPEG, Textual, Visual
+from torpido.analytics import Analytics
 from torpido.config import Cache
 from torpido.exceptions import RankingOfFeatureMissing, EastModelEnvironmentMissing
 from torpido.tools import Watcher, Log
@@ -55,6 +56,7 @@ class Controller:
         self.__visual = Visual()
         self.__auditory = Auditory()
         self.__ffmpeg = FFMPEG()
+        self.__analytics = Analytics()
         self.__cache = Cache()
         self.__watcher = Watcher()
 
@@ -148,6 +150,7 @@ class Controller:
 
         # running the final pass
         Log.d(f"Garbage collecting .. {gc.collect()}")
+        self.__analytics.analyze()
         self.__completedProcess()
 
     def __completedProcess(self):
@@ -188,34 +191,3 @@ class Controller:
         # deleting files created by processing modules
         self.__ffmpeg.cleanUp()
         Log.d("Terminating the processes")
-
-
-def call():
-    print("Calling this")
-    # objgraph.show_growth(limit=5)
-    control = Controller()
-    # import tracemalloc
-    # tracemalloc.start()
-    # print(" ************** GETTING GRAPH DATA *********")
-    # print(objgraph.show_growth(limit=5))
-    # snapshot1 = tracemalloc.take_snapshot()
-    control.startProcessing("", True)
-    # snapshot2 = tracemalloc.take_snapshot()
-    # def run_objgraph(type):
-    #     objgraph.show_backrefs(type,max_depth=20,
-    #          filename='/home/atul/Desktop/graphs/backrefs_%s_%d.png' % (type, os.getpid()))
-    #     roots = objgraph.get_leaking_objects()
-    #     print("************** LEAKING *****************")
-    #     print(objgraph.show_most_common_types(objects=roots))
-    #     print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-    #     objgraph.show_refs(roots[:3], refcounts=True,
-    #     	filename='/home/atul/Desktop/graphs/leaking_backrefs_%s_%d.png' % (type, os.getpid()))
-
-    # run_objgraph('dict')
-    # top_stats = snapshot2.compare_to(snapshot1, 'lineno')
-
-    # print("[ Top 10 differences ]")
-    # for stat in top_stats[:10]:
-    #     print(stat)
-
-# call()

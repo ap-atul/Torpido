@@ -1,62 +1,57 @@
-import os
+from matplotlib import pyplot as plt
 
-import numpy as np
-import pandas as pd
-from joblib import dump, load
-from sklearn.ensemble import RandomForestRegressor
-from sklearn.model_selection import train_test_split
-
-from torpido.config import MODEL_DIR, MODEL_NAME
+from torpido.util.timestamp import readTheRankings, getTimestamps
 
 
 class Analytics:
     def __init__(self):
-        self.inputCSV = '../examples/kaggle_yt.csv'
-        self.outputCSV = '../examples/youtube_data.csv'
+        self.__motion, self.__blur, self.__text, self.__audio = None, None, None, None
+        self.__rankLength = None
+        self.__ranks = None
 
-    def pre_process(self):
-        df = pd.read_csv(self.inputCSV)
-        names = ['__duration', 'comments', 'likes', 'dislikes', 'views']
+    def analyze(self):
+        self.__motion, self.__blur, self.__text, self.__audio = readTheRankings()
+        self.__rankLength = len(self.__motion)
 
-        ndf = pd.DataFrame({names[0]: df['duration_sec'],
-                            names[1]: df['comment_count'],
-                            names[2]: df['like_count'],
-                            names[3]: df['dislike_count'],
-                            names[4]: df['view_count']})
+        self.__ranks = [self.__motion[i] + self.__blur[i] +
+                        self.__text[i] + self.__audio[i] for i in range(self.__rankLength)]
 
-        ndf.to_csv(self.outputCSV, sep=',', index=False, header=names)
-        print('[INFO] File processed......')
+        self.__plotRankLine()
+        self.__plotSumLine()
 
-    def train(self):
-        df = pd.read_csv(self.outputCSV, low_memory=False, )
-        df.dropna(inplace=True)
-        df = df[df.notnull().all(axis=1)]
+    def __plotRankLine(self):
+        numbers = [i for i in range(self.__rankLength)]
+        fig = plt.figure()
 
-        X = df.iloc[:, [0, 1, 2, 3]].values
-        y = df.iloc[:, -1].values
+        ax = fig.add_subplot(411)
+        ax.plot(numbers, self.__motion, label="Motion", color='r')
+        plt.legend(loc=2)
 
-        n_estimator = 150
-        max_depth = 30
-        min_sample_split = 5
-        min_sample_leaf = 2
+        ax = fig.add_subplot(412)
+        ax.plot(numbers, self.__blur, label="Blur", color='g')
+        plt.legend(loc=2)
 
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.30, random_state=10)
+        ax = fig.add_subplot(413)
+        ax.plot(numbers, self.__audio, label="Audio", color='c')
+        plt.legend(loc=2)
 
-        clf = RandomForestRegressor(n_estimators=n_estimator, max_depth=max_depth, min_samples_split=min_sample_split,
-                                    min_samples_leaf=min_sample_leaf, n_jobs=-1)
-        clf.fit(X_train, y_train)
-        print(clf.score(X_test, y_test))
+        ax = fig.add_subplot(414)
+        ax.plot(numbers, self.__text, label="Text", color='m')
+        plt.legend(loc=2)
 
-        if os.path.isdir(MODEL_DIR) is False:
-            os.mkdir(MODEL_DIR)
+        plt.tight_layout()
+        plt.show()
 
-        dump(clf, os.path.join(MODEL_DIR, MODEL_NAME))
+    def __plotSumLine(self):
+        timestamps = getTimestamps()
 
-        return clf
+        for start, end, in timestamps:
+            plt.plot([start, start], [0, 10], color='red', linestyle='dashed', linewidth=2, label="start time")
+            plt.plot([end, end], [0, 10], color='green', linestyle='dashed', linewidth=2, label="end time")
 
-    @staticmethod
-    def predict(duration):
-        # '__duration', 'comments', 'likes', 'dislikes'
-        X = np.array([[duration, 100, 10000, 100]])
-        clf = load(os.path.join(MODEL_DIR, MODEL_NAME))
-        print(clf.predict(X))
+        plt.plot([i for i in range(self.__rankLength)], self.__ranks)
+        plt.legend(loc=2)
+        plt.title("Final summation of all ranks")
+        plt.xlabel("Video duration (sec)")
+        plt.ylabel("Summation of all rankings")
+        plt.show()

@@ -23,7 +23,7 @@ CACHE_AUDIO_INFO = "CACHE_AUDIO_INFO"
 RANK_MOTION = 3
 
 # ranking for blur in video
-RANK_BLUR = 1
+RANK_BLUR = 2
 
 # ranking for audio silence
 RANK_AUDIO = 3
@@ -32,7 +32,7 @@ RANK_AUDIO = 3
 RANK_TEXT = 5
 
 # output video min rank
-MIN_RANK_OUT_VIDEO = 5
+MIN_RANK_OUT_VIDEO = 3
 
 # ******************* VIDEO PART *************************
 # video width to keep while processing

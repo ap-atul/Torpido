@@ -67,22 +67,10 @@ class Visual:
         image : array
             frame from the video file
         """
-        # (h, w) = image.shape
-        # (cX, cY) = (int(w / 2.0), int(h / 2.0))
-        #
-        # fft = np.fft.fft2(image)
-        # fftShift = np.fft.fftshift(fft)
-        #
-        # fftShift[cY - size:cY + size, cX - size:cX + size] = 0
-        # fftShift = np.fft.ifftshift(fftShift)
-        # recon = np.fft.ifft2(fftShift)
-        #
-        # magnitude = 20 * np.log(np.abs(recon))
-        # mean = np.mean(magnitude)
-        # return mean <= thresh
+        # if blur rank is 0 else RANK_BLUR
         if cv2.Laplacian(image, cv2.CV_64F).var() >= self.__blurThreshold:
-            return RANK_BLUR
-        return 0
+            return 0
+        return RANK_BLUR
 
     def startProcessing(self, inputFile, display=False):
         """

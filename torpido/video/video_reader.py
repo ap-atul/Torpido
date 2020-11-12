@@ -33,7 +33,7 @@ class VideoGet:
 
     def __init__(self, src):
         cv2.setUseOptimized(True)
-        self.__Q = Queue(maxsize=2048)
+        self.__Q = Queue(maxsize=1200)
         self.stream = cv2.VideoCapture(src)
         self.stopped = False
 

@@ -192,9 +192,13 @@ class FFMPEG:
 
     def cleanUp(self):
         """
-        Deleted the audio files created while audio processing.
-        Minor clean ups.
+        Deletes extra files created while processing, deletes the ranking files
+        cache, etc.
         """
+        # well something is wrong here then bye
+        if self.__inputFileName is None:
+            return
+
         # original audio split from the video file
         if os.path.isfile(os.path.join(self.__outputFilePath, self.__inputAudioFileName)):
             os.unlink(os.path.join(self.__outputFilePath, self.__inputAudioFileName))
