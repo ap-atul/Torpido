@@ -20,6 +20,14 @@
 
 # Logs
 
+### Log 27, 13-11
+```AP```
+* Clean up
+* Analytics improved
+* Wavelets imported 
+* SNR plots added
+
+----------------------------------------
 ### Log 26, 12-11
 ```AP```
 * Added plots to visualize the final ranks
