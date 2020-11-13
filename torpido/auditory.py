@@ -123,7 +123,6 @@ class Auditory:
                 self.__energy.extend([self.__getEnergyRMS(cleaned)] * max(1, int(len(cleaned) / self.__rate)))
 
             if plot:
-                # plotSignals(block.T[0], cleaned.T[0])
                 self.__plotSNR()
 
         dump(self.__energy, self.__audioRankPath)
@@ -171,8 +170,6 @@ class Auditory:
         x_orig = np.arange(len(self.__snrBefore))
         plt.bar(x_orig - width / 2, np.abs(self.__snrBefore), width=width, label='Original')
         plt.bar(x_orig + width / 2, np.abs(self.__snrAfter), width=width, label='De-noised')
-
-        print(self.__snrAfter)
 
         plt.title("Signal to noise ratios SNR(dB)")
         plt.legend(loc=0)

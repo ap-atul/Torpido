@@ -161,7 +161,9 @@ class Controller:
         """
         self.__watcher.end()  # ending the watcher
         data = readTheRankings()
-        self.__analytics.analyze(data=data)
+
+        #  separate process for analytics
+        Process(target=self.__analytics.analyze, args=(data,)).start()
 
         try:
             timestamps = getTimestamps(data=data)

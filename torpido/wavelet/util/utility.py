@@ -84,11 +84,12 @@ def snr(data, axis=0, ddof=0):
     Signal to Noise ratio
     Simply given by mean / standard deviation
     """
-    a = np.asanyarray(data)
-    a = amp_to_db(a)
-    m = a.mean(axis)
-    sd = a.std(axis=axis, ddof=ddof)
-    return np.where(sd == 0, 0, m / sd)
+    with np.errstate(divide='ignore'):
+        a = np.asanyarray(data)
+        a = amp_to_db(a)
+        m = a.mean(axis)
+        sd = a.std(axis=axis, ddof=ddof)
+        return np.where(sd == 0, 0, m / sd)
 
 
 def amp_to_db(S, ref=1.0, min_value=1e-5, top_db=80.0):
