@@ -15,7 +15,7 @@ from torpido.analytics import Analytics
 from torpido.config import Cache
 from torpido.exceptions import RankingOfFeatureMissing, EastModelEnvironmentMissing
 from torpido.tools import Watcher, Log
-from torpido.util import checkIfVideo, getTimestamps, getOutputVideoLength
+from torpido.util import checkIfVideo, getTimestamps, getOutputVideoLength, readTheRankings
 
 
 def logo():
@@ -28,7 +28,7 @@ def logo():
                    |_|                  
     
              \033[37;41m Video editing made fun ;) \033[0m
-    _______________________________________________
+    ________________________________________
     
     """)
 
@@ -150,7 +150,6 @@ class Controller:
 
         # running the final pass
         Log.d(f"Garbage collecting .. {gc.collect()}")
-        self.__analytics.analyze()
         self.__completedProcess()
 
     def __completedProcess(self):
@@ -161,9 +160,11 @@ class Controller:
         the garbage collection module does some clean ups too.
         """
         self.__watcher.end()  # ending the watcher
+        data = readTheRankings()
+        self.__analytics.analyze(data=data)
 
         try:
-            timestamps = getTimestamps()
+            timestamps = getTimestamps(data=data)
         except RankingOfFeatureMissing:
             Log.e(RankingOfFeatureMissing.cause)
             return

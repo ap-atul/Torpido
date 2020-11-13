@@ -51,16 +51,15 @@ RANK_DIR = "model/"
 RANK_OUT_MOTION = 'motion_ranking.joblib'
 RANK_OUT_BLUR = "blur_ranking.joblib"
 
-
 # ******************* AUDIO PART *************************
-# reading 5 percent of audio file at a time
-AUDIO_BLOCK_PER = 0.5
+# reading 10 percent of audio file at a time
+AUDIO_BLOCK_PER = 0.2
 
 # window level in the wavelet level
 WAVELET_LEVEL = 1
 
-# wavelet used to de noise/  Daubechies wavelet band
-WAVELET = "db4"
+# wavelet used to de noise/  Coiflet wavelet band
+WAVELET = "coif1"
 
 # decomposition and re composition mode
 DEC_REC_MODE = "per"

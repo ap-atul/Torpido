@@ -136,9 +136,14 @@ def trimByRank(ranks):
     return timestamps
 
 
-def getTimestamps():
+def getTimestamps(data):
     """
     Returns parsed timestamps from the ranking of all 4 processing
+
+    Attributes
+    -----------
+    data: lol
+        list of list of ranks
 
     Returns
     -------
@@ -146,7 +151,7 @@ def getTimestamps():
         timestamps list containing start and emd timestamps
 
     """
-    motion, blur, text, audio = readTheRankings()
+    motion, blur, text, audio = data
     ranks = [motion[i] + blur[i] + text[i] + audio[i] for i in range(len(motion))]
 
     if ranks is not None:

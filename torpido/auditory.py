@@ -6,55 +6,11 @@ wavelet transforms a threshold will be added to each window with certain level
 import gc
 
 import numpy as np
-import pywt
 import soundfile
 from matplotlib import pyplot as plt
 
 from torpido.config import *
-
-
-def mad(array):
-    """
-    Median Absolute Deviation: a "Robust" version of standard deviation.
-    Indices variability of the sample.
-    https://en.wikipedia.org/wiki/Median_absolute_deviation
-
-    Gives variance for the input signal
-
-    Parameters
-    ----------
-    array : numpy array
-        input data from signal
-    """
-    array = np.ma.array(array).compressed()
-    return np.median(np.abs(array - np.median(array)))
-
-
-def plotSignals(inputData, cleanData):
-    """
-    Plotting the input signal and the cleaned version.
-    Not yet optimized. Heavy on memory
-
-    Spectrogram plotting
-
-    Parameters
-    ----------
-    inputData : array
-        input signal original
-    cleanData : array
-        cleaned signal
-    """
-    plt.subplot(211)
-    plt.title('Spectrogram for original and cleaned signal')
-    plt.specgram(inputData, Fs=44100)
-    plt.xlabel('Time')
-    plt.ylabel('Frequency')
-
-    plt.subplot(212)
-    plt.specgram(cleanData, Fs=44100)
-    plt.xlabel('Time')
-    plt.ylabel('Frequency')
-    plt.show()
+from torpido.wavelet import FastWaveletTransform, getExponent, VisuShrinkCompressor, snr
 
 
 class Auditory:
@@ -75,12 +31,20 @@ class Auditory:
         sound file object having the info of the audio file
     __energy : list
         list of the ranks for the audio signal
+    __snrBefore : list
+        list to store the snr of the original audio
+    __snrAfter : list
+        list to store the snr of the denoised audio
     __audioRankPath : str
         directory to store the rank of the audio
     __silenceThreshold : int
         threshold value to determine the rank
     __cache : Cache
         object of the cache to store the audio file info
+    __fwt : FastWaveletTransform
+        performs dwt & idwt on the data
+    __compressor : VisuShrinkCompressor
+        performs visu shrink thresholding on the coefficients
     """
     def __init__(self):
         self.__fileName = None
@@ -89,11 +53,15 @@ class Auditory:
         self.__plot = False
         self.__info = None
         self.__energy = None
+        self.__snrBefore = list()
+        self.__snrAfter = list()
         self.__audioRankPath = os.path.join(os.getcwd(), RANK_DIR, RANK_OUT_AUDIO)
         self.__silenceThreshold = SILENCE_THRESHOlD
         self.__cache = Cache()
+        self.__fwt = FastWaveletTransform(WAVELET)
+        self.__compressor = VisuShrinkCompressor()
 
-    def startProcessing(self, inputFile, outputFile, plot=False):
+    def startProcessing(self, inputFile, outputFile, plot=True):
         """
         Calculates the de noised signal based on the wavelets
         default wavelet is = db4, mode = per and thresh method = soft.
@@ -129,27 +97,34 @@ class Auditory:
         Log.i(f"Audio duration is {self.__info.duration}.")
 
         # creating and opening the output audio file
-        with soundfile.SoundFile(outputFile, mode="w", samplerate=self.__rate, channels=self.__info.channels) as out:
+        with soundfile.SoundFile(outputFile, mode="w", samplerate=self.__rate, channels=1) as out:
             for block in soundfile.blocks(self.__fileName, int(self.__rate * self.__info.duration * AUDIO_BLOCK_PER)):
+                # processing only single channel
+                if block.ndim > 1:
+                    block = block[:, 0]
+
                 # cal all coefficients
-                coefficients = pywt.wavedec(block, WAVELET, DEC_REC_MODE)
+                level = getExponent(len(block))
 
-                # getting the variance of the signal
-                sigma = mad(coefficients[- WAVELET_LEVEL])
+                # decomposition -> threshold -> reconstruction
+                coefficients = self.__fwt.wavedec(block, level=level)
+                coefficients = self.__compressor.compress(coefficients)
+                cleaned = self.__fwt.waverec(coefficients, level=level)
 
-                # VISU Shrink thresholding by applying the universal threshold proposed by Donoho and Johnstone
-                thresh = sigma * np.sqrt(2 * np.log(len(block)))
-                coefficients[1:] = (pywt.threshold(i, value=thresh, mode=WAVE_THRESH) for i in coefficients[1:])
-
-                cleaned = pywt.waverec(coefficients, WAVELET, mode=DEC_REC_MODE)
                 # recreating the audio signal in original form and writing to the output file
+                cleaned = np.array(cleaned, dtype=np.float_)
                 out.write(cleaned)
 
-                # calculating the audio rank
-                self.__energy.extend([self.__getEnergyRMS(block)] * max(1, int(len(block) / self.__rate)))
+                # collecting the signal to noise ratios
+                self.__snrBefore.append(snr(block))
+                self.__snrAfter.append(snr(cleaned))
 
-                if plot:
-                    plotSignals(block.T[0], cleaned.T[0])
+                # calculating the audio rank
+                self.__energy.extend([self.__getEnergyRMS(cleaned)] * max(1, int(len(cleaned) / self.__rate)))
+
+            if plot:
+                # plotSignals(block.T[0], cleaned.T[0])
+                self.__plotSNR()
 
         dump(self.__energy, self.__audioRankPath)
         Log.i("Audio de noised successfully")
@@ -179,11 +154,37 @@ class Auditory:
         return 0
 
     def __setAudioInfo(self):
+        """ Storing audio info """
         self.__cache.writeDataToCache(CACHE_AUDIO_INFO, self.__info)
+
+    def __plotSNR(self):
+        """
+        Plotting the snrs for the original and the de-nosied signals, the snrs are collected
+        during the processing, and the mean of the data is used to represent the final values
+        The snr is very low (negative with raised to values) so abs of the mean is taken.
+        Note: not to be mistaken with positive values
+
+        this SNR is  the reciprocal of the coefficient of variation, i.e.,
+        the ratio of mean to standard deviation of a signal, refer the snr function in wavelet/utility
+        """
+        width = 0.1
+        x_orig = np.arange(len(self.__snrBefore))
+        plt.bar(x_orig - width / 2, np.abs(self.__snrBefore), width=width, label='Original')
+        plt.bar(x_orig + width / 2, np.abs(self.__snrAfter), width=width, label='De-noised')
+
+        print(self.__snrAfter)
+
+        plt.title("Signal to noise ratios SNR(dB)")
+        plt.legend(loc=0)
+        plt.tight_layout()
+        plt.show()
 
     def __del__(self):
         """
         clean up
         """
         del self.__cache
+        del self.__fwt
+        del self.__compressor
+
         Log.d("Cleaning up.")

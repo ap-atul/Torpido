@@ -1,0 +1,1 @@
+from torpido.wavelet.compression.visu_shrink_compressor import VisuShrinkCompressor
