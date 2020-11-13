@@ -5,6 +5,9 @@
 * [Introduction](https://github.com/AP-Atul/Torpido#introduction)
 * [How?](https://github.com/AP-Atul/Torpido#how-are-we-doing-this?)
 * [Which?](https://github.com/AP-Atul/Torpido#which-features-are-we-talking-about?)
+   * [Visual](https://github.com/AP-Atul/Torpido#1-visual)
+   * [Auditory](https://github.com/AP-Atul/Torpido#2-auditory)
+   * [Textual](https://github.com/AP-Atul/Torpido#3-textual)
 * [Basic Working](https://github.com/AP-Atul/Torpido#basic-working)
 * [Applications](https://github.com/AP-Atul/Torpido#applications)
 * [Architecture](https://github.com/AP-Atul/Torpido#architecture)
@@ -21,6 +24,7 @@ Instagram, Twitter, etc.
 So we provide a solution to automate the task by using various methods to analyze audio and video
 aspects of the raw video and generate a better and summarized output content, expected by any user.
 
+
 ## How are we doing this?
 Automated summarization of digital Video Sequences is accomplished using a vector rank filter. The
 output of the rank vector is determined by the minimum rank to be given to the input sequence. And the
@@ -31,6 +35,7 @@ features to generate a ranking vector for each such feature.
 
 Applying filter on the final summation of all the ranked feature vectors to extract subsequences on the
 vector.
+
 
 ## Which features are we talking about?
 ### 1. Visual 
@@ -43,7 +48,7 @@ sequence.
 #### Blur
 * Determining the sharpness of the video FRAME, to rank the subsequence.
 * If the sharpness is below a certain threshold ranking is set to 0.
-
+----------------------
 ### 2. Auditory 
 #### Audio energy
 * Ranking the video sequence based on the audio activity i.e. talking, sound, music. etc.
@@ -51,7 +56,7 @@ sequence.
 
 #### De-noising
 * Audio will be denoised using Wavelet Transform
-
+----------------------
 ### 3. Textual
 #### Text Detection
 * Ranking the video sequence based on the text detected in the video
@@ -59,6 +64,7 @@ sequence.
 
 #### EAST model
 * The east model of the OpenCV will be used to detect the text in the video.
+
 
 ## Basic Working
 
@@ -84,6 +90,7 @@ sequence.
 - End
 ```
 
+
 ## Applications
 
 1. Automatic video editing for any video
@@ -92,10 +99,13 @@ sequence.
 4. In general video editing
 5. Audio de-noising of vlogging videos
 
+
 ## Architecture
 ![arch](https://github.com/AP-Atul/Torpido/blob/master/img/arch.png)
 
+
 ## Docs
+
 For all docs visit [torpido](https://ap-atul.github.io/torpido/)
 
 For dev logs visit [logs](https://github.com/AP-Atul/Torpido/tree/master/logs)
