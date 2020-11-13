@@ -3,8 +3,8 @@
 
 ## Table of Contents
 * [Introduction](https://github.com/AP-Atul/Torpido#introduction)
-* [How?](https://github.com/AP-Atul/Torpido#how-are-we-doing-this?)
-* [Which?](https://github.com/AP-Atul/Torpido#which-features-are-we-talking-about?)
+* [How?](https://github.com/AP-Atul/Torpido#how-are-we-doing-this)
+* [Which?](https://github.com/AP-Atul/Torpido#which-features-are-we-talking-about)
    * [Visual](https://github.com/AP-Atul/Torpido#1-visual)
    * [Auditory](https://github.com/AP-Atul/Torpido#2-auditory)
    * [Textual](https://github.com/AP-Atul/Torpido#3-textual)
