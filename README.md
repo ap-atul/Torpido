@@ -12,6 +12,7 @@
 * [Applications](https://github.com/AP-Atul/Torpido#applications)
 * [Architecture](https://github.com/AP-Atul/Torpido#architecture)
 * [Documentation](https://github.com/AP-Atul/Torpido#docs)
+* [Execution](https://github.com/AP-Atul/Torpido#execution)
 
 ## Introduction
 As we progress in this digital life concept, everyone tries to create contents plus they almost shoot
@@ -109,4 +110,41 @@ sequence.
 For all docs visit [torpido](https://ap-atul.github.io/torpido/)
 
 For dev logs visit [logs](https://github.com/AP-Atul/Torpido/tree/master/logs)
+
+## Execution
+* Install ffmpeg
+```
+$ sudo apt install ffmpeg
+```
+
+* Install all the dependencies
+```
+$ pip install -r requirements.txt
+```
+
+* Compile the cython files
+```
+$ python setup_dev.py build_ext --inplace
+```
+
+* Download EAST model and add it to the path
+```
+$ wget  https://www.dropbox.com/s/r2ingd0l3zt8hxs/frozen_east_text_detection.tar.gz?dl=1
+$ tar -xvf frozen_east_text_detection.tar.gz
+
+// set environment variable
+$ sudo gedit /etc/environment
+
+// add new var
+EAST_MODEL="path_to_frozen_east_text_detection.pb"
+
+// test the var
+$ echo $EAST_MODEL
+```
+
+* Run the run.py using some video file
+```
+$ python run.py /example/sample.mp4
+```
+
 

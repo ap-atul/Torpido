@@ -5,5 +5,4 @@ soundfile
 matplotlib
 python-opencv
 joblib
-pywt
 numpy
