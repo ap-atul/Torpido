@@ -101,3 +101,13 @@ SUPPORTED_VIDEO_FILES = [".mp4", ".webm", ".mkv", ".mov", ".flv", ".avi", ".ogg"
 # ********************* WATCHER ***********************************
 # delay to check the CPU and MEM usage (in secs)
 WATCHER_DELAY = 3
+
+# ******************** UI ***************************************
+# minimum height of window
+WINDOW_HEIGHT = 500
+
+# minimum width of window
+WINDOW_WIDTH = 900
+
+# name of the window
+WINDOW_TITLE = "Video Editing Automation (aka. Torpido)"
