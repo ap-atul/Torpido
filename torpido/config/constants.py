@@ -104,10 +104,10 @@ WATCHER_DELAY = 3
 
 # ******************** UI ***************************************
 # minimum height of window
-WINDOW_HEIGHT = 500
+WINDOW_HEIGHT = 600
 
 # minimum width of window
-WINDOW_WIDTH = 900
+WINDOW_WIDTH = 1000
 
 # name of the window
 WINDOW_TITLE = "Video Editing Automation (aka. Torpido)"
