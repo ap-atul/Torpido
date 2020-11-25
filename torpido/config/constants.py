@@ -3,10 +3,10 @@ import os
 # file to save all the constants that are to be used
 # ******************* CACHE PART *************************
 # cache store dir
-CACHE_DIR = "model/"
+CACHE_DIR = "torpido_tmp/"
 
 # cache file name
-CACHE_NAME = "vea_cache.joblib"
+CACHE_NAME = "vea_cache.tmp"
 
 # cache keys
 # video fps key
@@ -17,6 +17,18 @@ CACHE_FRAME_COUNT = "FRAME_COUNT"
 
 # audio info object
 CACHE_AUDIO_INFO = "CACHE_AUDIO_INFO"
+
+# ranking for audio
+CACHE_RANK_AUDIO = "CACHE_AUDIO_RANK"
+
+# ranking for motion
+CACHE_RANK_MOTION = "CACHE_RANK_MOTION"
+
+# ranking for blur
+CACHE_RANK_BLUR = "CACHE_RANK_BLUR"
+
+# ranking for text
+CACHE_RANK_TEXT = "CACHE_RANK_TEXT"
 
 # ******************* RANKS ****************************
 # ranking for motion in video
@@ -44,13 +56,6 @@ MOTION_THRESHOLD = 50
 # threshold for blur detection
 BLUR_THRESHOLD = 500
 
-# ranking dir
-RANK_DIR = "model/"
-
-# output folder to save the rankings dumps
-RANK_OUT_MOTION = 'motion_ranking.joblib'
-RANK_OUT_BLUR = "blur_ranking.joblib"
-
 # ******************* AUDIO PART *************************
 # reading 10 percent of audio file at a time
 AUDIO_BLOCK_PER = 0.2
@@ -67,9 +72,6 @@ DEC_REC_MODE = "per"
 # wave threshold method
 WAVE_THRESH = "soft"
 
-# output folder to save the ranking dumps
-RANK_OUT_AUDIO = 'audio_ranking.joblib'
-
 # silence threshold
 SILENCE_THRESHOlD = 0.005
 
@@ -82,15 +84,6 @@ TEXT_SKIP_FRAMES = 10
 
 # text detection model directory
 TEXT_EAST_MODEL_PATH = os.environ['EAST_MODEL']
-
-# name of the ranking file
-RANK_OUT_TEXT = "text_ranking.joblib"
-
-# ******************* ANALYTICS PART *************************
-MODEL_DIR = "model/"
-
-# model name
-MODEL_NAME = "views_predict_model.joblib"
 
 # ****************** FFMPEG *************************************
 # output video file name extension

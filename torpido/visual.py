@@ -21,10 +21,6 @@ class Visual:
 
     Attributes
     ----------
-    self.__motionRankPath : str
-        file to store the motion rank
-    self.__blurRankPath : str
-        file to store the blur rank
     self.__blurThreshold : int
         threshold to rank the blur feature
     self.__motionThreshold : int
@@ -45,8 +41,6 @@ class Visual:
 
     def __init__(self):
         cv2.setUseOptimized(True)
-        self.__motionRankPath = os.path.join(os.getcwd(), RANK_DIR, RANK_OUT_MOTION)
-        self.__blurRankPath = os.path.join(os.getcwd(), RANK_DIR, RANK_OUT_BLUR)
         self.__blurThreshold = BLUR_THRESHOLD
         self.__motionThreshold = MOTION_THRESHOLD
         self.__fps = None
@@ -190,8 +184,8 @@ class Visual:
                 break
 
         # saving all processed stuffs
-        dump(motionNormalize, self.__motionRankPath)
-        dump(blurNormalize, self.__blurRankPath)
+        self.__cache.writeDataToCache(CACHE_RANK_MOTION, motionNormalize)
+        self.__cache.writeDataToCache(CACHE_RANK_BLUR, blurNormalize)
         Log.d(f"Visual rank length {len(motionNormalize)}  {len(blurNormalize)}")
         Log.i(f"Visual ranking saved .............")
 

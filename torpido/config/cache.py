@@ -61,7 +61,7 @@ class Cache:
 
         Returns
         -------
-        object
+        result
             if exists cache else None
         """
         if os.path.isfile(self.__fileName):

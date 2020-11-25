@@ -47,33 +47,16 @@ def readTheRankings():
     list
         list of the sum of all ranks
     """
-    if os.path.isfile(os.path.join(RANK_DIR, RANK_OUT_MOTION)) is False:
-        Log.e("Motion Ranking does not exists")
-        return None
-
-    if os.path.isfile(os.path.join(RANK_DIR, RANK_OUT_BLUR)) is False:
-        Log.e("Blur Ranking does not exists")
-        return None
-
-    if os.path.isfile(os.path.join(RANK_DIR, RANK_OUT_TEXT)) is False:
-        Log.e("Text Ranking does not exists")
-        return None
-
-    if os.path.isfile(os.path.join(RANK_DIR, RANK_OUT_AUDIO)) is False:
-        Log.e("Audio Ranking does not exists")
-        return None
-
-    # reading the saved ranking from the joblib files
-    motionFile = os.path.join(RANK_DIR, RANK_OUT_MOTION)
-    blurFile = os.path.join(RANK_DIR, RANK_OUT_BLUR)
-    textFile = os.path.join(RANK_DIR, RANK_OUT_TEXT)
-    audioFile = os.path.join(RANK_DIR, RANK_OUT_AUDIO)
+    cache_rank = Cache()
 
     # loading the read files
-    motionRank = load(motionFile)
-    blurRank = load(blurFile)
-    textRank = load(textFile)
-    audioRank = load(audioFile)
+    motionRank = cache_rank.readDataFromCache(CACHE_RANK_MOTION)
+    blurRank = cache_rank.readDataFromCache(CACHE_RANK_MOTION)
+    textRank = cache_rank.readDataFromCache(CACHE_RANK_MOTION)
+    audioRank = cache_rank.readDataFromCache(CACHE_RANK_MOTION)
+
+    if not all([motionRank, blurRank, textRank, audioRank]):
+        raise RankingOfFeatureMissing
 
     # max length for ranking
     # NOTE: FFmpeg does not get bothered by greater values, not lower though

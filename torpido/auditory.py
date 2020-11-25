@@ -34,9 +34,7 @@ class Auditory:
     __snrBefore : list
         list to store the snr of the original audio
     __snrAfter : list
-        list to store the snr of the denoised audio
-    __audioRankPath : str
-        directory to store the rank of the audio
+        list to store the snr of the de-noised audio
     __silenceThreshold : int
         threshold value to determine the rank
     __cache : Cache
@@ -55,7 +53,6 @@ class Auditory:
         self.__energy = None
         self.__snrBefore = list()
         self.__snrAfter = list()
-        self.__audioRankPath = os.path.join(os.getcwd(), RANK_DIR, RANK_OUT_AUDIO)
         self.__silenceThreshold = SILENCE_THRESHOlD
         self.__cache = Cache()
         self.__fwt = FastWaveletTransform(WAVELET)
@@ -125,7 +122,7 @@ class Auditory:
             if plot:
                 self.__plotSNR()
 
-        dump(self.__energy, self.__audioRankPath)
+        self.__cache.writeDataToCache(CACHE_RANK_AUDIO, self.__energy)
         Log.i("Audio de noised successfully")
         Log.d(f"Audio ranking length {len(self.__energy)}")
         Log.i("Audio ranking saved .............")

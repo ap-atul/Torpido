@@ -37,6 +37,8 @@ class Textual:
         list of the ranks
     __videoGetter : VideoGet
         object of the video get to read the video through thread
+    __cache : Cache
+        object of the Cache to store the ranking
     __minConfidence : int
         minimum confidence to determine if the video contains text
     __WIDTH : int, default=320
@@ -45,8 +47,6 @@ class Textual:
         height of the frame
     __skipFrames : int
         no of frames to skip
-    __textRankPath : str
-        constants file defines where to store the ranks
     __net : object
         loaded east model
     __textDetectLayerName
@@ -61,11 +61,11 @@ class Textual:
         self.__frameCount = None
         self.__textRanks = None
         self.__videoGetter = None
+        self.__cache = Cache()
         self.__minConfidence = TEXT_MIN_CONFIDENCE
         self.__WIDTH = 320  # this val should be multiple of 32
         self.__HEIGHT = 320  # same thing for this
         self.__skipFrames = TEXT_SKIP_FRAMES
-        self.__textRankPath = os.path.join(os.getcwd(), RANK_DIR, RANK_OUT_TEXT)
 
         # initializing the model
         # reading the model in the memory
@@ -303,7 +303,7 @@ class Textual:
                 break
 
         # saving all processed stuffs
-        dump(textNormalize, self.__textRankPath)
+        self.__cache.writeDataToCache(CACHE_RANK_TEXT, textNormalize)
         Log.d(f"Textual rank length {len(textNormalize)}")
         Log.i("Textual ranking saved .............")
 

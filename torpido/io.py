@@ -207,29 +207,13 @@ class FFMPEG:
         if os.path.isfile(os.path.join(self.__outputFilePath, self.__outputAudioFileName)):
             os.unlink(os.path.join(self.__outputFilePath, self.__outputAudioFileName))
 
-        # motion ranking file
-        if os.path.isfile(os.path.join(MODEL_DIR, RANK_OUT_MOTION)):
-            os.unlink(os.path.join(MODEL_DIR, RANK_OUT_MOTION))
-
-        # blur ranking file
-        if os.path.isfile(os.path.join(MODEL_DIR, RANK_OUT_BLUR)):
-            os.unlink(os.path.join(MODEL_DIR, RANK_OUT_BLUR))
-
-        # audio ranking file
-        if os.path.isfile(os.path.join(MODEL_DIR, RANK_OUT_AUDIO)):
-            os.unlink(os.path.join(MODEL_DIR, RANK_OUT_AUDIO))
-
-        # text ranking file
-        if os.path.isfile(os.path.join(MODEL_DIR, RANK_OUT_TEXT)):
-            os.unlink(os.path.join(MODEL_DIR, RANK_OUT_TEXT))
-
         # cache storage file
         if os.path.isfile(os.path.join(CACHE_DIR, CACHE_NAME)):
             os.unlink(os.path.join(CACHE_DIR, CACHE_NAME))
 
         # removing the model directory
-        if os.path.isdir(MODEL_DIR):
-            os.rmdir(MODEL_DIR)
+        if os.path.isdir(CACHE_DIR):
+            os.rmdir(CACHE_DIR)
 
         del self.__progressBar
         Log.d(f"Garbage collected :: {gc.collect()}")
