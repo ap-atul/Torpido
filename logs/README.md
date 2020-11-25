@@ -20,6 +20,21 @@
 
 # Logs
 
+### Log 29, 25-11
+```AP```
+* Moved ranking from files to cache
+* Analytics improved
+* Performance improvements
+* testing small parts
+
+----------------------------------------
+### Log 28, 20-11
+```AP```
+* Completed SRS and looked into any corrections in Mathematical
+* Discussed about some more features or improvements
+* SRS correction and some changes
+
+----------------------------------------
 ### Log 27, 13-11
 ```AP```
 * Clean up
