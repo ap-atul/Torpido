@@ -1,7 +1,7 @@
 import sys
 
 from PyQt5 import QtGui, QtCore
-from PyQt5.QtGui import QPalette, QColor, QPixmap
+from PyQt5.QtGui import QPalette, QColor, QPixmap, QIcon
 from PyQt5.QtWidgets import (QWidget, QApplication, QVBoxLayout,
                              QHBoxLayout, QLabel, QGridLayout,
                              QGraphicsDropShadowEffect, QPushButton,
@@ -43,11 +43,11 @@ class Donut:
 
         # progress bar gradient
         gradientPoints = [(0, QtGui.QColor(72, 58, 78)),
-                          (0.4, QtGui.QColor(177, 123, 129)),
-                          (0.8, QtGui.QColor(191, 141, 124)),
-                          (0.9, QtGui.QColor(179, 132, 103))]
+                          (0.6, QtGui.QColor(177, 123, 129)),
+                          (0.90, QtGui.QColor(191, 141, 124)),
+                          (0.95, QtGui.QColor(179, 132, 103))]
         self.bar.setDataColors(gradientPoints)
-        self.bar.setValue(99)
+        self.bar.setValue(50)
 
         return self.bar
 
@@ -64,12 +64,22 @@ class App(QWidget):
         self.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT)
         self.setMaximumSize(1280, 720)
         self.setWindowTitle(WINDOW_TITLE)
+        self.setWindowIcon(QIcon('./assets/logo.png'))
 
         self.videoPicNotSelected = QPixmap('./assets/play-button-not-selected.png')
         self.videoPicNotSelected = self.videoPicNotSelected.scaledToWidth(140)
 
         self.videoPicSelected = QPixmap('./assets/play-button.png')
         self.videoPicSelected = self.videoPicSelected.scaledToWidth(140)
+
+        self.videoImage = QLabelAlternate()
+        self.introVideoImage = QLabelAlternate()
+        self.extroVideoImage = QLabelAlternate()
+
+        self.mainProgress = None
+        self.cpuProgress = None
+        self.memProgress = None
+
         self.buildLayouts()
 
     def buildLayouts(self):
@@ -96,49 +106,52 @@ class App(QWidget):
         optionsLayout = QGridLayout()
 
         # WIDGETS
-        mainProgress = Donut("mainProgress", self).get('%p%')
-        progressLayout.addWidget(mainProgress, 1, 1, 1, 2)
+        self.mainProgress = Donut("mainProgress", self).get('%p%')
+        self.mainProgress.setToolTip("Progress bar to represent the percentage completion of the video editing")
+        progressLayout.addWidget(self.mainProgress, 1, 1, 1, 2)
 
-        cpuProgress = Donut("cpuProgress", self).get('%p% \n CPU')
-        cpuProgress.setMaximumSize(150, 150)
-        progressLayout.addWidget(cpuProgress, 2, 1)
+        self.cpuProgress = Donut("cpuProgress", self).get('%p% \n CPU')
+        self.cpuProgress.setToolTip("Progress bar to represent the percentage usage of CPU by VEA")
+        self.cpuProgress.setMaximumSize(150, 150)
+        progressLayout.addWidget(self.cpuProgress, 2, 1)
 
-        memProgress = Donut("memProgress", self).get('%p% \n MEM')
-        memProgress.setMaximumSize(150, 150)
-        progressLayout.addWidget(memProgress, 2, 2)
+        self.memProgress = Donut("memProgress", self).get('%p% \n MEM')
+        self.memProgress.setToolTip("Progress bar to represent the percentage usage of Memory/RAM by VEA")
+        self.memProgress.setMaximumSize(150, 150)
+        progressLayout.addWidget(self.memProgress, 2, 2)
 
         select = QLabel("Drag or select a video file")
         select.setAlignment(QtCore.Qt.AlignLeft)
         select.setMaximumHeight(20)
         fileLayout.addWidget(select)
 
-        videoImage = QLabelAlternate()
-        videoImage.setPixmap(self.videoPicNotSelected)
-        videoImage.setGraphicsEffect(getShadow())
-        videoImage.setAlignment(QtCore.Qt.AlignLeft)
-        videoImage.setMaximumSize(140, 130)
-        videoImage.clicked.connect(self.selectFile)
-        fileLayout.addWidget(videoImage)
+        self.videoImage.setPixmap(self.videoPicNotSelected)
+        self.videoImage.setGraphicsEffect(getShadow())
+        self.videoImage.setAlignment(QtCore.Qt.AlignLeft)
+        self.videoImage.setMaximumSize(140, 130)
+        self.videoImage.clicked.connect(self.selectFile)
+        self.videoImage.setToolTip("Input video file")
+        fileLayout.addWidget(self.videoImage)
 
         optional = QLabel("Select intro and extro video files (optional)")
         optional.setContentsMargins(0, 30, 0, 0)
         optional.setAlignment(QtCore.Qt.AlignLeft)
         fileLayout.addWidget(optional)
 
-        introVideoImage = QLabelAlternate()
-        introVideoImage.setPixmap(self.videoPicNotSelected)
-        introVideoImage.setGraphicsEffect(getShadow())
-        introVideoImage.setMaximumSize(140, 130)
-        introVideoImage.clicked.connect(self.selectFile)
-        extraLayout.addWidget(introVideoImage)
+        self.introVideoImage.setPixmap(self.videoPicNotSelected)
+        self.introVideoImage.setGraphicsEffect(getShadow())
+        self.introVideoImage.setMaximumSize(140, 130)
+        self.introVideoImage.clicked.connect(self.selectFile)
+        self.introVideoImage.setToolTip("Intro video will be placed at the start")
+        extraLayout.addWidget(self.introVideoImage)
 
-        extroVideoImage = QLabelAlternate()
-        extroVideoImage.setPixmap(self.videoPicNotSelected)
-        extroVideoImage.setGraphicsEffect(getShadow())
-        extroVideoImage.setMaximumSize(140, 130)
-        extroVideoImage.clicked.connect(self.selectFile)
+        self.extroVideoImage.setPixmap(self.videoPicNotSelected)
+        self.extroVideoImage.setGraphicsEffect(getShadow())
+        self.extroVideoImage.setMaximumSize(140, 130)
+        self.extroVideoImage.clicked.connect(self.selectFile)
+        self.extroVideoImage.setToolTip("Extro video will be placed at the end")
+        extraLayout.addWidget(self.extroVideoImage)
 
-        extraLayout.addWidget(extroVideoImage)
         extraLayout.setSpacing(20)
         extraLayout.setAlignment(QtCore.Qt.AlignLeft)
         fileLayout.addLayout(extraLayout)
@@ -148,23 +161,33 @@ class App(QWidget):
         optionLabel.setAlignment(QtCore.Qt.AlignLeft)
         fileLayout.addWidget(optionLabel)
 
-        option1Label = QCheckBox("Option")
-        option2Label = QCheckBox("Option")
-        option3Label = QCheckBox("Option")
-        option4Label = QCheckBox("Option")
+        displayVideo = QCheckBox("Display video output")
+        displayVideo.setToolTip("Displays the video output while processing")
 
-        optionsLayout.addWidget(option1Label, 1, 1)
-        optionsLayout.addWidget(option2Label, 1, 2)
-        optionsLayout.addWidget(option3Label, 2, 1)
-        optionsLayout.addWidget(option4Label, 2, 2)
+        snrDisplay = QCheckBox("Display SNR plot")
+        snrDisplay.setToolTip("Displays the signal to noise ratio plot for audio denoising")
+
+        rankingPlot = QCheckBox("Display ranking plot")
+        rankingPlot.setToolTip("Displays the line plot for ranking of the video and their timestamps")
+
+        logOption = QCheckBox("Keep logs")
+        logOption.setToolTip("Stores the logs in a text file along with some info on the processing")
+
+        optionsLayout.addWidget(displayVideo, 1, 1)
+        optionsLayout.addWidget(snrDisplay, 1, 2)
+        optionsLayout.addWidget(rankingPlot, 2, 1)
+        optionsLayout.addWidget(logOption, 2, 2)
         optionsLayout.setRowStretch(3, 5)
 
         fileLayout.addLayout(optionsLayout)
 
         startButton = QPushButton("Start")
+        startButton.setToolTip("Start the processing for the input video given")
         buttonLayout.addWidget(startButton)
 
         stopButton = QPushButton("Stop")
+        stopButton.setToolTip("End the processing for the input video given")
+        stopButton.clicked.connect(self.close)
         buttonLayout.addWidget(stopButton)
         fileLayout.addLayout(buttonLayout)
 
@@ -176,10 +199,22 @@ class App(QWidget):
         mainLayout.addWidget(progressFrame, 1, 1)
         mainLayout.addLayout(fileLayout, 1, 2)
         mainLayout.setColumnMinimumWidth(1, 600)
+
         self.setLayout(mainLayout)
 
     def selectFile(self):
-        print("Yes")
+        self.videoImage.setPixmap(self.videoPicSelected)
+        self.introVideoImage.setPixmap(self.videoPicSelected)
+        self.extroVideoImage.setPixmap(self.videoPicSelected)
+
+    def setProgress(self, value):
+        self.mainProgress.setValue(value)
+
+    def setCpu(self, value):
+        self.cpuProgress.setValue(value)
+
+    def setMem(self, value):
+        self.memProgress.setValue(value)
 
 
 def startApp():

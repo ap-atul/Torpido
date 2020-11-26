@@ -20,6 +20,11 @@ QImage {
 QGridLayout {
    color:#ffffff;
 }
+QToolTip {
+   background-color: black;
+   color: white;
+   border: black solid 1px;
+}
 QPlainTextEdit {
 	selection-background-color:#007b50;
 	background-color:#2a2a32;
