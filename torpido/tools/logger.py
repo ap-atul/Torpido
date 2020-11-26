@@ -3,6 +3,9 @@ Main logger class to print to console based on the modes selected or passed. Uti
 
 Android style logging system!
 """
+import os
+
+from torpido.config.constants import CACHE_DIR, LOG_FILE
 
 
 class Log:
@@ -16,6 +19,9 @@ class Log:
 
     {"mode" : "color"}
 
+    Log.toFile : bool
+        if true, logs will be saved to file
+
     Examples
     ---------
     >>> Log.e("The input file does not exists")
@@ -28,6 +34,12 @@ class Log:
     modes['ERROR'] = '\033[91m'
     modes['INFO'] = '\033[94m'
     modes['WARN'] = '\033[93m'
+
+    toFile = False
+
+    @staticmethod
+    def setToFile(value=False):
+        Log.toFile = value
 
     @staticmethod
     def log(message, mode='INFO'):
@@ -48,6 +60,18 @@ class Log:
 
         """
         print(f"{Log.modes[mode]}[{mode}] {message}")
+
+        try:
+            if Log.toFile:
+                if not os.path.isdir(CACHE_DIR):
+                    os.mkdir(CACHE_DIR)
+
+                with open(os.path.join(CACHE_DIR, LOG_FILE), "a", encoding='utf-8') as f:
+                    f.write(message + "\n")
+
+                f.close()
+        except:
+            pass
 
     @staticmethod
     def d(message):

@@ -182,6 +182,10 @@ class Controller:
         else:
             return
 
+    @staticmethod
+    def saveLogs(value=True):
+        Log.toFile = value
+
     def __del__(self):
         """clean up"""
         if self.__visualProcess is not None:

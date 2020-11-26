@@ -111,3 +111,7 @@ WINDOW_WIDTH = 1000
 
 # name of the window
 WINDOW_TITLE = "Video Editing Automation (aka. Torpido)"
+
+# ******************** LOG **************************
+# log file
+LOG_FILE = "torpido.log"
