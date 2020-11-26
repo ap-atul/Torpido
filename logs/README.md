@@ -26,6 +26,7 @@
 * Built basic ui
 * Completed the ui structure
 * Added assets cleaned up
+* Added splash screen
 
 ----------------------------------------
 ### Log 29, 25-11
