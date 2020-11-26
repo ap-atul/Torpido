@@ -1,8 +1,6 @@
-import sys
-
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtGui import QPalette, QColor, QPixmap, QIcon
-from PyQt5.QtWidgets import (QWidget, QApplication, QVBoxLayout,
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
                              QHBoxLayout, QLabel, QGridLayout,
                              QGraphicsDropShadowEffect, QPushButton,
                              QCheckBox, QFrame)
@@ -43,10 +41,10 @@ class Donut:
         self.bar.setFormat(text)
 
         # progress bar gradient
-        gradientPoints = [(0, QtGui.QColor(72, 58, 78)),
-                          (0.6, QtGui.QColor(177, 123, 129)),
-                          (0.90, QtGui.QColor(191, 141, 124)),
-                          (0.95, QtGui.QColor(179, 132, 103))]
+        gradientPoints = [(0, QtGui.QColor(179, 132, 103)),
+                          (0.2, QtGui.QColor(191, 141, 124)),
+                          (0.40, QtGui.QColor(177, 123, 129)),
+                          (0.95, QtGui.QColor(72, 58, 78))]
         self.bar.setDataColors(gradientPoints)
 
         return self.bar
@@ -60,19 +58,19 @@ class App(QWidget):
         self.controller = Controller()
 
         # setting the theme
-        theme = QtCore.QFile("./theme/style.qss")
+        theme = QtCore.QFile("./ui/theme/style.qss")
         theme.open(QtCore.QIODevice.ReadOnly)
 
         self.setStyleSheet(QtCore.QTextStream(theme).readAll())
         self.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT)
         self.setMaximumSize(1280, 720)
         self.setWindowTitle(WINDOW_TITLE)
-        self.setWindowIcon(QIcon('./assets/logo.png'))
+        self.setWindowIcon(QIcon('./ui/assets/logo.png'))
 
-        self.videoPicNotSelected = QPixmap('./assets/play-button-not-selected.png')
+        self.videoPicNotSelected = QPixmap('./ui/assets/play-button-not-selected.png')
         self.videoPicNotSelected = self.videoPicNotSelected.scaledToWidth(140)
 
-        self.videoPicSelected = QPixmap('./assets/play-button.png')
+        self.videoPicSelected = QPixmap('./ui/assets/play-button.png')
         self.videoPicSelected = self.videoPicSelected.scaledToWidth(140)
 
         self.videoImage = QLabelAlternate()
@@ -168,7 +166,7 @@ class App(QWidget):
         displayVideo.setToolTip("Displays the video output while processing")
 
         snrDisplay = QCheckBox("Display SNR plot")
-        snrDisplay.setToolTip("Displays the signal to noise ratio plot for audio denoising")
+        snrDisplay.setToolTip("Displays the signal to noise ratio plot for audio de-noising")
 
         rankingPlot = QCheckBox("Display ranking plot")
         rankingPlot.setToolTip("Displays the line plot for ranking of the video and their timestamps")
@@ -230,13 +228,3 @@ class App(QWidget):
             self.controller.terminate()
 
         del self.controller
-
-
-def startApp():
-    app = QApplication(sys.argv)
-    torpido = App()
-    torpido.show()
-    sys.exit(app.exec_())
-
-
-startApp()

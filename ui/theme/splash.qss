@@ -1,0 +1,25 @@
+QMainWindow {
+	background-color:#2a2a32;
+}
+QWidget {
+	background-color:#2a2a32;
+}
+QFrame {
+    background-color: #2a2a32;
+    color: #C8C8C8;
+    border-radius: 10px;
+}
+QLabel {
+    color: #C8C8C8;
+}
+QProgressBar {
+    background-color: #2a2a32;
+    color: #C8C8C8;
+    border-style: none;
+    border-radius: 10px;
+    text-align: center;
+}
+QProgressBar::chunk {
+    border-radius: 10px;
+    background-color: qlineargradient(spread:pad, x1:0, y1:0.511364, x2:1, y2:0.523, stop:0 rgba(191, 141, 124, 255), stop:1 rgba(72, 58, 78, 255));
+}
