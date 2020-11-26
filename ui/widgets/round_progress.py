@@ -123,7 +123,7 @@ class QRoundProgressBar(QWidget):
         self.setRange(self.m_min, val)
 
     @pyqtSlot(int)
-    def setValue(self, val: int):
+    def setValue(self, val: float):
         if self.m_value != val:
             if val < self.m_min:
                 self.m_value = self.m_min

@@ -8,6 +8,7 @@ from PyQt5.QtWidgets import (QWidget, QApplication, QVBoxLayout,
                              QCheckBox, QFrame)
 
 from torpido.config import *
+from ui.controller import Controller
 from ui.widgets import QRoundProgressBar, QLabelAlternate
 
 layoutStyle = '''
@@ -47,7 +48,6 @@ class Donut:
                           (0.90, QtGui.QColor(191, 141, 124)),
                           (0.95, QtGui.QColor(179, 132, 103))]
         self.bar.setDataColors(gradientPoints)
-        self.bar.setValue(50)
 
         return self.bar
 
@@ -55,6 +55,9 @@ class Donut:
 class App(QWidget):
     def __init__(self):
         super().__init__()
+
+        # middleware class object
+        self.controller = Controller()
 
         # setting the theme
         theme = QtCore.QFile("./theme/style.qss")
@@ -178,11 +181,11 @@ class App(QWidget):
         optionsLayout.addWidget(rankingPlot, 2, 1)
         optionsLayout.addWidget(logOption, 2, 2)
         optionsLayout.setRowStretch(3, 5)
-
         fileLayout.addLayout(optionsLayout)
 
         startButton = QPushButton("Start")
         startButton.setToolTip("Start the processing for the input video given")
+        startButton.clicked.connect(self.start)
         buttonLayout.addWidget(startButton)
 
         stopButton = QPushButton("Stop")
@@ -201,6 +204,9 @@ class App(QWidget):
         mainLayout.setColumnMinimumWidth(1, 600)
 
         self.setLayout(mainLayout)
+        self.controller.signal.percentComplete.connect(self.setProgress)
+        self.controller.signal.percentMem.connect(self.setMem)
+        self.controller.signal.percentCpu.connect(self.setCpu)
 
     def selectFile(self):
         self.videoImage.setPixmap(self.videoPicSelected)
@@ -215,6 +221,15 @@ class App(QWidget):
 
     def setMem(self, value):
         self.memProgress.setValue(value)
+
+    def start(self):
+        self.controller.startProcess()
+
+    def __del__(self):
+        if self.controller is not None:
+            self.controller.terminate()
+
+        del self.controller
 
 
 def startApp():
