@@ -20,6 +20,14 @@
 
 # Logs
 
+### Log 30, 26-11
+```AP```
+* Started with ui
+* Built basic ui
+* Completed the ui structure
+* Added assets cleaned up
+
+----------------------------------------
 ### Log 29, 25-11
 ```AP```
 * Moved ranking from files to cache
