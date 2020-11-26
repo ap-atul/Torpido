@@ -4,7 +4,7 @@ from enum import Enum
 from PyQt5.QtCore import pyqtSlot, QPointF, Qt, QRectF
 from PyQt5.QtGui import (QPalette, QConicalGradient, QGradient, QRadialGradient,
                          QFontMetricsF, QFont, QPainter, QPen, QPainterPath, QImage,
-                         QPaintEvent)
+                         QPaintEvent, QColor)
 from PyQt5.QtWidgets import QWidget
 
 
@@ -25,7 +25,7 @@ class QRoundProgressBar(QWidget):
         self.m_value = 25
         self.m_nullPosition = QRoundProgressBar.PositionTop
         self.m_barStyle = self.BarStyle.DONUT
-        self.m_outlinePenWidth = 1
+        self.m_outlinePenWidth = 0
         self.m_dataPenWidth = 1
         self.m_rebuildBrush = False
         self.m_format = '%p%'
@@ -162,7 +162,7 @@ class QRoundProgressBar(QWidget):
 
     def drawBase(self, p: QPainter, baseRect: QRectF):
         if self.m_barStyle == self.BarStyle.DONUT:
-            p.setPen(QPen(self.palette().shadow().color(), self.m_outlinePenWidth))
+            p.setPen(QPen(QColor(42, 42, 50), self.m_outlinePenWidth))
             p.setBrush(self.palette().base())
             p.drawEllipse(baseRect)
         elif self.m_barStyle == self.BarStyle.LINE:
@@ -207,7 +207,7 @@ class QRoundProgressBar(QWidget):
             dataPath.arcTo(baseRect, self.m_nullPosition, -arcLength)
             dataPath.lineTo(baseRect.center())
         p.setBrush(self.palette().highlight())
-        p.setPen(QPen(self.palette().shadow().color(), self.m_dataPenWidth))
+        p.setPen(QPen(QColor(42, 42, 50), self.m_dataPenWidth))
         p.drawPath(dataPath)
 
     def calculateInnerRect(self, outerRadius: float):
