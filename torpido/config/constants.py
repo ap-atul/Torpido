@@ -104,7 +104,7 @@ WATCHER_DELAY = 3
 
 # ******************** UI ***************************************
 # minimum height of window
-WINDOW_HEIGHT = 600
+WINDOW_HEIGHT = 630
 
 # minimum width of window
 WINDOW_WIDTH = 1000

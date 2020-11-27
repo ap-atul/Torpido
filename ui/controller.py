@@ -1,6 +1,6 @@
-import time
-
 from PyQt5.QtCore import pyqtSignal, QThread, QObject
+
+from controller import Controller as MainController
 
 
 class Signal(QObject):
@@ -8,22 +8,22 @@ class Signal(QObject):
     percentMem = pyqtSignal(float)
     percentCpu = pyqtSignal(float)
     message = pyqtSignal(str)
+    logger = pyqtSignal(str)
 
 
 class Controller(QThread):
     def __init__(self, parent=None):
         QThread.__init__(self, parent)
         self.signal = Signal(self)
+        self.controller = MainController()
+        self.controller.saveLogs(self)
 
     def startProcess(self):
         self.start()
 
     def run(self):
         for i in range(101):
-            time.sleep(0.1)
-            self.signal.percentComplete.emit(i)
-            self.signal.percentCpu.emit(i)
-            self.signal.percentMem.emit(i)
+            self.signal.logger.emit("Hello")
 
     def setPercentComplete(self, value: float):
         self.signal.percentComplete.emit(value)
@@ -39,3 +39,6 @@ class Controller(QThread):
 
     def terminate(self) -> None:
         print("Exiting from the controller")
+
+    def setLog(self, messsage):
+        self.signal.logger.emit(messsage)

@@ -36,10 +36,15 @@ class Log:
     modes['WARN'] = '\033[93m'
 
     toFile = False
+    app = None
 
     @staticmethod
     def setToFile(value=False):
         Log.toFile = value
+
+    @staticmethod
+    def setHandler(app):
+        Log.app = app
 
     @staticmethod
     def log(message, mode='INFO'):
@@ -62,6 +67,9 @@ class Log:
         print(f"{Log.modes[mode]}[{mode}] {message}")
 
         try:
+            if Log.app is not None:
+                Log.app.setLog(f"[{mode}] {message}")
+
             if Log.toFile:
                 if not os.path.isdir(CACHE_DIR):
                     os.mkdir(CACHE_DIR)

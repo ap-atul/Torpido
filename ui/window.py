@@ -1,9 +1,9 @@
 from PyQt5 import QtGui, QtCore
-from PyQt5.QtGui import QPalette, QColor, QPixmap, QIcon
+from PyQt5.QtGui import QPalette, QColor, QPixmap, QIcon, QFont
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
                              QHBoxLayout, QLabel, QGridLayout,
                              QGraphicsDropShadowEffect, QPushButton,
-                             QCheckBox, QFrame)
+                             QCheckBox, QFrame, QPlainTextEdit)
 
 from torpido.config import *
 from ui.controller import Controller
@@ -46,6 +46,7 @@ class Donut:
                           (0.40, QtGui.QColor(177, 123, 129)),
                           (0.95, QtGui.QColor(72, 58, 78))]
         self.bar.setDataColors(gradientPoints)
+        self.bar.setValue(100)
 
         return self.bar
 
@@ -80,14 +81,15 @@ class App(QWidget):
         self.mainProgress = None
         self.cpuProgress = None
         self.memProgress = None
+        self.logWindow = None
 
         self.buildLayouts()
 
     def buildLayouts(self):
         # base layout
         mainLayout = QGridLayout()
-        mainLayout.setContentsMargins(20, 20, 20, 20)
-        mainLayout.setSpacing(20)
+        mainLayout.setContentsMargins(20, 20, 20, 10)
+        mainLayout.setSpacing(10)
 
         # progress v layout
         progressLayout = QGridLayout()
@@ -113,12 +115,12 @@ class App(QWidget):
 
         self.cpuProgress = Donut("cpuProgress", self).get('%p% \n CPU')
         self.cpuProgress.setToolTip("Progress bar to represent the percentage usage of CPU by VEA")
-        self.cpuProgress.setMaximumSize(150, 150)
+        self.cpuProgress.setMaximumSize(120, 120)
         progressLayout.addWidget(self.cpuProgress, 2, 1)
 
         self.memProgress = Donut("memProgress", self).get('%p% \n MEM')
         self.memProgress.setToolTip("Progress bar to represent the percentage usage of Memory/RAM by VEA")
-        self.memProgress.setMaximumSize(150, 150)
+        self.memProgress.setMaximumSize(120, 120)
         progressLayout.addWidget(self.memProgress, 2, 2)
 
         select = QLabel("Drag or select a video file")
@@ -192,6 +194,15 @@ class App(QWidget):
         buttonLayout.addWidget(stopButton)
         fileLayout.addLayout(buttonLayout)
 
+        font = QFont()
+        font.setPointSize(10)
+        self.logWindow = QPlainTextEdit()
+        self.logWindow.setMaximumHeight(80)
+        self.logWindow.setCenterOnScroll(True)
+        self.logWindow.setReadOnly(True)
+        self.logWindow.setFont(font)
+        self.logWindow.setLineWrapMode(QPlainTextEdit.NoWrap)
+
         progressFrame = QFrame()
         progressFrame.setLayout(progressLayout)
         progressFrame.setStyleSheet(layoutStyle)
@@ -200,11 +211,13 @@ class App(QWidget):
         mainLayout.addWidget(progressFrame, 1, 1)
         mainLayout.addLayout(fileLayout, 1, 2)
         mainLayout.setColumnMinimumWidth(1, 600)
+        mainLayout.addWidget(self.logWindow, 2, 1, 1, 2)
 
         self.setLayout(mainLayout)
         self.controller.signal.percentComplete.connect(self.setProgress)
         self.controller.signal.percentMem.connect(self.setMem)
         self.controller.signal.percentCpu.connect(self.setCpu)
+        self.controller.signal.logger.connect(self.setLog)
 
     def selectFile(self):
         self.videoImage.setPixmap(self.videoPicSelected)
@@ -219,6 +232,9 @@ class App(QWidget):
 
     def setMem(self, value):
         self.memProgress.setValue(value)
+
+    def setLog(self, message):
+        self.logWindow.appendPlainText(message)
 
     def start(self):
         self.controller.startProcess()

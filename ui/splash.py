@@ -74,7 +74,7 @@ class Splash(QWidget):
         description.setAlignment(QtCore.Qt.AlignCenter)
 
         self.progress = QProgressBar(dropShadowFrame)
-        self.progress.setGeometry(QRect(50, 280, 561, 23))
+        self.progress.setGeometry(QRect(50, 280, 561, 20))
         self.progress.setValue(0)
 
         font.setPointSize(10)

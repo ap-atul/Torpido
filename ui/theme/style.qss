@@ -26,15 +26,15 @@ QToolTip {
    border: black solid 1px;
 }
 QPlainTextEdit {
-	selection-background-color:#007b50;
+	selection-background-color:rgb(179, 132, 103);
 	background-color:#2a2a32;
 	border-style: solid;
-	border-top-color: transparent;
-	border-right-color: transparent;
-	border-left-color: transparent;
-	border-bottom-color: transparent;
+	border-color: #775157;
+	border-radius: 5px;
+	padding-left: 10px;
+	padding-right: 10px;
 	border-width: 1px;
-	color: #a9b7c6;
+	color: #BEB1C6;
 }
 QPushButton{
 	border-style: solid;
