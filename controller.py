@@ -70,7 +70,7 @@ class Controller:
             Log.e(EastModelEnvironmentMissing.cause)
             return
 
-    def startProcessing(self, inputFile, display=False):
+    def startProcessing(self, lock, inputFile, display=False):
         """
         Process the input file call splitting function to split the input video file into
         audio and create 3 processes each for feature ranking, After completion of all the
@@ -98,6 +98,7 @@ class Controller:
 
         """
         logo()
+        lock.acquire()
         if not os.path.isfile(inputFile):
             Log.e(f"Video file does not exists.")
             return
@@ -119,6 +120,7 @@ class Controller:
 
         # starting the sub processes
         self.__startModules(display)
+        lock.release()
 
     def __startModules(self, display):
         """

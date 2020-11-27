@@ -17,7 +17,7 @@ class Worker(QThread):
 
     def run(self) -> None:
         for i in range(101):
-            time.sleep(0.05)
+            time.sleep(0.04)
             self.progress.emit(i)
 
 
@@ -107,13 +107,14 @@ class Splash(QWidget):
 
 
 def startSplash():
+    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads)
     app = QApplication(sys.argv)
     torpido = Splash()
     torpido.start()
 
-    QtCore.QTimer.singleShot(2500, lambda: torpido.loading.setText("<strong>LOADING</strong> visuals ..."))
-    QtCore.QTimer.singleShot(3500, lambda: torpido.loading.setText("<strong>LOADING</strong> constants ..."))
-    QtCore.QTimer.singleShot(4000, lambda: torpido.loading.setText("<strong>LOADING</strong> models ..."))
-    QtCore.QTimer.singleShot(5000, lambda: torpido.loading.setText("almost done ..."))
+    QtCore.QTimer.singleShot(1500, lambda: torpido.loading.setText("<strong>LOADING</strong> visuals ..."))
+    QtCore.QTimer.singleShot(2700, lambda: torpido.loading.setText("<strong>LOADING</strong> constants ..."))
+    QtCore.QTimer.singleShot(3000, lambda: torpido.loading.setText("<strong>LOADING</strong> models ..."))
+    QtCore.QTimer.singleShot(3500, lambda: torpido.loading.setText("almost done ..."))
 
     sys.exit(app.exec_())

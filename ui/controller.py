@@ -1,4 +1,6 @@
-from PyQt5.QtCore import pyqtSignal, QThread, QObject
+from multiprocessing import Lock
+
+from PyQt5.QtCore import pyqtSignal, QObject, QRunnable
 
 from controller import Controller as MainController
 
@@ -11,19 +13,20 @@ class Signal(QObject):
     logger = pyqtSignal(str)
 
 
-class Controller(QThread):
-    def __init__(self, parent=None):
-        QThread.__init__(self, parent)
-        self.signal = Signal(self)
+class Controller(QRunnable):
+    def __init__(self):
+        super().__init__()
+        self.signal = Signal()
         self.controller = MainController()
-        self.controller.saveLogs(self)
+        self.controller.addLogsToUi(self)
+        self.videoFile = None
 
-    def startProcess(self):
-        self.start()
+    def setVideo(self, videoFile):
+        self.videoFile = videoFile
 
     def run(self):
-        for i in range(101):
-            self.signal.logger.emit("Hello")
+        lock = Lock()
+        self.controller.startProcessing(lock, self.videoFile, True)
 
     def setPercentComplete(self, value: float):
         self.signal.percentComplete.emit(value)
@@ -40,5 +43,5 @@ class Controller(QThread):
     def terminate(self) -> None:
         print("Exiting from the controller")
 
-    def setLog(self, messsage):
-        self.signal.logger.emit(messsage)
+    def setMessageLog(self, message):
+        self.signal.logger.emit(message)

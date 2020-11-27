@@ -1,9 +1,10 @@
 from PyQt5 import QtGui, QtCore
+from PyQt5.QtCore import QThreadPool
 from PyQt5.QtGui import QPalette, QColor, QPixmap, QIcon, QFont
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
                              QHBoxLayout, QLabel, QGridLayout,
                              QGraphicsDropShadowEffect, QPushButton,
-                             QCheckBox, QFrame, QPlainTextEdit)
+                             QCheckBox, QFrame, QPlainTextEdit, QFileDialog)
 
 from torpido.config import *
 from ui.controller import Controller
@@ -82,6 +83,8 @@ class App(QWidget):
         self.cpuProgress = None
         self.memProgress = None
         self.logWindow = None
+        self.inputVideoFile = None
+        self.threadPool = QThreadPool()
 
         self.buildLayouts()
 
@@ -220,9 +223,13 @@ class App(QWidget):
         self.controller.signal.logger.connect(self.setLog)
 
     def selectFile(self):
-        self.videoImage.setPixmap(self.videoPicSelected)
-        self.introVideoImage.setPixmap(self.videoPicSelected)
-        self.extroVideoImage.setPixmap(self.videoPicSelected)
+        name = QFileDialog.getOpenFileName(None, "Open File", "~",
+                                           "Video Files (*.mp4 *.flv *.avi *.mov *.mpg *.mxf)")
+
+        if len(name[0]) > 0:
+            # self.videoImage.setPixmap(self.videoPicSelected)
+            self.videoImage.setToolTip(str(name[0]))
+            self.inputVideoFile = str(name[0])
 
     def setProgress(self, value):
         self.mainProgress.setValue(value)
@@ -237,7 +244,9 @@ class App(QWidget):
         self.logWindow.appendPlainText(message)
 
     def start(self):
-        self.controller.startProcess()
+        if self.inputVideoFile is not None:
+            self.controller.setVideo(self.inputVideoFile)
+            self.threadPool.start(self.controller)
 
     def __del__(self):
         if self.controller is not None:

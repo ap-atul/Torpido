@@ -68,11 +68,11 @@ class Log:
 
         try:
             if Log.app is not None:
-                Log.app.setLog(f"[{mode}] {message}")
+                Log.app.setMessageLog(message)
 
             if Log.toFile:
-                if not os.path.isdir(CACHE_DIR):
-                    os.mkdir(CACHE_DIR)
+                if os.path.isdir(os.path.join(os.getcwd(), CACHE_DIR)) is False:
+                    os.mkdir(os.path.join(os.getcwd(), CACHE_DIR))
 
                 with open(os.path.join(CACHE_DIR, LOG_FILE), "a", encoding='utf-8') as f:
                     f.write(message + "\n")
