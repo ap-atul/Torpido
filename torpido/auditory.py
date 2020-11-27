@@ -58,7 +58,7 @@ class Auditory:
         self.__fwt = FastWaveletTransform(WAVELET)
         self.__compressor = VisuShrinkCompressor()
 
-    def startProcessing(self, inputFile, outputFile, plot=True):
+    def startProcessing(self, inputFile, outputFile, plot=False):
         """
         Calculates the de noised signal based on the wavelets
         default wavelet is = db4, mode = per and thresh method = soft.

@@ -45,6 +45,7 @@ class Controller:
     """
 
     def __init__(self):
+        self.__App = None
         self.__fps = None
         self.__videoFile = None
         self.__outputFile = None
@@ -70,7 +71,7 @@ class Controller:
             Log.e(EastModelEnvironmentMissing.cause)
             return
 
-    def startProcessing(self, lock, inputFile, display=False):
+    def startProcessing(self, app, inputFile, display=False):
         """
         Process the input file call splitting function to split the input video file into
         audio and create 3 processes each for feature ranking, After completion of all the
@@ -98,7 +99,8 @@ class Controller:
 
         """
         logo()
-        lock.acquire()
+        self.__App = app
+
         if not os.path.isfile(inputFile):
             Log.e(f"Video file does not exists.")
             return
@@ -120,7 +122,6 @@ class Controller:
 
         # starting the sub processes
         self.__startModules(display)
-        lock.release()
 
     def __startModules(self, display):
         """
@@ -139,7 +140,8 @@ class Controller:
 
         self.__audioProcess = Process(target=self.__auditory.startProcessing,
                                       args=(self.__audioFile, self.__deNoisedAudioFile))
-        self.__visualProcess = Process(target=self.__visual.startProcessing, args=(self.__videoFile, display))
+        self.__visualProcess = Process(target=self.__visual.startProcessing,
+                                       args=(self.__App, self.__videoFile, display))
         self.__textualProcess = Process(target=self.__textual.startProcessing, args=(self.__videoFile, display))
 
         self.__audioProcess.start()
@@ -165,7 +167,7 @@ class Controller:
         data = readTheRankings()
 
         #  separate process for analytics
-        Process(target=self.__analytics.analyze, args=(data,)).start()
+        # Process(target=self.__analytics.analyze, args=(data,)).start()
 
         try:
             timestamps = getTimestamps(data=data)

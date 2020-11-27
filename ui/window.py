@@ -1,5 +1,4 @@
 from PyQt5 import QtGui, QtCore
-from PyQt5.QtCore import QThreadPool
 from PyQt5.QtGui import QPalette, QColor, QPixmap, QIcon, QFont
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
                              QHBoxLayout, QLabel, QGridLayout,
@@ -84,9 +83,9 @@ class App(QWidget):
         self.memProgress = None
         self.logWindow = None
         self.inputVideoFile = None
-        self.threadPool = QThreadPool()
 
         self.buildLayouts()
+        self.show()
 
     def buildLayouts(self):
         # base layout
@@ -217,21 +216,24 @@ class App(QWidget):
         mainLayout.addWidget(self.logWindow, 2, 1, 1, 2)
 
         self.setLayout(mainLayout)
-        self.controller.signal.percentComplete.connect(self.setProgress)
-        self.controller.signal.percentMem.connect(self.setMem)
-        self.controller.signal.percentCpu.connect(self.setCpu)
-        self.controller.signal.logger.connect(self.setLog)
+        self.controller.percentComplete.connect(self.setProgress)
+        self.controller.percentMem.connect(self.setMem)
+        self.controller.percentCpu.connect(self.setCpu)
+        self.controller.logger.connect(self.setLog)
 
     def selectFile(self):
-        name = QFileDialog.getOpenFileName(None, "Open File", "~",
+        name = QFileDialog.getOpenFileName(None,
+                                           "Open File",
+                                           "~",
                                            "Video Files (*.mp4 *.flv *.avi *.mov *.mpg *.mxf)")
 
         if len(name[0]) > 0:
-            # self.videoImage.setPixmap(self.videoPicSelected)
+            self.videoImage.setPixmap(self.videoPicSelected)
             self.videoImage.setToolTip(str(name[0]))
             self.inputVideoFile = str(name[0])
 
     def setProgress(self, value):
+        print(f"{value} from Visual")
         self.mainProgress.setValue(value)
 
     def setCpu(self, value):
@@ -246,10 +248,7 @@ class App(QWidget):
     def start(self):
         if self.inputVideoFile is not None:
             self.controller.setVideo(self.inputVideoFile)
-            self.threadPool.start(self.controller)
+            self.controller.start()
 
     def __del__(self):
-        if self.controller is not None:
-            self.controller.terminate()
-
-        del self.controller
+        print("Window is dying")

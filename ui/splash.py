@@ -25,6 +25,7 @@ class Splash(QWidget):
     def __init__(self):
         super().__init__()
 
+        self.val = 0
         self.worker = Worker()
         self.torpido = None
 
@@ -102,12 +103,11 @@ class Splash(QWidget):
         self.progress.setValue(val)
         if val == 100:
             self.torpido = App()
-            self.torpido.show()
-            self.close()
+            self.hide()
 
 
 def startSplash():
-    QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads)
+    # QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads)
     app = QApplication(sys.argv)
     torpido = Splash()
     torpido.start()

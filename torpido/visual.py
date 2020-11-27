@@ -66,13 +66,15 @@ class Visual:
             return 0
         return RANK_BLUR
 
-    def startProcessing(self, inputFile, display=False):
+    def startProcessing(self, app, inputFile, display=False):
         """
         Function to run the processing on the Video file. Motion and Blur features are
         detected and based on that ranking is set
 
         Parameters
         ----------
+        app : Controller object
+            set progress on the ui
         inputFile : str
             input video file
         display : bool
@@ -150,6 +152,9 @@ class Visual:
 
             # assigning the processed frame as the first frame to cal diff later on
             firstFrame = frame
+
+            # setting progress on the ui
+            app.setPercentComplete(float((count / totalFrames) * 100))
 
         # clearing memory
         myClip.release()

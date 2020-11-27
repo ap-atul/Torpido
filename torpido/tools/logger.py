@@ -35,7 +35,7 @@ class Log:
     modes['INFO'] = '\033[94m'
     modes['WARN'] = '\033[93m'
 
-    toFile = False
+    toFile = True
     app = None
 
     @staticmethod
@@ -78,8 +78,8 @@ class Log:
                     f.write(message + "\n")
 
                 f.close()
-        except:
-            pass
+        except Exception as e:
+            print(e)
 
     @staticmethod
     def d(message):
