@@ -20,6 +20,22 @@
 
 # Logs
 
+
+### Log 32, 29-11
+```AP```
+* Pipes needed to be create for slot connections
+* Inter process communication completed
+* Created pipes, queue, class communication between different components
+* Changes matplot lib backend
+
+----------------------------------------
+### Log 31, 28-11
+```AP```
+* UI connection created
+* Processing between two controllers designed
+* Implemented few parts
+
+----------------------------------------
 ### Log 30, 26-11
 ```AP```
 * Started with ui
