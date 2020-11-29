@@ -46,7 +46,7 @@ class Donut:
                           (0.40, QtGui.QColor(177, 123, 129)),
                           (0.95, QtGui.QColor(72, 58, 78))]
         self.bar.setDataColors(gradientPoints)
-        self.bar.setValue(100)
+        self.bar.setValue(0.0)
 
         return self.bar
 
@@ -54,7 +54,6 @@ class Donut:
 class App(QWidget):
     def __init__(self):
         super().__init__()
-
         # middleware class object
         self.controller = Controller()
 
@@ -216,10 +215,10 @@ class App(QWidget):
         mainLayout.addWidget(self.logWindow, 2, 1, 1, 2)
 
         self.setLayout(mainLayout)
-        self.controller.percentComplete.connect(self.setProgress)
-        self.controller.percentMem.connect(self.setMem)
-        self.controller.percentCpu.connect(self.setCpu)
-        self.controller.logger.connect(self.setLog)
+        self.controller.percentComplete.connect(self.mainProgress.setValue)
+        self.controller.percentMem.connect(self.memProgress.setValue)
+        self.controller.percentCpu.connect(self.cpuProgress.setValue)
+        self.controller.logger.connect(self.logWindow.appendPlainText)
 
     def selectFile(self):
         name = QFileDialog.getOpenFileName(None,
@@ -231,19 +230,6 @@ class App(QWidget):
             self.videoImage.setPixmap(self.videoPicSelected)
             self.videoImage.setToolTip(str(name[0]))
             self.inputVideoFile = str(name[0])
-
-    def setProgress(self, value):
-        print(f"{value} from Visual")
-        self.mainProgress.setValue(value)
-
-    def setCpu(self, value):
-        self.cpuProgress.setValue(value)
-
-    def setMem(self, value):
-        self.memProgress.setValue(value)
-
-    def setLog(self, message):
-        self.logWindow.appendPlainText(message)
 
     def start(self):
         if self.inputVideoFile is not None:

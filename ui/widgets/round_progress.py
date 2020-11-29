@@ -122,7 +122,7 @@ class QRoundProgressBar(QWidget):
     def setMaximum(self, val: float):
         self.setRange(self.m_min, val)
 
-    @pyqtSlot(int)
+    @pyqtSlot(float)
     def setValue(self, val: float):
         if self.m_value != val:
             if val < self.m_min:

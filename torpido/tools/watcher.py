@@ -76,17 +76,22 @@ class Watcher:
         self.__delay = WATCHER_DELAY
         self.__exp = re.compile(r'(\d)')
         self.__enable = True
+        self.__app = None
+        self.__memPipe = None
 
-    def enable(self, enable=True):
+    def enable(self, app, enable=True):
         """
         Utility function to enable and disable the watcher
 
         Parameters
         ----------
+        app : ui controller
+            to set values to the ui
         enable : bool, default=True
             enables the watcher
         """
         self.__enable = enable
+        self.__app = app
 
     def start(self):
         """
@@ -129,6 +134,7 @@ class Watcher:
                     cpuInfo.update(current)
 
                 Log.i(f"[ CPU :: {round(percent)} % ]")
+                self.__app.setCpuComplete(percent)
 
             run.stdout.close()
             if run.wait():
@@ -153,7 +159,11 @@ class Watcher:
             for stdout in iter(run.stdout.readline, ""):
                 lines.append(int(stdout))
 
-            Log.i(f"[ RAM :: {round((lines[0] - lines[2]) * 100 / lines[0])} % ]")
+            percent = round((lines[0] - lines[2]) * 100 / lines[0])
+
+            Log.i(f"[ RAM :: {percent} % ]")
+            self.__app.setMemComplete(percent)
+
             run.stdout.close()
             if run.wait():
                 Log.e("Can't initiate Watcher for RAM")

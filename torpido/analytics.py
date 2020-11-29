@@ -4,9 +4,12 @@ start and stop are displayed. All ranks are displayed as subplots
 (line graphs)
 """
 
+import matplotlib
 from matplotlib import pyplot as plt
 
 from torpido.util.timestamp import getTimestamps
+
+matplotlib.use("TkAgg")
 
 
 class Analytics:

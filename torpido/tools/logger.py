@@ -36,15 +36,15 @@ class Log:
     modes['WARN'] = '\033[93m'
 
     toFile = True
-    app = None
+    pipe = None
 
     @staticmethod
     def setToFile(value=False):
         Log.toFile = value
 
     @staticmethod
-    def setHandler(app):
-        Log.app = app
+    def setHandler(pipe):
+        Log.pipe = pipe
 
     @staticmethod
     def log(message, mode='INFO'):
@@ -67,8 +67,8 @@ class Log:
         print(f"{Log.modes[mode]}[{mode}] {message}")
 
         try:
-            if Log.app is not None:
-                Log.app.setMessageLog(message)
+            if Log.pipe is not None:
+                Log.pipe.put(message)
 
             if Log.toFile:
                 if os.path.isdir(os.path.join(os.getcwd(), CACHE_DIR)) is False:

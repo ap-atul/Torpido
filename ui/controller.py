@@ -1,4 +1,4 @@
-from PyQt5.QtCore import pyqtSignal, QThread
+from PyQt5.QtCore import pyqtSignal, QThread, pyqtSlot
 
 from controller import Controller as MainController
 
@@ -12,7 +12,7 @@ class Controller(QThread):
     def __init__(self):
         super().__init__()
         self.controller = MainController()
-        self.controller.addLogsToUi(self)
+
         self.videoFile = None
 
     def setVideo(self, videoFile):
@@ -21,18 +21,19 @@ class Controller(QThread):
     def run(self):
         self.controller.startProcessing(self, self.videoFile, False)
 
+    @pyqtSlot()
     def setPercentComplete(self, value):
         self.percentComplete.emit(value)
 
+    @pyqtSlot()
     def setCpuComplete(self, value: float):
         self.percentCpu.emit(value)
 
+    @pyqtSlot()
     def setMemComplete(self, value: float):
         self.percentMem.emit(value)
 
-    def terminate(self) -> None:
-        print("Exiting from the controller")
-
+    @pyqtSlot()
     def setMessageLog(self, message):
         self.logger.emit(message)
 

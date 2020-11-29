@@ -8,7 +8,8 @@ object would be shared in functions
 import gc
 import os
 import time
-from multiprocessing import Process
+from multiprocessing import Process, Pipe, Queue
+from threading import Thread
 
 from torpido import Auditory, FFMPEG, Textual, Visual
 from torpido.analytics import Analytics
@@ -50,10 +51,10 @@ class Controller:
         self.__videoFile = None
         self.__outputFile = None
         self.__audioFile = None
-        self.__deNoisedAudioFile = None
         self.__audioProcess = None
         self.__visualProcess = None
         self.__textualProcess = None
+        self.__deNoisedAudioFile = None
         self.__visual = Visual()
         self.__auditory = Auditory()
         self.__ffmpeg = FFMPEG()
@@ -61,15 +62,22 @@ class Controller:
         self.__cache = Cache()
         self.__watcher = Watcher()
 
-        # not enables currently
-        self.__watcher.enable(False)
-
         # checking for EAST MODEL env var
         try:
             self.__textual = Textual()
         except EastModelEnvironmentMissing:
             Log.e(EastModelEnvironmentMissing.cause)
             return
+
+        # communication links
+        self.__progressParentPipe, self.__progressChildPipe = Pipe()
+        self.__loggerPipe = Queue()
+
+        # communication for logs to ui
+        Log.setHandler(self.__loggerPipe)
+
+        # watcher enable/disable
+        self.__watcher.enable(self, enable=True)
 
     def startProcessing(self, app, inputFile, display=False):
         """
@@ -80,6 +88,8 @@ class Controller:
 
         Parameters
         ----------
+        app : some controller object
+            handles ui interactions
         inputFile : str
             input video file (validating if its in supported format)
         display : bool
@@ -99,7 +109,13 @@ class Controller:
 
         """
         logo()
+
+        # saving the instance of the ui controller
         self.__App = app
+
+        # starting listening on the communication link
+        Thread(target=self.setPercent, args=()).start()
+        Thread(target=self.setLog, args=()).start()
 
         if not os.path.isfile(inputFile):
             Log.e(f"Video file does not exists.")
@@ -141,7 +157,7 @@ class Controller:
         self.__audioProcess = Process(target=self.__auditory.startProcessing,
                                       args=(self.__audioFile, self.__deNoisedAudioFile))
         self.__visualProcess = Process(target=self.__visual.startProcessing,
-                                       args=(self.__App, self.__videoFile, display))
+                                       args=(self.__progressChildPipe, self.__videoFile, display))
         self.__textualProcess = Process(target=self.__textual.startProcessing, args=(self.__videoFile, display))
 
         self.__audioProcess.start()
@@ -167,7 +183,7 @@ class Controller:
         data = readTheRankings()
 
         #  separate process for analytics
-        # Process(target=self.__analytics.analyze, args=(data,)).start()
+        Process(target=self.__analytics.analyze, args=(data,)).start()
 
         try:
             timestamps = getTimestamps(data=data)
@@ -186,13 +202,7 @@ class Controller:
         else:
             return
 
-    @staticmethod
-    def saveLogs(value=True):
-        Log.toFile = value
-
-    @staticmethod
-    def addLogsToUi(control):
-        Log.setHandler(control)
+        Log.d("Finished processing")
 
     def __del__(self):
         """clean up"""
@@ -202,7 +212,38 @@ class Controller:
             self.__audioProcess.terminate()
         if self.__textualProcess is not None:
             self.__textualProcess.terminate()
+        if self.__loggerPipe is not None:
+            self.__loggerPipe.close()
+        if self.__progressParentPipe is not None:
+            self.__progressParentPipe.close()
+        if self.__progressChildPipe is not None:
+            self.__progressChildPipe.close()
 
         # deleting files created by processing modules
         self.__ffmpeg.cleanUp()
         Log.d("Terminating the processes")
+
+    @staticmethod
+    def saveLogs(value=True):
+        Log.toFile = value
+
+    def setPercent(self):
+        while True:
+            value = self.__progressParentPipe.recv()
+            if self.__App is not None and value is not None:
+                self.__App.setPercentComplete(value)
+
+    def setLog(self):
+        while True:
+            try:
+                message = self.__loggerPipe.get()
+                if self.__App is not None and message is not None:
+                    self.__App.setMessageLog(message)
+            except EOFError as _:
+                pass
+
+    def setCpuComplete(self, val):
+        self.__App.setCpuComplete(val)
+
+    def setMemComplete(self, val):
+        self.__App.setMemComplete(val)
