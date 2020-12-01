@@ -8,12 +8,13 @@ from controller import Controller as MainController
 
 class Controller(QThread):
     """
-    Middleware between the UI and the nain core, all interactions reside here. with slots
+    Middleware between the UI and the main core, all interactions reside here. with slots
     and signals, since, this a derived class of the QThread it can operate without any
     locking mechanism and does not affect the main gui thread.
 
     Attributes
     ----------
+
     Controller.percentComplete : pyqtSignal(float)
         signal for progress bar on the UI, progress value comes from torpido.Visual
     Controller.percentMem : pyqtSignal(float)
@@ -30,7 +31,7 @@ class Controller(QThread):
     controller : MainController
         object of the controller class in the core
     videoFile : str
-        path of the intput video file
+        path of the input video file
 
     """
     percentComplete = pyqtSignal(float)

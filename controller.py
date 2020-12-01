@@ -43,11 +43,59 @@ class Controller:
 
     Inheriting from the QPySignal to create signal slots to display texts
     and to make the working of the UI not blocking
+
+    Attributes
+    ----------
+    __App : ui controller
+        middleware of the controller and the ui
+    __videoFile : str
+        input video file to process
+    __outputFile : str
+        output video file generated
+    __audioFile : str
+        input audio file split from the video file
+    __audioProcess : Process
+        process to perform audio processing
+    __visualProcess : Process
+        process to perform video processing
+    __textualProcess : Process
+        process to perform video text detection
+    __deNoisedAudioFile : str
+        output audio file from the audio processing
+    __videoDisplay : bool
+        displays the output video
+    __textDetectDisplay : bool
+        displays the output video when text is detected
+    __snrPlotDisplay : bool
+        displays the snr plot for the audio
+    __analyticsDisplay : bool
+        displays the analytics of the processing
+    __visual : Visual
+        object of the video processing class
+    __auditory : Auditory
+        object of the audio processing class
+    __textual : Textual
+        object of the text video processing class
+    __ffmpeg : FFMPEG
+        object of the ffmpeg class to perform io operations
+    __analytics : Analytics
+        object of the class to perform analytics on the processes
+    __cache : Cache
+        object of the cache class to store the cache
+    __watcher : Watcher
+        object of the class watcher that monitors cpu and ram usage
+    __progressParentPipe : link
+        parent communication pipe for the progress bar
+    __progressChildPipe : link
+        child communication pipe for the progress bar
+    __loggerPipe : link / queue
+        communication link between the logs and the ui
+    __videoPipe : link
+        communication pipe for the video display in the gui thread
     """
 
     def __init__(self):
         self.__App = None
-        self.__fps = None
         self.__videoFile = None
         self.__outputFile = None
         self.__audioFile = None

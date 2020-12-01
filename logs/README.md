@@ -20,7 +20,14 @@
 
 # Logs
 
+### Log 33, 01-12
+```AP```
+* Created widget for video display
+* Use diff backend for matplot lib
+* Checkbox connected
+* Clean up
 
+----------------------------------------
 ### Log 32, 29-11
 ```AP```
 * Pipes needed to be create for slot connections
