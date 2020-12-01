@@ -61,6 +61,62 @@ class Auditory:
         self.__fwt = FastWaveletTransform(WAVELET)
         self.__compressor = VisuShrinkCompressor()
 
+    def __getEnergyRMS(self, block):
+        """
+        RMS = Root Mean Square to calculate the signal data to the dB, if signal
+        satisfies some threshold the ranking can be affected and audio portion
+        can be ranked
+        RMS -> square root of mean of squared data
+
+        Parameters
+        ----------
+        block : array
+            input signal block
+
+        Returns
+        -------
+        int
+            rank for the portion which is then set for all the portion of data
+        """
+        if np.sqrt(np.mean(block ** 2)) > self.__silenceThreshold:
+            return RANK_AUDIO
+        return 0
+
+    def __setAudioInfo(self):
+        """ Storing audio info """
+        self.__cache.writeDataToCache(CACHE_AUDIO_INFO, self.__info)
+
+    def __plotSNR(self):
+        """
+        Plotting the snrs for the original and the de-noised signals, the snrs are collected
+        during the processing, and the mean of the data is used to represent the final values
+        The snr is very low (negative with raised to values) so abs of the mean is taken.
+        Note: not to be mistaken with positive values
+
+        this SNR is  the reciprocal of the coefficient of variation, i.e.,
+        the ratio of mean to standard deviation of a signal, refer the snr function in wavelet/utility
+        """
+
+        width = 0.1
+        x_orig = np.arange(len(self.__snrBefore))
+        plt.bar(x_orig - width / 2, np.abs(self.__snrBefore), width=width, label='Original')
+        plt.bar(x_orig + width / 2, np.abs(self.__snrAfter), width=width, label='De-noised')
+
+        plt.title("Signal to noise ratios SNR(dB)")
+        plt.legend(loc=0)
+        plt.tight_layout()
+        plt.show()
+
+    def __del__(self):
+        """
+        clean up
+        """
+        del self.__cache
+        del self.__fwt
+        del self.__compressor
+
+        Log.d("Cleaning up.")
+
     def startProcessing(self, inputFile, outputFile, plot=False):
         """
         Calculates the de noised signal based on the wavelets
@@ -130,59 +186,3 @@ class Auditory:
         Log.d(f"Audio ranking length {len(self.__energy)}")
         Log.i("Audio ranking saved .............")
         Log.d(f"Garbage collected :: {gc.collect()}")
-
-    def __getEnergyRMS(self, block):
-        """
-        RMS = Root Mean Square to calculate the signal data to the dB, if signal
-        satisfies some threshold the ranking can be affected and audio portion
-        can be ranked
-        RMS -> square root of mean of squared data
-
-        Parameters
-        ----------
-        block : array
-            input signal block
-
-        Returns
-        -------
-        int
-            rank for the portion which is then set for all the portion of data
-        """
-        if np.sqrt(np.mean(block ** 2)) > self.__silenceThreshold:
-            return RANK_AUDIO
-        return 0
-
-    def __setAudioInfo(self):
-        """ Storing audio info """
-        self.__cache.writeDataToCache(CACHE_AUDIO_INFO, self.__info)
-
-    def __plotSNR(self):
-        """
-        Plotting the snrs for the original and the de-noised signals, the snrs are collected
-        during the processing, and the mean of the data is used to represent the final values
-        The snr is very low (negative with raised to values) so abs of the mean is taken.
-        Note: not to be mistaken with positive values
-
-        this SNR is  the reciprocal of the coefficient of variation, i.e.,
-        the ratio of mean to standard deviation of a signal, refer the snr function in wavelet/utility
-        """
-
-        width = 0.1
-        x_orig = np.arange(len(self.__snrBefore))
-        plt.bar(x_orig - width / 2, np.abs(self.__snrBefore), width=width, label='Original')
-        plt.bar(x_orig + width / 2, np.abs(self.__snrAfter), width=width, label='De-noised')
-
-        plt.title("Signal to noise ratios SNR(dB)")
-        plt.legend(loc=0)
-        plt.tight_layout()
-        plt.show()
-
-    def __del__(self):
-        """
-        clean up
-        """
-        del self.__cache
-        del self.__fwt
-        del self.__compressor
-
-        Log.d("Cleaning up.")

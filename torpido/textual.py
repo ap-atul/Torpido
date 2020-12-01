@@ -81,84 +81,6 @@ class Textual:
         self.__textDisplayLayerNames = ["feature_fusion/Conv_7/Sigmoid",
                                         "feature_fusion/concat_3"]
 
-    def startProcessing(self, inputFile, display=False):
-        """
-        Function to perform the Textual Processing on the input video file.
-        The video can be displayed as the processing is going on.
-
-        Parameters
-        ----------
-        inputFile : str
-            input video file
-        display : bool
-            True to display the video while processing
-        """
-
-        if os.path.isfile(inputFile) is False:
-            Log.e(f"File {inputFile} does not exists")
-            return
-
-        self.__videoGetter = VideoGet(str(inputFile)).start()
-        myClip = self.__videoGetter.stream
-
-        if self.__videoGetter.getQueueSize() == 0:
-            time.sleep(0.5)
-            Log.d("Waiting for the buffer to fill up.")
-
-        self.__fps = myClip.get(cv2.CAP_PROP_FPS)
-        self.__frameCount = myClip.get(cv2.CAP_PROP_FRAME_COUNT)
-        self.__skipFrames = int(self.__fps * self.__skipFrames)
-
-        # maintaining the ranks for text detection
-        count = 0
-        self.__textRanks = []
-
-        while self.__videoGetter.more():
-            frame = self.__videoGetter.read()
-
-            if frame is None:
-                break
-
-            # resizing the frame to a multiple of 32 x 32
-            # resizing the frame
-            original = frame
-            (H, W) = frame.shape[:2]
-            rW = W / float(self.__WIDTH)
-            rH = H / float(self.__HEIGHT)
-            frame = cv2.resize(frame, (W, H))
-            count += 1
-
-            if count % self.__skipFrames == 0:
-
-                #  making the image blob
-                blob = cv2.dnn.blobFromImage(frame,
-                                             1.0,
-                                             (self.__WIDTH, self.__HEIGHT),
-                                             (123.68, 116.78, 103.94),
-                                             swapRB=True, crop=False)
-
-                # run text detection
-                if display:
-                    detectedText = self.__runTextDetectDisplay(blob, (rW, rH), original)
-                else:
-                    detectedText = self.__runTextDetect(blob)
-
-                # if text is detected
-                if detectedText:
-                    self.__textRanks.extend([RANK_TEXT] * int(self.__skipFrames))
-                    Log.d("Text detected.")
-                else:
-                    self.__textRanks.extend([0] * int(self.__skipFrames))
-                    Log.d("No text detected.")
-
-        # clearing the memory
-        myClip.release()
-        self.__videoGetter.stop()
-        cv2.destroyAllWindows()
-
-        # calling the normalization of ranking
-        self.__timedRankingNormalize()
-
     def __runTextDetect(self, blob):
         """
         Function to detect only text and no display. Gets the scores and calculates if the image
@@ -314,3 +236,81 @@ class Textual:
         del self.__net
         del self.__videoGetter
         Log.d("Cleaning up.")
+
+    def startProcessing(self, inputFile, display=False):
+        """
+        Function to perform the Textual Processing on the input video file.
+        The video can be displayed as the processing is going on.
+
+        Parameters
+        ----------
+        inputFile : str
+            input video file
+        display : bool
+            True to display the video while processing
+        """
+
+        if os.path.isfile(inputFile) is False:
+            Log.e(f"File {inputFile} does not exists")
+            return
+
+        self.__videoGetter = VideoGet(str(inputFile)).start()
+        myClip = self.__videoGetter.stream
+
+        if self.__videoGetter.getQueueSize() == 0:
+            time.sleep(0.5)
+            Log.d("Waiting for the buffer to fill up.")
+
+        self.__fps = myClip.get(cv2.CAP_PROP_FPS)
+        self.__frameCount = myClip.get(cv2.CAP_PROP_FRAME_COUNT)
+        self.__skipFrames = int(self.__fps * self.__skipFrames)
+
+        # maintaining the ranks for text detection
+        count = 0
+        self.__textRanks = []
+
+        while self.__videoGetter.more():
+            frame = self.__videoGetter.read()
+
+            if frame is None:
+                break
+
+            # resizing the frame to a multiple of 32 x 32
+            # resizing the frame
+            original = frame
+            (H, W) = frame.shape[:2]
+            rW = W / float(self.__WIDTH)
+            rH = H / float(self.__HEIGHT)
+            frame = cv2.resize(frame, (W, H))
+            count += 1
+
+            if count % self.__skipFrames == 0:
+
+                #  making the image blob
+                blob = cv2.dnn.blobFromImage(frame,
+                                             1.0,
+                                             (self.__WIDTH, self.__HEIGHT),
+                                             (123.68, 116.78, 103.94),
+                                             swapRB=True, crop=False)
+
+                # run text detection
+                if display:
+                    detectedText = self.__runTextDetectDisplay(blob, (rW, rH), original)
+                else:
+                    detectedText = self.__runTextDetect(blob)
+
+                # if text is detected
+                if detectedText:
+                    self.__textRanks.extend([RANK_TEXT] * int(self.__skipFrames))
+                    Log.d("Text detected.")
+                else:
+                    self.__textRanks.extend([0] * int(self.__skipFrames))
+                    Log.d("No text detected.")
+
+        # clearing the memory
+        myClip.release()
+        self.__videoGetter.stop()
+        cv2.destroyAllWindows()
+
+        # calling the normalization of ranking
+        self.__timedRankingNormalize()

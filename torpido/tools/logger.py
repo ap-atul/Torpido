@@ -22,6 +22,9 @@ class Log:
     Log.toFile : bool
         if true, logs will be saved to file
 
+    Log.pipe : pipe
+        communication link to display logs on the ui
+
     Examples
     ---------
     >>> Log.e("The input file does not exists")
@@ -40,10 +43,12 @@ class Log:
 
     @staticmethod
     def setToFile(value=False):
+        """ Save all logs to a file name from the config/constants.py """
         Log.toFile = value
 
     @staticmethod
     def setHandler(pipe):
+        """ Log all logs directly to the ui, pipe communication used """
         Log.pipe = pipe
 
     @staticmethod
@@ -67,9 +72,11 @@ class Log:
         print(f"{Log.modes[mode]}[{mode}] {message}")
 
         try:
+            # send to ui
             if Log.pipe is not None:
                 Log.pipe.put(message)
 
+            # save to file
             if Log.toFile:
                 if os.path.isdir(os.path.join(os.getcwd(), CACHE_DIR)) is False:
                     os.mkdir(os.path.join(os.getcwd(), CACHE_DIR))

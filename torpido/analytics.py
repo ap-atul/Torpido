@@ -9,6 +9,8 @@ from matplotlib import pyplot as plt
 
 from torpido.util.timestamp import getTimestamps
 
+# since, ui is using QTAgg, need to send the data to main gui thread
+# or just use Tk ;)
 matplotlib.use("TkAgg")
 
 

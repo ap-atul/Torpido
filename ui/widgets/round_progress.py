@@ -1,3 +1,5 @@
+""" Custom progress implementation """
+
 import operator
 from enum import Enum
 
@@ -214,7 +216,7 @@ class QRoundProgressBar(QWidget):
         if self.m_barStyle in (self.BarStyle.LINE, self.BarStyle.EXPAND):
             innerRadius = outerRadius - self.m_outlinePenWidth
         else:
-            innerRadius = outerRadius * 0.75
+            innerRadius = outerRadius * 0.65
         delta = (outerRadius - innerRadius) / 2
         innerRect = QRectF(delta, delta, innerRadius, innerRadius)
         return innerRect, innerRadius

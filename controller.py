@@ -55,6 +55,10 @@ class Controller:
         self.__visualProcess = None
         self.__textualProcess = None
         self.__deNoisedAudioFile = None
+        self.__videoDisplay = False
+        self.__textDetectDisplay = False
+        self.__snrPlotDisplay = False
+        self.__analyticsDisplay = False
         self.__visual = Visual()
         self.__auditory = Auditory()
         self.__ffmpeg = FFMPEG()
@@ -70,18 +74,17 @@ class Controller:
             return
 
         # communication links
-        self.__progressParentPipe, self.__progressChildPipe = Pipe()
+        self.__progressParentPipe, self.__progressChildPipe = None, None
         self.__loggerPipe = Queue()
-        self.__videoPipe = Queue()
+        self.__videoPipe = None
 
         # communication for logs to ui
         Log.setHandler(self.__loggerPipe)
-        self.__visual.setPipe(self.__videoPipe)
 
         # watcher enable/disable
         self.__watcher.enable(self, enable=True)
 
-    def startProcessing(self, app, inputFile, display=False):
+    def startProcessing(self, app, inputFile):
         """
         Process the input file call splitting function to split the input video file into
         audio and create 3 processes each for feature ranking, After completion of all the
@@ -94,8 +97,6 @@ class Controller:
             handles ui interactions
         inputFile : str
             input video file (validating if its in supported format)
-        display : bool
-            True to display the video while processing
 
         Notes
         ------
@@ -115,10 +116,22 @@ class Controller:
         # saving the instance of the ui controller
         self.__App = app
 
+        # creating pipe for progress bar communication
+        self.__progressParentPipe, self.__progressChildPipe = Pipe()
+
         # starting listening on the communication link
         Thread(target=self.setPercent, args=()).start()
         Thread(target=self.setLog, args=()).start()
-        Thread(target=self.setVideo, args=()).start()
+
+        # initialize the queue and thread
+        if self.__videoDisplay:
+            self.__videoPipe = Queue()
+            self.__visual.setPipe(self.__videoPipe)
+            Thread(target=self.setVideo, args=()).start()
+
+        # if from terminal
+        if self.__App is None:
+            self.__textDetectDisplay = True
 
         if not os.path.isfile(inputFile):
             Log.e(f"Video file does not exists.")
@@ -140,28 +153,28 @@ class Controller:
         self.__deNoisedAudioFile = self.__ffmpeg.getOutputAudioFileNamePath()
 
         # starting the sub processes
-        self.__startModules(display)
+        self.__startModules()
 
-    def __startModules(self, display):
+    def __startModules(self):
         """
         Creating 3 processes using the Process class of the multi-processing module.
         FFmpeg separated files are referenced from the Controller public variables
-
-        Introducing private vars soon.
-
-        Parameters
-        ----------
-        display : bool
-            to display the video while processing
-
         """
         self.__watcher.start()  # starting the watcher
 
         self.__audioProcess = Process(target=self.__auditory.startProcessing,
-                                      args=(self.__audioFile, self.__deNoisedAudioFile, True))
+                                      args=(self.__audioFile,
+                                            self.__deNoisedAudioFile,
+                                            self.__snrPlotDisplay))
+
         self.__visualProcess = Process(target=self.__visual.startProcessing,
-                                       args=(self.__progressChildPipe, self.__videoFile, True))
-        self.__textualProcess = Process(target=self.__textual.startProcessing, args=(self.__videoFile, display))
+                                       args=(self.__progressChildPipe,
+                                             self.__videoFile,
+                                             self.__videoDisplay))
+
+        self.__textualProcess = Process(target=self.__textual.startProcessing,
+                                        args=(self.__videoFile,
+                                              self.__textDetectDisplay))
 
         self.__audioProcess.start()
         self.__visualProcess.start()
@@ -185,8 +198,9 @@ class Controller:
         self.__watcher.end()  # ending the watcher
         data = readTheRankings()
 
-        #  separate process for analytics
-        Process(target=self.__analytics.analyze, args=(data,)).start()
+        if self.__analyticsDisplay:
+            #  separate process for analytics
+            Process(target=self.__analytics.analyze, args=(data,)).start()
 
         try:
             timestamps = getTimestamps(data=data)
@@ -205,8 +219,6 @@ class Controller:
         else:
             return
 
-        Log.d("Finished processing")
-
     def __del__(self):
         """clean up"""
         if self.__visualProcess is not None:
@@ -215,8 +227,6 @@ class Controller:
             self.__audioProcess.terminate()
         if self.__textualProcess is not None:
             self.__textualProcess.terminate()
-        if self.__loggerPipe is not None:
-            self.__loggerPipe.close()
         if self.__progressParentPipe is not None:
             self.__progressParentPipe.close()
         if self.__progressChildPipe is not None:
@@ -226,39 +236,75 @@ class Controller:
         self.__ffmpeg.cleanUp()
         Log.d("Terminating the processes")
 
-    @staticmethod
-    def saveLogs(value=True):
+    def __closeCommunication(self):
+        """ Close all the pipes """
+        if self.__progressParentPipe is not None:
+            self.__progressParentPipe.close()
+        if self.__progressChildPipe is not None:
+            self.__progressChildPipe.close()
+
+    def setSaveLogs(self, value=False):
+        """ Save all the logs to a file """
         Log.toFile = value
 
+    def setVideoDisplay(self, value=False):
+        """ Display the processing video output """
+        self.__videoDisplay = value
+
+    def setSNRPlot(self, value=False):
+        """ Display the snr plot for the audio """
+        self.__snrPlotDisplay = value
+
+    def setRankingPlot(self, value=False):
+        """ Display the analytics """
+        self.__analyticsDisplay = value
+
     def setPercent(self):
+        """ Send the signal to the ui with the percentage of processing """
         while True:
             value = self.__progressParentPipe.recv()
+
+            # checking whether the request is from UI
             if self.__App is not None and value is not None:
                 self.__App.setPercentComplete(value)
 
                 if value == 100:
                     self.__App.setVideoClose()
+                    self.__closeCommunication()
+                    break
 
     def setLog(self):
+        """ Send the signal to the ui with the log of the processing """
         while True:
             try:
                 message = self.__loggerPipe.get()
+
+                # checking whether the request is from UI
                 if self.__App is not None and message is not None:
                     self.__App.setMessageLog(message)
             except EOFError as _:
                 pass
 
     def setVideo(self):
+        """ Send the signal to the ui with the vidoe frame to display """
         while True:
             try:
                 frame = self.__videoPipe.get()
-                if frame is not None:
+
+                # checking whether the request is from UI
+                if self.__App is not None and frame is not None:
                     self.__App.setVideoFrame(frame)
             except EOFError as _:
                 pass
 
     def setCpuComplete(self, val):
-        self.__App.setCpuComplete(val)
+        """ Send the signal to the ui with the percent usage of the cpu """
+        # checking whether the request is from UI
+        if self.__App is not None:
+            self.__App.setCpuComplete(val)
 
     def setMemComplete(self, val):
-        self.__App.setMemComplete(val)
+        """ Send the signal to the ui with the percent usage of the ram/memory """
+        # checking whether the request is from UI
+        if self.__App is not None:
+            self.__App.setMemComplete(val)

@@ -29,6 +29,8 @@ def getShadow():
 
 
 class Donut:
+    """ Custom progress bar """
+
     def __init__(self, name, widget: QWidget):
         self.bar = QRoundProgressBar(widget)
         self.bar.setObjectName(name)
@@ -48,7 +50,7 @@ class Donut:
                           (0.40, QtGui.QColor(177, 123, 129)),
                           (0.95, QtGui.QColor(72, 58, 78))]
         self.bar.setDataColors(gradientPoints)
-        self.bar.setValue(0.0)
+        self.bar.setValue(100)
 
         return self.bar
 
@@ -57,10 +59,11 @@ class App(QWidget):
     videoFrame = pyqtSignal(np.ndarray)
     videoClose = pyqtSignal()
 
-    def __init__(self):
+    def __init__(self, app):
         super().__init__()
         # middleware class object
         self.controller = Controller()
+        self.app = app
 
         # setting the theme
         theme = QtCore.QFile("./ui/theme/style.qss")
@@ -88,6 +91,10 @@ class App(QWidget):
         self.logWindow = None
         self.inputVideoFile = None
         self.video = None
+        self.videoDisplayCheckbox = None
+        self.snrPlotDisplayCheckbox = None
+        self.analyticsCheckbox = None
+        self.saveLogsCheckbox = None
 
         self.buildLayouts()
         self.show()
@@ -171,22 +178,26 @@ class App(QWidget):
         optionLabel.setAlignment(QtCore.Qt.AlignLeft)
         fileLayout.addWidget(optionLabel)
 
-        displayVideo = QCheckBox("Display video output")
-        displayVideo.setToolTip("Displays the video output while processing")
+        self.videoDisplayCheckbox = QCheckBox("Display video output")
+        self.videoDisplayCheckbox.setToolTip("Displays the video output while processing")
+        self.videoDisplayCheckbox.stateChanged.connect(self.setVideoDisplay)
 
-        snrDisplay = QCheckBox("Display SNR plot")
-        snrDisplay.setToolTip("Displays the signal to noise ratio plot for audio de-noising")
+        self.snrPlotDisplayCheckbox = QCheckBox("Display SNR plot")
+        self.snrPlotDisplayCheckbox.setToolTip("Displays the signal to noise ratio plot for audio de-noising")
+        self.snrPlotDisplayCheckbox.stateChanged.connect(self.setSNRPlot)
 
-        rankingPlot = QCheckBox("Display ranking plot")
-        rankingPlot.setToolTip("Displays the line plot for ranking of the video and their timestamps")
+        self.analyticsCheckbox = QCheckBox("Display ranking plot")
+        self.analyticsCheckbox.setToolTip("Displays the line plot for ranking of the video and their timestamps")
+        self.analyticsCheckbox.stateChanged.connect(self.setRankingPlot)
 
-        logOption = QCheckBox("Keep logs")
-        logOption.setToolTip("Stores the logs in a text file along with some info on the processing")
+        self.saveLogsCheckbox = QCheckBox("Save logs to file")
+        self.saveLogsCheckbox.setToolTip("Stores the logs in a text file along with some info on the processing")
+        self.saveLogsCheckbox.stateChanged.connect(self.setSaveLogs)
 
-        optionsLayout.addWidget(displayVideo, 1, 1)
-        optionsLayout.addWidget(snrDisplay, 1, 2)
-        optionsLayout.addWidget(rankingPlot, 2, 1)
-        optionsLayout.addWidget(logOption, 2, 2)
+        optionsLayout.addWidget(self.videoDisplayCheckbox, 1, 1)
+        optionsLayout.addWidget(self.snrPlotDisplayCheckbox, 1, 2)
+        optionsLayout.addWidget(self.analyticsCheckbox, 2, 1)
+        optionsLayout.addWidget(self.saveLogsCheckbox, 2, 2)
         optionsLayout.setRowStretch(3, 5)
         fileLayout.addLayout(optionsLayout)
 
@@ -197,7 +208,7 @@ class App(QWidget):
 
         stopButton = QPushButton("Stop")
         stopButton.setToolTip("End the processing for the input video given")
-        stopButton.clicked.connect(self.close)
+        stopButton.clicked.connect(self.exit)
         buttonLayout.addWidget(stopButton)
         fileLayout.addLayout(buttonLayout)
 
@@ -217,7 +228,7 @@ class App(QWidget):
         # setting final layouts
         mainLayout.addWidget(progressFrame, 1, 1)
         mainLayout.addLayout(fileLayout, 1, 2)
-        mainLayout.setColumnMinimumWidth(1, 600)
+        mainLayout.setColumnMinimumWidth(1, 620)
         mainLayout.addWidget(self.logWindow, 2, 1, 1, 2)
 
         self.setLayout(mainLayout)
@@ -232,20 +243,43 @@ class App(QWidget):
         self.controller.videoClose.connect(self.videoClose.emit)
 
     def selectFile(self):
+        """ Starts a file explorer to select video file """
         name = QFileDialog.getOpenFileName(None,
                                            "Open File",
                                            "~",
                                            "Video Files (*.mp4 *.flv *.avi *.mov *.mpg *.mxf)")
 
+        # setting the data and ui image for video
         if len(name[0]) > 0:
             self.videoImage.setPixmap(self.videoPicSelected)
             self.videoImage.setToolTip(str(name[0]))
             self.inputVideoFile = str(name[0])
 
     def start(self):
+        """ Starting the processing """
+
         if self.inputVideoFile is not None:
             self.controller.setVideo(self.inputVideoFile)
             self.controller.start()
+
+    def setVideoDisplay(self):
+        """ Display a video output """
+        self.controller.setVideoDisplay(self.videoDisplayCheckbox.isChecked())
+
+    def setSNRPlot(self):
+        """ Display SNR plot for audio """
+        self.controller.setSNRPlot(self.snrPlotDisplayCheckbox.isChecked())
+
+    def setRankingPlot(self):
+        """ Display analytics for the processing """
+        self.controller.setRankingPlot(self.analyticsCheckbox.isChecked())
+
+    def setSaveLogs(self):
+        """ Save all logs to a file """
+        self.controller.setSaveLogs(self.saveLogsCheckbox.isChecked())
+
+    def exit(self):
+        self.app.quit()
 
     def __del__(self):
         print("Window is dying")

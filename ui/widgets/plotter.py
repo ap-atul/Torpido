@@ -5,6 +5,9 @@ from matplotlib.figure import Figure
 
 
 class MplCanvas(FigureCanvasQTAgg):
+    """
+    Integration of UI and the matplot lib with Qt
+    """
 
     def __init__(self, parent=None, width=5, height=4, dpi=100):
         fig = Figure(figsize=(width, height), dpi=dpi)
@@ -13,6 +16,12 @@ class MplCanvas(FigureCanvasQTAgg):
 
 
 class JoinBarPlot(QtWidgets.QMainWindow):
+    """
+    Plotting in the main UI Thread, a separate window with integrated Matplot plots.
+    Window of same size, only the data need to be collected from the processes
+    via pipes, since the data from different process would not reflect on the
+    ui at any cost
+    """
 
     def __init__(self, *args, **kwargs):
         super(JoinBarPlot, self).__init__(*args, **kwargs)

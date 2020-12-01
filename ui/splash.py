@@ -1,3 +1,5 @@
+""" Sick splash screen """
+
 import sys
 import time
 
@@ -10,6 +12,7 @@ from ui.window import App
 
 
 class Worker(QThread):
+    """ Loading bar for the splash (fake) """
     progress = pyqtSignal(int)
 
     def __init__(self):
@@ -22,8 +25,10 @@ class Worker(QThread):
 
 
 class Splash(QWidget):
-    def __init__(self):
+    def __init__(self, app):
         super().__init__()
+
+        self.app = app
 
         self.val = 0
         self.worker = Worker()
@@ -102,14 +107,16 @@ class Splash(QWidget):
     def setProgress(self, val):
         self.progress.setValue(val)
         if val == 100:
-            self.torpido = App()
+            self.torpido = App(self.app)
             self.hide()
 
 
 def startSplash():
+    """ entry point """
+
     # QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads)
     app = QApplication(sys.argv)
-    torpido = Splash()
+    torpido = Splash(app)
     torpido.start()
 
     QtCore.QTimer.singleShot(1500, lambda: torpido.loading.setText("<strong>LOADING</strong> visuals ..."))

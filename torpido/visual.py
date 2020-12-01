@@ -67,6 +67,58 @@ class Visual:
             return 0
         return RANK_BLUR
 
+    def __timedRankingNormalize(self):
+        """
+        Since ranking is added to frames, since frames are duration * fps
+        and audio frame system is different since frame are duration * rate
+        so we need to generalize the ranking system
+        sol: ranking sec of the video and audio, for than taking mean of the
+        frames to generate rank for video.
+
+        Since ranking is 0 or 1, the mean will be different and we get more versatile
+        results.
+
+        We will read both the list and slice the video to get 1 sec of frames(1 * fps) and get
+        mean/average as the rank for the 1 sec
+
+        """
+        motionNormalize = []
+        blurNormalize = []
+        for i in range(0, int(self.__frameCount), int(self.__fps)):
+            if len(self.__motion) >= (i + int(self.__fps)):
+                motionNormalize.append(np.mean(self.__motion[i: i + int(self.__fps)]))
+                blurNormalize.append(np.mean(self.__blur[i: i + int(self.__fps)]))
+            else:
+                break
+
+        # saving all processed stuffs
+        self.__cache.writeDataToCache(CACHE_RANK_MOTION, motionNormalize)
+        self.__cache.writeDataToCache(CACHE_RANK_BLUR, blurNormalize)
+        Log.d(f"Visual rank length {len(motionNormalize)}  {len(blurNormalize)}")
+        Log.i(f"Visual ranking saved .............")
+
+    def __setVideoFps(self):
+        """
+        Function to set the original video fps to cache
+        """
+        self.__cache.writeDataToCache(CACHE_FPS, self.__fps)
+
+    def __setVideoFrameCount(self):
+        """
+        Function to set the original video frame count to cache
+        """
+        self.__cache.writeDataToCache(CACHE_FRAME_COUNT, self.__frameCount)
+
+    def __del__(self):
+        """
+        Clean ups
+        """
+        del self.__cache
+        if self.__videoGetter is not None:
+            del self.__videoGetter
+
+        Log.d("Cleaning up.")
+
     def startProcessing(self, pipe, inputFile, display=False):
         """
         Function to run the processing on the Video file. Motion and Blur features are
@@ -74,7 +126,7 @@ class Visual:
 
         Parameters
         ----------
-        pipe : Commuunication link
+        pipe : Communication link
             set progress on the ui
         inputFile : str
             input video file
@@ -149,11 +201,10 @@ class Visual:
                 if self.__videoPipe is not None:
                     self.__videoPipe.put(original)
 
-                # cv2.imshow("Video Feed", original)
-                # key = cv2.waitKey(1) & 0xFF
-                # if the `q` key is pressed, break from the loop
-                # if key == ord("q"):
-                # break
+                # not a ui request, so this works
+                else:
+                    cv2.imshow("Video Output", original)
+                    # if the `q` key is pressed, break from the loop
 
             # assigning the processed frame as the first frame to cal diff later on
             firstFrame = frame
@@ -171,57 +222,15 @@ class Visual:
         # calling the normalization of ranking
         self.__timedRankingNormalize()
 
-    def __timedRankingNormalize(self):
-        """
-        Since ranking is added to frames, since frames are duration * fps
-        and audio frame system is different since frame are duration * rate
-        so we need to generalize the ranking system
-        sol: ranking sec of the video and audio, for than taking mean of the
-        frames to generate rank for video.
-
-        Since ranking is 0 or 1, the mean will be different and we get more versatile
-        results.
-
-        We will read both the list and slice the video to get 1 sec of frames(1 * fps) and get
-        mean/average as the rank for the 1 sec
-
-        """
-        motionNormalize = []
-        blurNormalize = []
-        for i in range(0, int(self.__frameCount), int(self.__fps)):
-            if len(self.__motion) >= (i + int(self.__fps)):
-                motionNormalize.append(np.mean(self.__motion[i: i + int(self.__fps)]))
-                blurNormalize.append(np.mean(self.__blur[i: i + int(self.__fps)]))
-            else:
-                break
-
-        # saving all processed stuffs
-        self.__cache.writeDataToCache(CACHE_RANK_MOTION, motionNormalize)
-        self.__cache.writeDataToCache(CACHE_RANK_BLUR, blurNormalize)
-        Log.d(f"Visual rank length {len(motionNormalize)}  {len(blurNormalize)}")
-        Log.i(f"Visual ranking saved .............")
-
     def setPipe(self, pipe):
+        """
+        Send video frame to the ui threads for displaying, since open cv
+        is using the Qt backend, it should be in the main ui thread or else
+        the im show does not work in the sub process
+
+        Parameters
+        ----------
+        pipe : some queue
+            add frames and continuous read to the ui display
+        """
         self.__videoPipe = pipe
-
-    def __setVideoFps(self):
-        """
-        Function to set the original video fps to cache
-        """
-        self.__cache.writeDataToCache(CACHE_FPS, self.__fps)
-
-    def __setVideoFrameCount(self):
-        """
-        Function to set the original video frame count to cache
-        """
-        self.__cache.writeDataToCache(CACHE_FRAME_COUNT, self.__frameCount)
-
-    def __del__(self):
-        """
-        Clean ups
-        """
-        del self.__cache
-        if self.__videoGetter is not None:
-            del self.__videoGetter
-
-        Log.d("Cleaning up.")

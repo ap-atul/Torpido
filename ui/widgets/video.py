@@ -1,3 +1,5 @@
+""" QWidget for Open cv im show alternative with Qt """
+
 import cv2
 import numpy as np
 from PyQt5 import QtCore, QtWidgets, QtGui
@@ -5,6 +7,8 @@ from PyQt5.QtWidgets import QMainWindow
 
 
 class OpenCVQImage(QtGui.QImage):
+    """ Conversion of open cv image to QImage """
+
     def __init__(self, image: np.ndarray) -> None:
         if len(image.shape) == 3:
             height, width, n_channels = image.shape
@@ -23,6 +27,8 @@ class OpenCVQImage(QtGui.QImage):
 
 
 class QVideoWidget(QtWidgets.QWidget):
+    """ Widget with paint events and communication slot for frame retrieval and display """
+
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
 
@@ -33,10 +39,12 @@ class QVideoWidget(QtWidgets.QWidget):
         self._frame = None
 
     def setFrame(self, frame: np.ndarray):
+        """ Set the frame to the window """
         self._frame = frame
-        cv2.imshow("some", self._frame)
+        cv2.imshow("Video Output", self._frame)
 
     def end(self):
+        """ Close all the windows """
         cv2.destroyAllWindows()
 
     def changeEvent(self, event: QtCore.QEvent) -> None:
@@ -56,6 +64,8 @@ class QVideoWidget(QtWidgets.QWidget):
 
 
 class QVideoWindow(QMainWindow):
+    """ Separate window for video display """
+
     def __init__(self, window):
         super().__init__()
 
