@@ -1,4 +1,6 @@
+import numpy as np
 from PyQt5 import QtGui, QtCore
+from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPalette, QColor, QPixmap, QIcon, QFont
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
                              QHBoxLayout, QLabel, QGridLayout,
@@ -7,7 +9,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
 
 from torpido.config import *
 from ui.controller import Controller
-from ui.widgets import QRoundProgressBar, QLabelAlternate
+from ui.widgets import QRoundProgressBar, QLabelAlternate, QVideoWindow
 
 layoutStyle = '''
                 border-color: #775157;
@@ -52,6 +54,9 @@ class Donut:
 
 
 class App(QWidget):
+    videoFrame = pyqtSignal(np.ndarray)
+    videoClose = pyqtSignal()
+
     def __init__(self):
         super().__init__()
         # middleware class object
@@ -82,6 +87,7 @@ class App(QWidget):
         self.memProgress = None
         self.logWindow = None
         self.inputVideoFile = None
+        self.video = None
 
         self.buildLayouts()
         self.show()
@@ -219,6 +225,11 @@ class App(QWidget):
         self.controller.percentMem.connect(self.memProgress.setValue)
         self.controller.percentCpu.connect(self.cpuProgress.setValue)
         self.controller.logger.connect(self.logWindow.appendPlainText)
+
+        # creating the video window
+        self.video = QVideoWindow(self.controller)
+        self.controller.videoFrame.connect(self.videoFrame.emit)
+        self.controller.videoClose.connect(self.videoClose.emit)
 
     def selectFile(self):
         name = QFileDialog.getOpenFileName(None,

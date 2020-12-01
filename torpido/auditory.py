@@ -5,12 +5,15 @@ wavelet transforms a threshold will be added to each window with certain level
 
 import gc
 
+import matplotlib
 import numpy as np
 import soundfile
 from matplotlib import pyplot as plt
 
 from torpido.config import *
 from torpido.wavelet import FastWaveletTransform, getExponent, VisuShrinkCompressor, snr
+
+matplotlib.use("TkAgg")
 
 
 class Auditory:
@@ -155,7 +158,7 @@ class Auditory:
 
     def __plotSNR(self):
         """
-        Plotting the snrs for the original and the de-nosied signals, the snrs are collected
+        Plotting the snrs for the original and the de-noised signals, the snrs are collected
         during the processing, and the mean of the data is used to represent the final values
         The snr is very low (negative with raised to values) so abs of the mean is taken.
         Note: not to be mistaken with positive values
@@ -163,6 +166,7 @@ class Auditory:
         this SNR is  the reciprocal of the coefficient of variation, i.e.,
         the ratio of mean to standard deviation of a signal, refer the snr function in wavelet/utility
         """
+
         width = 0.1
         x_orig = np.arange(len(self.__snrBefore))
         plt.bar(x_orig - width / 2, np.abs(self.__snrBefore), width=width, label='Original')

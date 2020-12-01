@@ -49,6 +49,7 @@ class Visual:
         self.__blur = None
         self.__cache = Cache()
         self.__videoGetter = None
+        self.__videoPipe = None
 
     def __detectBlur(self, image):
         """
@@ -143,12 +144,16 @@ class Visual:
                 self.__motion.append(0)
 
             if display:
-                cv2.imshow("Video Feed", original)
-                key = cv2.waitKey(1) & 0xFF
 
+                # adding the frame to the pipe
+                if self.__videoPipe is not None:
+                    self.__videoPipe.put(original)
+
+                # cv2.imshow("Video Feed", original)
+                # key = cv2.waitKey(1) & 0xFF
                 # if the `q` key is pressed, break from the loop
-                if key == ord("q"):
-                    break
+                # if key == ord("q"):
+                # break
 
             # assigning the processed frame as the first frame to cal diff later on
             firstFrame = frame
@@ -162,7 +167,6 @@ class Visual:
         # clearing memory
         myClip.release()
         self.__videoGetter.stop()
-        cv2.destroyAllWindows()
 
         # calling the normalization of ranking
         self.__timedRankingNormalize()
@@ -196,6 +200,9 @@ class Visual:
         self.__cache.writeDataToCache(CACHE_RANK_BLUR, blurNormalize)
         Log.d(f"Visual rank length {len(motionNormalize)}  {len(blurNormalize)}")
         Log.i(f"Visual ranking saved .............")
+
+    def setPipe(self, pipe):
+        self.__videoPipe = pipe
 
     def __setVideoFps(self):
         """

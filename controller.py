@@ -72,9 +72,11 @@ class Controller:
         # communication links
         self.__progressParentPipe, self.__progressChildPipe = Pipe()
         self.__loggerPipe = Queue()
+        self.__videoPipe = Queue()
 
         # communication for logs to ui
         Log.setHandler(self.__loggerPipe)
+        self.__visual.setPipe(self.__videoPipe)
 
         # watcher enable/disable
         self.__watcher.enable(self, enable=True)
@@ -116,6 +118,7 @@ class Controller:
         # starting listening on the communication link
         Thread(target=self.setPercent, args=()).start()
         Thread(target=self.setLog, args=()).start()
+        Thread(target=self.setVideo, args=()).start()
 
         if not os.path.isfile(inputFile):
             Log.e(f"Video file does not exists.")
@@ -155,9 +158,9 @@ class Controller:
         self.__watcher.start()  # starting the watcher
 
         self.__audioProcess = Process(target=self.__auditory.startProcessing,
-                                      args=(self.__audioFile, self.__deNoisedAudioFile))
+                                      args=(self.__audioFile, self.__deNoisedAudioFile, True))
         self.__visualProcess = Process(target=self.__visual.startProcessing,
-                                       args=(self.__progressChildPipe, self.__videoFile, display))
+                                       args=(self.__progressChildPipe, self.__videoFile, True))
         self.__textualProcess = Process(target=self.__textual.startProcessing, args=(self.__videoFile, display))
 
         self.__audioProcess.start()
@@ -233,12 +236,24 @@ class Controller:
             if self.__App is not None and value is not None:
                 self.__App.setPercentComplete(value)
 
+                if value == 100:
+                    self.__App.setVideoClose()
+
     def setLog(self):
         while True:
             try:
                 message = self.__loggerPipe.get()
                 if self.__App is not None and message is not None:
                     self.__App.setMessageLog(message)
+            except EOFError as _:
+                pass
+
+    def setVideo(self):
+        while True:
+            try:
+                frame = self.__videoPipe.get()
+                if frame is not None:
+                    self.__App.setVideoFrame(frame)
             except EOFError as _:
                 pass
 
