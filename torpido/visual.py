@@ -210,10 +210,12 @@ class Visual:
             firstFrame = frame
 
             # setting progress on the ui
-            pipe.send(float((count / totalFrames) * 100))
+            if pipe is not None:
+                pipe.send(float((count / totalFrames) * 100))
 
         # completing the progress
-        pipe.send(100.0)
+        if pipe is not None:
+            pipe.send(100.0)
 
         # clearing memory
         myClip.release()

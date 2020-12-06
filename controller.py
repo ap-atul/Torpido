@@ -16,7 +16,7 @@ from torpido.analytics import Analytics
 from torpido.config import Cache
 from torpido.exceptions import RankingOfFeatureMissing, EastModelEnvironmentMissing
 from torpido.tools import Watcher, Log
-from torpido.util import checkIfVideo, getTimestamps, getOutputVideoLength, readTheRankings
+from torpido.util import checkIfVideo, getTimestamps, readTheRankings
 
 
 def logo():
@@ -130,7 +130,7 @@ class Controller:
         Log.setHandler(self.__loggerPipe)
 
         # watcher enable/disable
-        self.__watcher.enable(self, enable=True)
+        self.__watcher.enable(self, enable=False)
 
     def startProcessing(self, app, inputFile):
         """
@@ -164,21 +164,26 @@ class Controller:
         # saving the instance of the ui controller
         self.__App = app
 
-        # creating pipe for progress bar communication
-        self.__progressParentPipe, self.__progressChildPipe = Pipe()
+        if self.__App is not None:
 
-        # starting listening on the communication link
-        Thread(target=self.setPercent, args=()).start()
-        Thread(target=self.setLog, args=()).start()
+            # setting watcher to enabled
+            self.__watcher.enable(self, enable=True)
 
-        # initialize the queue and thread
-        if self.__videoDisplay:
-            self.__videoPipe = Queue()
-            self.__visual.setPipe(self.__videoPipe)
-            Thread(target=self.setVideo, args=()).start()
+            # creating pipe for progress bar communication
+            self.__progressParentPipe, self.__progressChildPipe = Pipe()
+
+            # starting listening on the communication link
+            Thread(target=self.setPercent, args=()).start()
+            Thread(target=self.setLog, args=()).start()
+
+            # initialize the queue and thread
+            if self.__videoDisplay:
+                self.__videoPipe = Queue()
+                self.__visual.setPipe(self.__videoPipe)
+                Thread(target=self.setVideo, args=()).start()
 
         # if from terminal
-        if self.__App is None:
+        else:
             self.__textDetectDisplay = True
 
         if not os.path.isfile(inputFile):
@@ -255,12 +260,7 @@ class Controller:
             Log.e(RankingOfFeatureMissing.cause)
             return
 
-        if len(timestamps) == 0:
-            Log.w("There are not good enough portions to cut. Try changing the configurations.")
-            return
-
-        Log.i(f"Clipping a total of {len(timestamps)} sub portions.")
-        Log.i(f"Output video length would be approx. :: {getOutputVideoLength(timestamps)}")
+        # merging the final video
         if self.__ffmpeg.mergeAudioVideo(timestamps):
             Log.d("Merged the final output video ...............")
         else:
@@ -268,14 +268,21 @@ class Controller:
 
     def clean(self):
         """ clean up """
+
+        # terminating all processing tasks
         if self.__visualProcess is not None:
             self.__visualProcess.terminate()
+
         if self.__audioProcess is not None:
             self.__audioProcess.terminate()
+
         if self.__textualProcess is not None:
             self.__textualProcess.terminate()
+
+        # closing all communication links
         if self.__progressParentPipe is not None:
             self.__progressParentPipe.close()
+
         if self.__progressChildPipe is not None:
             self.__progressChildPipe.close()
 

@@ -85,8 +85,9 @@ class Log:
                     f.write(message + "\n")
 
                 f.close()
-        except Exception as e:
-            print(e)
+
+        except Exception as _:
+            pass
 
     @staticmethod
     def d(message):
