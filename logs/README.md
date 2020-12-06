@@ -20,6 +20,21 @@
 
 # Logs
 
+### Log 35, 06-12
+```AP```
+* Solved few bugs
+* Update analytics
+* Changes to controller
+
+----------------------------------------
+### Log 34, 05-12
+```AP```
+* Completed the workbook, send it
+* Updated the documents like reports
+* Basic discussions on the sem report
+* Started with the sem report
+
+----------------------------------------
 ### Log 33, 01-12
 ```AP```
 * Created widget for video display
