@@ -4,8 +4,6 @@ It consists of two functions to split and merge video and audio
 using ffmpeg.
 """
 
-import gc
-
 from torpido.config import *
 from torpido.exceptions import AudioStreamMissingException, FFmpegProcessException
 from torpido.progress import Progress
@@ -195,22 +193,23 @@ class FFMPEG:
         Deletes extra files created while processing, deletes the ranking files
         cache, etc.
         """
-        # well something is wrong here then bye
-        if self.__inputFileName is None:
-            return
 
-        # original audio split from the video file
-        if os.path.isfile(os.path.join(self.__outputFilePath, self.__inputAudioFileName)):
-            os.unlink(os.path.join(self.__outputFilePath, self.__inputAudioFileName))
+        # processing is not yet started for something went wrong
+        if self.__inputFileName is not None:
 
-        # de-noised audio file output of Auditory
-        if os.path.isfile(os.path.join(self.__outputFilePath, self.__outputAudioFileName)):
-            os.unlink(os.path.join(self.__outputFilePath, self.__outputAudioFileName))
+            # original audio split from the video file
+            if os.path.isfile(os.path.join(self.__outputFilePath, self.__inputAudioFileName)):
+                os.unlink(os.path.join(self.__outputFilePath, self.__inputAudioFileName))
+
+            # de-noised audio file output of Auditory
+            if os.path.isfile(os.path.join(self.__outputFilePath, self.__outputAudioFileName)):
+                os.unlink(os.path.join(self.__outputFilePath, self.__outputAudioFileName))
 
         # cache storage file
         if os.path.isfile(os.path.join(CACHE_DIR, CACHE_NAME)):
             os.unlink(os.path.join(CACHE_DIR, CACHE_NAME))
 
-        del self.__progressBar
-        Log.d(f"Garbage collected :: {gc.collect()}")
+        if self.__progressBar is not None:
+            del self.__progressBar
+
         Log.d("Clean up completed.")

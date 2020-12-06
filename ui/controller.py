@@ -101,9 +101,9 @@ class Controller(QThread):
         """ Emits the signal to end the video display """
         self.videoClose.emit()
 
-    def __del__(self):
+    def terminate(self) -> None:
         """ Clean up """
-        del self.controller
+        self.controller.clean()
         del Controller.percentComplete
         del Controller.percentMem
         del Controller.percentCpu

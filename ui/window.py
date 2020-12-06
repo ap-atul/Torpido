@@ -59,11 +59,10 @@ class App(QWidget):
     videoFrame = pyqtSignal(np.ndarray)
     videoClose = pyqtSignal()
 
-    def __init__(self, app):
+    def __init__(self):
         super().__init__()
         # middleware class object
         self.controller = Controller()
-        self.app = app
 
         # setting the theme
         theme = QtCore.QFile("./ui/theme/style.qss")
@@ -206,10 +205,10 @@ class App(QWidget):
         startButton.clicked.connect(self.start)
         buttonLayout.addWidget(startButton)
 
-        stopButton = QPushButton("Stop")
-        stopButton.setToolTip("End the processing for the input video given")
-        stopButton.clicked.connect(self.exit)
-        buttonLayout.addWidget(stopButton)
+        exitButton = QPushButton("Exit")
+        exitButton.setToolTip("End the processing for the input video given")
+        exitButton.clicked.connect(self.exit)
+        buttonLayout.addWidget(exitButton)
         fileLayout.addLayout(buttonLayout)
 
         font = QFont()
@@ -279,7 +278,8 @@ class App(QWidget):
         self.controller.setSaveLogs(self.saveLogsCheckbox.isChecked())
 
     def exit(self):
-        self.app.quit()
+        self.controller.terminate()
+        self.close()
 
     def __del__(self):
-        print("Window is dying")
+        print("Bye !")

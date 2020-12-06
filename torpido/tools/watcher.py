@@ -6,7 +6,6 @@ machine to retrieve the CPU and RAM usage manually
 
 May upgrade later to use `psutil`
 """
-import gc
 import re
 import subprocess
 import time
@@ -186,5 +185,3 @@ class Watcher:
             del self.__memThread
         if self.__cpuThread is not None:
             del self.__cpuThread
-
-        Log.d(f"Garbage Collected :: {gc.collect()}")

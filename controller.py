@@ -233,7 +233,6 @@ class Controller:
         self.__textualProcess.join()
 
         # running the final pass
-        Log.d(f"Garbage collecting .. {gc.collect()}")
         self.__completedProcess()
 
     def __completedProcess(self):
@@ -267,8 +266,8 @@ class Controller:
         else:
             return
 
-    def __del__(self):
-        """clean up"""
+    def clean(self):
+        """ clean up """
         if self.__visualProcess is not None:
             self.__visualProcess.terminate()
         if self.__audioProcess is not None:
@@ -281,8 +280,15 @@ class Controller:
             self.__progressChildPipe.close()
 
         # deleting files created by processing modules
-        self.__ffmpeg.cleanUp()
+        if self.__ffmpeg is not None:
+            self.__ffmpeg.cleanUp()
+
         Log.d("Terminating the processes")
+        Log.d(f"Garbage collecting .. {gc.collect()}")
+
+    def __del__(self):
+        """ clean up """
+        self.clean()
 
     def __closeCommunication(self):
         """ Close all the pipes """

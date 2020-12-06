@@ -25,10 +25,8 @@ class Worker(QThread):
 
 
 class Splash(QWidget):
-    def __init__(self, app):
+    def __init__(self):
         super().__init__()
-
-        self.app = app
 
         self.val = 0
         self.worker = Worker()
@@ -107,7 +105,7 @@ class Splash(QWidget):
     def setProgress(self, val):
         self.progress.setValue(val)
         if val == 100:
-            self.torpido = App(self.app)
+            self.torpido = App()
             self.hide()
 
 
@@ -116,7 +114,7 @@ def startSplash():
 
     # QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads)
     app = QApplication(sys.argv)
-    torpido = Splash(app)
+    torpido = Splash()
     torpido.start()
 
     QtCore.QTimer.singleShot(1500, lambda: torpido.loading.setText("<strong>LOADING</strong> visuals ..."))
