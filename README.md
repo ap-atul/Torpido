@@ -11,6 +11,7 @@
 * [Basic Working](https://github.com/AP-Atul/Torpido#basic-working)
 * [Applications](https://github.com/AP-Atul/Torpido#applications)
 * [Architecture](https://github.com/AP-Atul/Torpido#architecture)
+* [Screem]
 * [Documentation](https://github.com/AP-Atul/Torpido#docs)
 * [Execution](https://github.com/AP-Atul/Torpido#execution)
 
@@ -104,6 +105,12 @@ sequence.
 ## Architecture
 ![arch](https://github.com/AP-Atul/Torpido/blob/master/img/arch.png)
 
+
+## Screens
+
+![splash](https://github.com/AP-Atul/Torpido/blob/master/img/splash.png)
+
+![window](https://github.com/AP-Atul/Torpido/blob/master/img/window.png)
 
 ## Docs
 
