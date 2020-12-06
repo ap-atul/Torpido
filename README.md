@@ -11,7 +11,7 @@
 * [Basic Working](https://github.com/AP-Atul/Torpido#basic-working)
 * [Applications](https://github.com/AP-Atul/Torpido#applications)
 * [Architecture](https://github.com/AP-Atul/Torpido#architecture)
-* [Screem]
+* [Screen](https://github.com/AP-Atul/Torpido#screens)
 * [Documentation](https://github.com/AP-Atul/Torpido#docs)
 * [Execution](https://github.com/AP-Atul/Torpido#execution)
 
