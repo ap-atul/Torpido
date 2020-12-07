@@ -70,24 +70,26 @@ class File:
         All changes will be rewritten on request from the ui component
         All constants bare same key aas their name mentioned
         """
+        configs = [("RANK_MOTION" + SEPARATOR + str(RANK_MOTION) + "\n"),
+                   ("RANK_BLUR" + SEPARATOR + str(RANK_BLUR) + "\n"),
+                   ("RANK_TEXT" + SEPARATOR + str(RANK_TEXT) + "\n"),
+                   ("RANK_AUDIO" + SEPARATOR + str(RANK_AUDIO) + "\n"),
+
+                   ("MIN_RANK_OUT_VIDEO" + SEPARATOR + str(MIN_RANK_OUT_VIDEO) + "\n"),
+                   ("MOTION_THRESHOLD" + SEPARATOR + str(MOTION_THRESHOLD) + "\n"),
+                   ("BLUR_THRESHOLD" + SEPARATOR + str(BLUR_THRESHOLD) + "\n"),
+                   ("SILENCE_THRESHOlD" + SEPARATOR + str(SILENCE_THRESHOlD) + "\n"),
+                   ("TEXT_MIN_CONFIDENCE" + SEPARATOR + str(TEXT_MIN_CONFIDENCE) + "\n"),
+
+                   ("AUDIO_BLOCK_PER" + SEPARATOR + str(AUDIO_BLOCK_PER) + "\n"),
+                   ("TEXT_SKIP_FRAMES" + SEPARATOR + str(TEXT_SKIP_FRAMES) + "\n"),
+                   ("WAVELET" + SEPARATOR + str(WAVELET) + "\n"),
+
+                   ("WATCHER_DELAY" + SEPARATOR + str(WATCHER_DELAY) + "\n"),
+                   ]
+
         with open(CONFIG_FILE, "w") as config:
-            config.write("RANK_MOTION" + SEPARATOR + str(RANK_MOTION) + "\n")
-            config.write("RANK_BLUR" + SEPARATOR + str(RANK_BLUR) + "\n")
-            config.write("RANK_TEXT" + SEPARATOR + str(RANK_TEXT) + "\n")
-            config.write("RANK_AUDIO" + SEPARATOR + str(RANK_AUDIO) + "\n")
-
-            config.write("MIN_RANK_OUT_VIDEO" + SEPARATOR + str(MIN_RANK_OUT_VIDEO) + "\n")
-            config.write("MOTION_THRESHOLD" + SEPARATOR + str(MOTION_THRESHOLD) + "\n")
-            config.write("BLUR_THRESHOLD" + SEPARATOR + str(BLUR_THRESHOLD) + "\n")
-            config.write("SILENCE_THRESHOlD" + SEPARATOR + str(SILENCE_THRESHOlD) + "\n")
-            config.write("TEXT_MIN_CONFIDENCE" + SEPARATOR + str(TEXT_MIN_CONFIDENCE) + "\n")
-
-            config.write("AUDIO_BLOCK_PER" + SEPARATOR + str(AUDIO_BLOCK_PER) + "\n")
-            config.write("TEXT_SKIP_FRAMES" + SEPARATOR + str(TEXT_SKIP_FRAMES) + "\n")
-            config.write("WAVELET" + SEPARATOR + str(WAVELET) + "\n")
-
-            config.write("WATCHER_DELAY" + SEPARATOR + str(WATCHER_DELAY) + "\n")
-
+            config.writelines(configs)
             config.close()
 
     @staticmethod
