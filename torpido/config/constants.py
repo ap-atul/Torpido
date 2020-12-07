@@ -1,5 +1,7 @@
 import os
 
+from torpido.config.config import Config
+
 # file to save all the constants that are to be used
 # ******************* CACHE PART *************************
 # cache store dir
@@ -32,39 +34,39 @@ CACHE_RANK_TEXT = "CACHE_RANK_TEXT"
 
 # ******************* RANKS ****************************
 # ranking for motion in video
-RANK_MOTION = 3
+RANK_MOTION = Config.read("RANK_MOTION", float)
 
 # ranking for blur in video
-RANK_BLUR = 2
+RANK_BLUR = Config.read("RANK_BLUR", float)
 
 # ranking for audio silence
-RANK_AUDIO = 3
+RANK_AUDIO = Config.read("RANK_AUDIO", float)
 
 # ranking for text in video
-RANK_TEXT = 5
+RANK_TEXT = Config.read("RANK_TEXT", float)
 
 # output video min rank
-MIN_RANK_OUT_VIDEO = 3
+MIN_RANK_OUT_VIDEO = Config.read("MIN_RANK_OUT_VIDEO", float)
 
 # ******************* VIDEO PART *************************
 # video width to keep while processing
 VIDEO_WIDTH = 500
 
 # threshold for video reading motion
-MOTION_THRESHOLD = 50
+MOTION_THRESHOLD = Config.read("MOTION_THRESHOLD", int)
 
 # threshold for blur detection
-BLUR_THRESHOLD = 500
+BLUR_THRESHOLD = Config.read("BLUR_THRESHOLD", int)
 
 # ******************* AUDIO PART *************************
 # reading 10 percent of audio file at a time
-AUDIO_BLOCK_PER = 0.2
+AUDIO_BLOCK_PER = Config.read("AUDIO_BLOCK_PER", float)
 
 # window level in the wavelet level
 WAVELET_LEVEL = 1
 
 # wavelet used to de noise/  Coiflet wavelet band
-WAVELET = "coif1"
+WAVELET = Config.read("WAVELET", str)
 
 # decomposition and re composition mode
 DEC_REC_MODE = "per"
@@ -73,14 +75,14 @@ DEC_REC_MODE = "per"
 WAVE_THRESH = "soft"
 
 # silence threshold
-SILENCE_THRESHOlD = 0.005
+SILENCE_THRESHOlD = Config.read("SILENCE_THRESHOlD", float)
 
 # ********************** TEXTUAL PART ************************
 # min confidence of the text being detected
-TEXT_MIN_CONFIDENCE = 0.5
+TEXT_MIN_CONFIDENCE = Config.read("TEXT_MIN_CONFIDENCE", float)
 
 # text detection is slow so some frames are skipped (sec)
-TEXT_SKIP_FRAMES = 10
+TEXT_SKIP_FRAMES = Config.read("TEXT_SKIP_FRAMES", int)
 
 # text detection model directory
 TEXT_EAST_MODEL_PATH = os.environ['EAST_MODEL']
@@ -100,7 +102,7 @@ SUPPORTED_VIDEO_FILES = [".mp4", ".webm", ".mkv", ".mov", ".flv", ".avi", ".ogg"
 
 # ********************* WATCHER ***********************************
 # delay to check the CPU and MEM usage (in secs)
-WATCHER_DELAY = 3
+WATCHER_DELAY = Config.read("WATCHER_DELAY", int)
 
 # ******************** UI ***************************************
 # minimum height of window
