@@ -109,7 +109,7 @@ WATCHER_DELAY = Config.read("WATCHER_DELAY", int)
 WINDOW_HEIGHT = 630
 
 # minimum width of window
-WINDOW_WIDTH = 1000
+WINDOW_WIDTH = 850
 
 # name of the window
 WINDOW_TITLE = "Video Editing Automation (aka. Torpido)"

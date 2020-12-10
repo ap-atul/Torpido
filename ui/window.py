@@ -3,26 +3,19 @@ from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import pyqtSignal
 from PyQt5.QtGui import QPalette, QColor, QPixmap, QIcon, QFont
 from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
-                             QHBoxLayout, QLabel, QGridLayout,
+                             QHBoxLayout, QGridLayout,
                              QGraphicsDropShadowEffect, QPushButton,
-                             QCheckBox, QFrame, QPlainTextEdit, QFileDialog)
+                             QCheckBox, QPlainTextEdit, QFileDialog, QGroupBox)
 
 from torpido.config import *
 from ui.controller import Controller
 from ui.widgets import QRoundProgressBar, QLabelAlternate, QVideoWindow
 
-layoutStyle = '''
-                border-color: #775157;
-                border-width: 1px;
-                border-style: solid;
-                border-radius: 10px;
-              '''
-
 
 def getShadow():
     shadowEffect = QGraphicsDropShadowEffect()
-    shadowEffect.setBlurRadius(5)
-    shadowEffect.setOffset(5)
+    shadowEffect.setBlurRadius(20)
+    shadowEffect.setOffset(-5)
     shadowEffect.setColor(QColor(72, 58, 78))
 
     return shadowEffect
@@ -70,15 +63,14 @@ class App(QWidget):
 
         self.setStyleSheet(QtCore.QTextStream(theme).readAll())
         self.setMinimumSize(WINDOW_WIDTH, WINDOW_HEIGHT)
-        self.setMaximumSize(1280, 720)
         self.setWindowTitle(WINDOW_TITLE)
         self.setWindowIcon(QIcon('./ui/assets/logo.png'))
 
         self.videoPicNotSelected = QPixmap('./ui/assets/play-button-not-selected.png')
-        self.videoPicNotSelected = self.videoPicNotSelected.scaledToWidth(140)
+        self.videoPicNotSelected = self.videoPicNotSelected.scaledToWidth(120)
 
         self.videoPicSelected = QPixmap('./ui/assets/play-button.png')
-        self.videoPicSelected = self.videoPicSelected.scaledToWidth(140)
+        self.videoPicSelected = self.videoPicSelected.scaledToWidth(120)
 
         self.videoImage = QLabelAlternate()
         self.introVideoImage = QLabelAlternate()
@@ -96,6 +88,9 @@ class App(QWidget):
         self.saveLogsCheckbox = None
 
         self.buildLayouts()
+
+        # resizing in min size
+        self.resize(WINDOW_WIDTH, WINDOW_HEIGHT)
         self.show()
 
     def buildLayouts(self):
@@ -109,7 +104,7 @@ class App(QWidget):
 
         # file v layout
         fileLayout = QVBoxLayout()
-        fileLayout.setSpacing(5)
+        fileLayout.setSpacing(10)
 
         # extro and intro layout
         extraLayout = QHBoxLayout()
@@ -136,46 +131,38 @@ class App(QWidget):
         self.memProgress.setMaximumSize(120, 120)
         progressLayout.addWidget(self.memProgress, 2, 2)
 
-        select = QLabel("Drag or select a video file")
-        select.setAlignment(QtCore.Qt.AlignLeft)
-        select.setMaximumHeight(20)
-        fileLayout.addWidget(select)
-
         self.videoImage.setPixmap(self.videoPicNotSelected)
-        self.videoImage.setGraphicsEffect(getShadow())
         self.videoImage.setAlignment(QtCore.Qt.AlignLeft)
-        self.videoImage.setMaximumSize(140, 130)
+        self.introVideoImage.setMaximumSize(120, 120)
         self.videoImage.clicked.connect(self.selectFile)
         self.videoImage.setToolTip("Input video file")
-        fileLayout.addWidget(self.videoImage)
 
-        optional = QLabel("Select intro and extro video files (optional)")
-        optional.setContentsMargins(0, 30, 0, 0)
-        optional.setAlignment(QtCore.Qt.AlignLeft)
-        fileLayout.addWidget(optional)
+        videoLayout = QHBoxLayout()
+        videoLayout.setAlignment(QtCore.Qt.AlignLeft)
+        videoLayout.addWidget(self.videoImage)
+        videoImageFrame = QGroupBox("Input Video")
+        videoImageFrame.setLayout(videoLayout)
+        fileLayout.addWidget(videoImageFrame)
 
         self.introVideoImage.setPixmap(self.videoPicNotSelected)
-        self.introVideoImage.setGraphicsEffect(getShadow())
-        self.introVideoImage.setMaximumSize(140, 130)
+        self.introVideoImage.setMaximumSize(120, 120)
         self.introVideoImage.clicked.connect(self.selectFile)
         self.introVideoImage.setToolTip("Intro video will be placed at the start")
         extraLayout.addWidget(self.introVideoImage)
 
         self.extroVideoImage.setPixmap(self.videoPicNotSelected)
-        self.extroVideoImage.setGraphicsEffect(getShadow())
-        self.extroVideoImage.setMaximumSize(140, 130)
+        self.extroVideoImage.setMaximumSize(120, 120)
         self.extroVideoImage.clicked.connect(self.selectFile)
         self.extroVideoImage.setToolTip("Extro video will be placed at the end")
         extraLayout.addWidget(self.extroVideoImage)
 
         extraLayout.setSpacing(20)
         extraLayout.setAlignment(QtCore.Qt.AlignLeft)
-        fileLayout.addLayout(extraLayout)
 
-        optionLabel = QLabel("Choose below options")
-        optionLabel.setContentsMargins(0, 30, 0, 0)
-        optionLabel.setAlignment(QtCore.Qt.AlignLeft)
-        fileLayout.addWidget(optionLabel)
+        extraFrame = QGroupBox("Extro and Intro Videos [Optional]")
+        extraFrame.setFlat(True)
+        extraFrame.setLayout(extraLayout)
+        fileLayout.addWidget(extraFrame)
 
         self.videoDisplayCheckbox = QCheckBox("Display video output")
         self.videoDisplayCheckbox.setToolTip("Displays the video output while processing")
@@ -197,8 +184,11 @@ class App(QWidget):
         optionsLayout.addWidget(self.snrPlotDisplayCheckbox, 1, 2)
         optionsLayout.addWidget(self.analyticsCheckbox, 2, 1)
         optionsLayout.addWidget(self.saveLogsCheckbox, 2, 2)
-        optionsLayout.setRowStretch(3, 5)
-        fileLayout.addLayout(optionsLayout)
+
+        # frame for the options
+        optionsFrame = QGroupBox("Options")
+        optionsFrame.setLayout(optionsLayout)
+        fileLayout.addWidget(optionsFrame)
 
         startButton = QPushButton("Start")
         startButton.setToolTip("Start the processing for the input video given")
@@ -214,21 +204,29 @@ class App(QWidget):
         font = QFont()
         font.setPointSize(10)
         self.logWindow = QPlainTextEdit()
-        self.logWindow.setMaximumHeight(80)
         self.logWindow.setCenterOnScroll(True)
         self.logWindow.setReadOnly(True)
         self.logWindow.setFont(font)
         self.logWindow.setLineWrapMode(QPlainTextEdit.NoWrap)
+        self.logWindow.appendPlainText("HELLO")
 
-        progressFrame = QFrame()
+        # frame for the progress elements
+        progressFrame = QGroupBox("Progress Metrics")
         progressFrame.setLayout(progressLayout)
-        progressFrame.setStyleSheet(layoutStyle)
+
+        # frame for the log window
+        logLayout = QHBoxLayout()
+        logLayout.addWidget(self.logWindow)
+        logLayout.setContentsMargins(5, 5, 5, 5)
+        logFrame = QGroupBox("Logs")
+        logFrame.setLayout(logLayout)
+        logFrame.setMaximumHeight(120)
 
         # setting final layouts
         mainLayout.addWidget(progressFrame, 1, 1)
         mainLayout.addLayout(fileLayout, 1, 2)
         mainLayout.setColumnMinimumWidth(1, 620)
-        mainLayout.addWidget(self.logWindow, 2, 1, 1, 2)
+        mainLayout.addWidget(logFrame, 2, 1, 1, 2)
 
         self.setLayout(mainLayout)
         self.controller.percentComplete.connect(self.mainProgress.setValue)

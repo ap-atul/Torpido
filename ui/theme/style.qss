@@ -17,9 +17,6 @@ QTextEdit {
 QImage {
     background-color:#ffffff;
 }
-QGridLayout {
-   color:#ffffff;
-}
 QToolTip {
    background-color: black;
    color: white;
@@ -28,12 +25,9 @@ QToolTip {
 QPlainTextEdit {
 	selection-background-color:rgb(179, 132, 103);
 	background-color:#2a2a32;
-	border-style: solid;
-	border-color: #775157;
-	border-radius: 5px;
+	border: none;
 	padding-left: 10px;
 	padding-right: 10px;
-	border-width: 1px;
 	color: #BEB1C6;
 }
 QPushButton{
@@ -84,6 +78,20 @@ QPushButton:disabled{
 	padding-bottom: 1px;
 	background-color: #2a2a32;
 }
+
+QGroupBox {
+    border: 0.5px solid #775157;
+    border-radius: 5px;
+    margin-top: 0.5em;
+}
+
+QGroupBox::title {
+    subcontrol-origin: margin;
+    left: 15px;
+    padding: 0 3px 0 3px;
+    color: #a9b7c6;
+}
+
 QToolButton {
 	border-style: solid;
 	border-top-color: transparent;
