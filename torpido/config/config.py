@@ -85,7 +85,7 @@ class File:
                    ("TEXT_SKIP_FRAMES" + SEPARATOR + str(TEXT_SKIP_FRAMES) + "\n"),
                    ("WAVELET" + SEPARATOR + str(WAVELET) + "\n"),
 
-                   ("WATCHER_DELAY" + SEPARATOR + str(WATCHER_DELAY) + "\n"),
+                   ("WATCHER_DELAY" + SEPARATOR + str(WATCHER_DELAY)),
                    ]
 
         with open(CONFIG_FILE, "w") as config:
