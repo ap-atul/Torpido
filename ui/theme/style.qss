@@ -14,6 +14,11 @@ QTextEdit {
 	background-color:#2a2a32;
 	color: #a9b7c6;
 }
+QLineEdit {
+	background-color:#2a2a32;
+	color: #a9b7c6;
+	border-color: #775157;
+}
 QImage {
     background-color:#ffffff;
 }
@@ -78,20 +83,17 @@ QPushButton:disabled{
 	padding-bottom: 1px;
 	background-color: #2a2a32;
 }
-
 QGroupBox {
     border: 0.5px solid #775157;
     border-radius: 5px;
     margin-top: 0.5em;
 }
-
 QGroupBox::title {
     subcontrol-origin: margin;
     left: 15px;
     padding: 0 3px 0 3px;
     color: #a9b7c6;
 }
-
 QToolButton {
 	border-style: solid;
 	border-top-color: transparent;

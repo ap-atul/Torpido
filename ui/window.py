@@ -9,6 +9,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
 
 from torpido.config import *
 from ui.controller import Controller
+from ui.settings import SettingsDialog
 from ui.widgets import QRoundProgressBar, QLabelAlternate, QVideoWindow
 
 
@@ -72,9 +73,13 @@ class App(QWidget):
         self.videoPicSelected = QPixmap('./ui/assets/play-button.png')
         self.videoPicSelected = self.videoPicSelected.scaledToWidth(120)
 
+        self.settingPic = QPixmap('./ui/assets/settings.png')
+        self.settingPic = self.settingPic.scaledToWidth(35)
+
         self.videoImage = QLabelAlternate()
         self.introVideoImage = QLabelAlternate()
         self.extroVideoImage = QLabelAlternate()
+        self.settings = QLabelAlternate()
 
         self.mainProgress = None
         self.cpuProgress = None
@@ -190,6 +195,12 @@ class App(QWidget):
         optionsFrame.setLayout(optionsLayout)
         fileLayout.addWidget(optionsFrame)
 
+        self.settings.setPixmap(self.settingPic)
+        self.settings.setToolTip("Settings")
+        self.settings.clicked.connect(self.startSettings)
+        self.settings.setMaximumSize(40, 40)
+        buttonLayout.addWidget(self.settings)
+
         startButton = QPushButton("Start")
         startButton.setToolTip("Start the processing for the input video given")
         startButton.clicked.connect(self.start)
@@ -274,6 +285,9 @@ class App(QWidget):
     def setSaveLogs(self):
         """ Save all logs to a file """
         self.controller.setSaveLogs(self.saveLogsCheckbox.isChecked())
+
+    def startSettings(self):
+        self.settings = SettingsDialog()
 
     def exit(self):
         self.controller.terminate()
