@@ -20,6 +20,14 @@
 
 # Logs
 
+### Log 36, 11-12
+```AP```
+* Added settings page
+* Connected the config and the page load
+* Improved the ui for the main window
+* Fixed clean up
+
+----------------------------------------
 ### Log 35, 06-12
 ```AP```
 * Solved few bugs
