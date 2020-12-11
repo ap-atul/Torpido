@@ -129,8 +129,10 @@ WAVELETS_VALUES = ['db2',
 
 class SettingsDialog(QWidget):
 
-    def __init__(self):
+    def __init__(self, reboot):
         super().__init__()
+
+        self.reboot = reboot
 
         # setting the theme
         theme = QtCore.QFile("./ui/theme/style.qss")
@@ -233,6 +235,7 @@ class SettingsDialog(QWidget):
         formFrame.setLayout(formLayout)
 
         self.save = QPushButton("Save")
+        self.save.setToolTip("Requires restart")
         self.save.clicked.connect(self.saveSettings)
 
         self.exit = QPushButton("Close")
@@ -263,4 +266,5 @@ class SettingsDialog(QWidget):
                   }
 
         Config.writeAll(config)
+        self.reboot.emit()
         self.close()

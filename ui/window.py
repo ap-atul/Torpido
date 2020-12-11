@@ -50,8 +50,11 @@ class Donut:
 
 
 class App(QWidget):
+    REBOOT = 101
+
     videoFrame = pyqtSignal(np.ndarray)
     videoClose = pyqtSignal()
+    reboot = pyqtSignal()
 
     def __init__(self):
         super().__init__()
@@ -227,7 +230,7 @@ class App(QWidget):
         # frame for the log window
         logLayout = QHBoxLayout()
         logLayout.addWidget(self.logWindow)
-        logLayout.setContentsMargins(5, 5, 5, 5)
+        logLayout.setContentsMargins(5, 10, 5, 5)
         logFrame = QGroupBox("Logs")
         logFrame.setLayout(logLayout)
         logFrame.setMaximumHeight(120)
@@ -248,6 +251,7 @@ class App(QWidget):
         self.video = QVideoWindow(self.controller)
         self.controller.videoFrame.connect(self.videoFrame.emit)
         self.controller.videoClose.connect(self.videoClose.emit)
+        self.reboot.connect(self.restart)
 
     def selectFile(self):
         """ Starts a file explorer to select video file """
@@ -286,11 +290,15 @@ class App(QWidget):
         self.controller.setSaveLogs(self.saveLogsCheckbox.isChecked())
 
     def startSettings(self):
-        self.settings = SettingsDialog()
+        self.settings = SettingsDialog(self.reboot)
 
     def exit(self):
         self.controller.terminate()
         self.close()
+
+    def restart(self):
+        self.exit()
+        # QtGui.QGuiApplication.exit(self.REBOOT)
 
     def __del__(self):
         print("Bye !")
