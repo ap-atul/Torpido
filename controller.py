@@ -7,6 +7,7 @@ object would be shared in functions
 
 import gc
 import os
+import sys
 import time
 from multiprocessing import Process, Pipe, Queue
 from threading import Thread
@@ -112,7 +113,10 @@ class Controller:
         self.__ffmpeg = FFMPEG()
         self.__analytics = Analytics()
         self.__cache = Cache()
-        self.__watcher = Watcher()
+
+        # watcher is only available for Linux
+        if sys.platform.startswith("linux"):
+            self.__watcher = Watcher()
 
         # checking for EAST MODEL env var
         try:
@@ -130,7 +134,8 @@ class Controller:
         Log.setHandler(self.__loggerPipe)
 
         # watcher enable/disable
-        self.__watcher.enable(self, enable=False)
+        if self.__watcher is not None:
+            self.__watcher.enable(self, enable=False)
 
     def startProcessing(self, app, inputFile):
         """
@@ -167,7 +172,8 @@ class Controller:
         if self.__App is not None:
 
             # setting watcher to enabled
-            self.__watcher.enable(self, enable=True)
+            if self.__watcher is not None:
+                self.__watcher.enable(self, enable=True)
 
             # creating pipe for progress bar communication
             self.__progressParentPipe, self.__progressChildPipe = Pipe()
@@ -213,7 +219,9 @@ class Controller:
         Creating 3 processes using the Process class of the multi-processing module.
         FFmpeg separated files are referenced from the Controller public variables
         """
-        self.__watcher.start()  # starting the watcher
+
+        if self.__watcher is not None:
+            self.__watcher.start()  # starting the watcher
 
         self.__audioProcess = Process(target=self.__auditory.startProcessing,
                                       args=(self.__audioFile,
@@ -247,7 +255,9 @@ class Controller:
         generated are deleted as a part of the clean up process. Along with it
         the garbage collection module does some clean ups too.
         """
-        self.__watcher.end()  # ending the watcher
+
+        if self.__watcher is not None:
+            self.__watcher.end()  # ending the watcher
         data = readTheRankings()
 
         if self.__analyticsDisplay:
