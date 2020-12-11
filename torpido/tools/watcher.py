@@ -133,7 +133,9 @@ class Watcher:
                     cpuInfo.update(current)
 
                 Log.i(f"[ CPU :: {round(percent)} % ]")
-                self.__app.setCpuComplete(percent)
+
+                if self.__app is not None:
+                    self.__app.setCpuComplete(percent)
 
             run.stdout.close()
             if run.wait():
@@ -161,7 +163,9 @@ class Watcher:
             percent = round((lines[0] - lines[2]) * 100 / lines[0])
 
             Log.i(f"[ RAM :: {percent} % ]")
-            self.__app.setMemComplete(percent)
+
+            if self.__app is not None:
+                self.__app.setMemComplete(percent)
 
             run.stdout.close()
             if run.wait():
