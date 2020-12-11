@@ -19,6 +19,16 @@ QLineEdit {
 	color: #a9b7c6;
 	border-color: #775157;
 }
+QLineEdit {
+	border-width: 1px; border-radius: 4px;
+	border-color: #775157;
+	border-style: inset;
+	padding: 0 8px;
+	color: #a9b7c6;
+	background:#2a2a32;
+	selection-background-color:rgb(179, 132, 103);
+	selection-color: #FFFFFF;
+}
 QImage {
     background-color:#ffffff;
 }
@@ -117,16 +127,6 @@ QToolButton:hover{
 	color: #FFFFFF;
 	padding-bottom: 1px;
 	background-color: #2a2a32;
-}
-QLineEdit {
-	border-width: 1px; border-radius: 4px;
-	border-color: rgb(58, 58, 58);
-	border-style: inset;
-	padding: 0 8px;
-	color: #a9b7c6;
-	background:#2a2a32;
-	selection-background-color:#007b50;
-	selection-color: #FFFFFF;
 }
 QLabel {
 	color: #a9b7c6;

@@ -6,71 +6,125 @@ from PyQt5.QtWidgets import (QComboBox, QWidget,
 
 from torpido.config.constants import *
 
-wavelet = {
-    "Daubechies2": "db2",
-    "Daubechies3": "db3",
-    "Daubechies4": "db4",
-    "Daubechies5": "db5",
-    "Daubechies6": "db6",
-    "Daubechies7": "db7",
-    "Daubechies8": "db8",
-    "Daubechies9": "db9",
-    "Daubechies10": "db10",
-    "Daubechies11": "db11",
-    "Daubechies12": "db12",
-    "Daubechies13": "db13",
-    "Daubechies14": "db14",
-    "Daubechies15": "db15",
-    "Daubechies16": "db16",
-    "Daubechies17": "db17",
-    "Daubechies18": "db18",
-    "Daubechies19": "db19",
-    "Daubechies20": "db20",
-    "Symlet2": "sym2",
-    "Symlet3": "sym3",
-    "Symlet4": "sym4",
-    "Symlet5": "sym5",
-    "Symlet6": "sym6",
-    "Symlet7": "sym7",
-    "Symlet8": "sym8",
-    "Symlet9": "sym9",
-    "Symlet10": "sym10",
-    "Symlet11": "sym11",
-    "Symlet12": "sym12",
-    "Symlet13": "sym13",
-    "Symlet14": "sym14",
-    "Symlet15": "sym15",
-    "Symlet16": "sym16",
-    "Symlet17": "sym17",
-    "Symlet18": "sym18",
-    "Symlet19": "sym19",
-    "Symlet20": "sym20",
-    "Haar": "haar",
-    "Coiflet1": "coif1",
-    "Coiflet2": "coif2",
-    "Coiflet3": "coif3",
-    "Coiflet4": "coif4",
-    "Coiflet5": "coif5",
-    "Biorthogonal11": "bior1.1",
-    "Biorthogonal13": "bior1.3",
-    "Biorthogonal15": "bior1.5",
-    "Biorthogonal22": "bior2.2",
-    "Biorthogonal24": "bior2.4",
-    "Biorthogonal26": "bior2.6",
-    "Biorthogonal28": "bior2.8",
-    "Biorthogonal31": "bior3.1",
-    "Biorthogonal33": "bior3.3",
-    "Biorthogonal35": "bior3.5",
-    "Biorthogonal37": "bior3.7",
-    "Biorthogonal39": "bior3.9",
-    "Biorthogonal44": "bior4.4",
-    "Biorthogonal55": "bior5.5",
-    "Biorthogonal68": "bior6.8",
-    "Meyer": "meyer"
-}
-
-waveletKeys = list(wavelet.keys())
-waveletValues = list(wavelet.values())
+WAVELETS_NAMES = ['Daubechies2',
+                  'Daubechies3',
+                  'Daubechies4',
+                  'Daubechies5',
+                  'Daubechies6',
+                  'Daubechies7',
+                  'Daubechies8',
+                  'Daubechies9',
+                  'Daubechies10',
+                  'Daubechies11',
+                  'Daubechies12',
+                  'Daubechies13',
+                  'Daubechies14',
+                  'Daubechies15',
+                  'Daubechies16',
+                  'Daubechies17',
+                  'Daubechies18',
+                  'Daubechies20',
+                  'Symlet2',
+                  'Symlet3',
+                  'Symlet4',
+                  'Symlet5',
+                  'Symlet6',
+                  'Symlet7',
+                  'Symlet8',
+                  'Symlet9',
+                  'Symlet10',
+                  'Symlet11',
+                  'Symlet12',
+                  'Symlet13',
+                  'Symlet14',
+                  'Symlet15',
+                  'Symlet16',
+                  'Symlet17',
+                  'Symlet18',
+                  'Symlet19',
+                  'Symlet20',
+                  'Haar',
+                  'Coiflet1',
+                  'Coiflet2',
+                  'Coiflet3',
+                  'Coiflet4',
+                  'Coiflet5',
+                  'Biorthogonal11',
+                  'Biorthogonal13',
+                  'Biorthogonal15',
+                  'Biorthogonal22',
+                  'Biorthogonal24',
+                  'Biorthogonal26',
+                  'Biorthogonal28',
+                  'Biorthogonal31',
+                  'Biorthogonal33',
+                  'Biorthogonal35',
+                  'Biorthogonal37',
+                  'Biorthogonal39',
+                  'Biorthogonal44',
+                  'Biorthogonal55',
+                  'Biorthogonal68',
+                  'Meyer']
+WAVELETS_VALUES = ['db2',
+                   'db3',
+                   'db4',
+                   'db5',
+                   'db6',
+                   'db7',
+                   'db8',
+                   'db9',
+                   'db10',
+                   'db11',
+                   'db12',
+                   'db13',
+                   'db14',
+                   'db15',
+                   'db16',
+                   'db17',
+                   'db18',
+                   'db19',
+                   'db20',
+                   'sym2',
+                   'sym3',
+                   'sym4',
+                   'sym5',
+                   'sym6',
+                   'sym7',
+                   'sym8',
+                   'sym9',
+                   'sym10',
+                   'sym11',
+                   'sym12'
+                   'sym13',
+                   'sym14',
+                   'sym15',
+                   'sym16',
+                   'sym17',
+                   'sym18',
+                   'sym19',
+                   'sym20',
+                   'haar',
+                   'coif1',
+                   'coif2',
+                   'coif3',
+                   'coif4',
+                   'coif5',
+                   'bior1.1',
+                   'bior1.3',
+                   'bior1.5',
+                   'bior2.2',
+                   'bior2.4',
+                   'bior2.6',
+                   'bior2.8',
+                   'bior3.1',
+                   'bior3.3',
+                   'bior3.5',
+                   'bior3.7',
+                   'bior3.9',
+                   'bior4.4',
+                   'bior5.5',
+                   'bior6.8',
+                   'meyer']
 
 
 class SettingsDialog(QWidget):
@@ -155,8 +209,8 @@ class SettingsDialog(QWidget):
         self.textSkipFramesInput.setText(str(TEXT_SKIP_FRAMES))
 
         self.waveletInput = QComboBox()
-        self.waveletInput.addItems(waveletKeys)
-        self.waveletInput.setCurrentIndex(waveletValues.index(WAVELET))
+        self.waveletInput.addItems(WAVELETS_NAMES)
+        self.waveletInput.setCurrentIndex(WAVELETS_VALUES.index(WAVELET))
 
         self.watcherDelayInput = QLineEdit()
         self.watcherDelayInput.setText(str(WATCHER_DELAY))
@@ -179,7 +233,7 @@ class SettingsDialog(QWidget):
         formFrame.setLayout(formLayout)
 
         self.save = QPushButton("Save")
-        self.save.clicked.connect(self.close)
+        self.save.clicked.connect(self.saveSettings)
 
         self.exit = QPushButton("Close")
         self.exit.clicked.connect(self.close)
@@ -191,3 +245,22 @@ class SettingsDialog(QWidget):
         mainLayout.addLayout(buttonLayout)
 
         self.setLayout(mainLayout)
+
+    def saveSettings(self):
+        config = {'RANK_MOTION': self.rankMotionInput.text(),
+                  'RANK_BLUR': self.rankBlurInput.text(),
+                  'RANK_TEXT': self.rankTextInput.text(),
+                  'RANK_AUDIO': self.rankAudioInput.text(),
+                  'MIN_RANK_OUT_VIDEO': self.minRankInput.text(),
+                  'MOTION_THRESHOLD': self.motionThresholdInput.text(),
+                  'BLUR_THRESHOLD': self.blurThresholdInput.text(),
+                  'SILENCE_THRESHOlD': self.silenceThresholdInput.text(),
+                  'TEXT_MIN_CONFIDENCE': self.textThresholdInput.text(),
+                  'AUDIO_BLOCK_PER': self.audioBlockInput.text(),
+                  'TEXT_SKIP_FRAMES': self.textSkipFramesInput.text(),
+                  'WAVELET': WAVELETS_VALUES[self.waveletInput.currentIndex()],
+                  'WATCHER_DELAY': self.watcherDelayInput.text()
+                  }
+
+        Config.writeAll(config)
+        self.close()

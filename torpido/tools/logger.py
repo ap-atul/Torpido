@@ -38,7 +38,7 @@ class Log:
     modes['INFO'] = '\033[94m'
     modes['WARN'] = '\033[93m'
 
-    toFile = True
+    toFile = False
     pipe = None
 
     @staticmethod

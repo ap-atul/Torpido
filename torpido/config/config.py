@@ -53,7 +53,7 @@ TEXT_MIN_CONFIDENCE = 0.5
 TEXT_SKIP_FRAMES = 10
 
 # delay to check the CPU and MEM usage (in secs)
-WATCHER_DELAY = 3
+WATCHER_DELAY = 5
 
 
 class File:
@@ -98,8 +98,8 @@ class File:
         Write the entire dictionary containing the updated values
         """
         with open(CONFIG_FILE, "w") as config:
-            for key, value in configs:
-                config.write(str(key) + SEPARATOR + str(value))
+            for key, value in configs.items():
+                config.write(str(key) + SEPARATOR + str(value) + "\n")
             config.close()
 
     @staticmethod
@@ -140,6 +140,10 @@ class Config:
     # stores the configurations
     configs = File.get()
 
+    if len(configs) == 0:
+        File.init()
+        configs = File.get()
+
     @staticmethod
     def read(key, dtype):
         """
@@ -179,3 +183,18 @@ class Config:
         """
         Config.configs[key] = value
         File.write(Config.configs)
+
+    @staticmethod
+    def writeAll(config: dict):
+        """
+        Update the file for the config on the system. All values are written to the
+        file from scratch, so if any key-val is missing it won't appear while reading,
+        that will cause errors
+
+        Parameters
+        ----------
+        config : dict
+            key-val pairs
+        """
+        Config.configs = config
+        File.write(config)

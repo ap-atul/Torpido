@@ -219,7 +219,6 @@ class App(QWidget):
         self.logWindow.setReadOnly(True)
         self.logWindow.setFont(font)
         self.logWindow.setLineWrapMode(QPlainTextEdit.NoWrap)
-        self.logWindow.appendPlainText("HELLO")
 
         # frame for the progress elements
         progressFrame = QGroupBox("Progress Metrics")
