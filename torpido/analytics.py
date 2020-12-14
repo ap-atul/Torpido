@@ -68,10 +68,6 @@ class Analytics:
         self.__motion, self.__blur, self.__text, self.__audio = self.__data
         self.__rankLength = len(self.__motion)
 
-        self.__outputLength = getOutputVideoLength(self.__timestamps)
-        self.__actualLength = abs(self.__cache.readDataFromCache(CACHE_FRAME_COUNT) /
-                                  self.__cache.readDataFromCache(CACHE_FPS))
-
         self.__ranks = [self.__motion[i] + self.__blur[i] +
                         self.__text[i] + self.__audio[i] for i in range(self.__rankLength)]
 
@@ -80,6 +76,10 @@ class Analytics:
         except RankingOfFeatureMissing:
             Log.e(RankingOfFeatureMissing.cause)
             return
+
+        self.__outputLength = getOutputVideoLength(self.__timestamps)
+        self.__actualLength = abs(self.__cache.readDataFromCache(CACHE_FRAME_COUNT) /
+                                  self.__cache.readDataFromCache(CACHE_FPS))
 
         self.__plotRankLine()
         self.__plotSumLine()
