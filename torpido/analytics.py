@@ -50,6 +50,8 @@ class Analytics:
         self.__ranks = None
         self.__data = None
         self.__timestamps = None
+        self.__outputLength = None
+        self.__actualLength = None
         self.__cache = Cache()
 
     def analyze(self, data):
@@ -65,6 +67,10 @@ class Analytics:
         self.__data = data
         self.__motion, self.__blur, self.__text, self.__audio = self.__data
         self.__rankLength = len(self.__motion)
+
+        self.__outputLength = getOutputVideoLength(self.__timestamps)
+        self.__actualLength = abs(self.__cache.readDataFromCache(CACHE_FRAME_COUNT) /
+                                  self.__cache.readDataFromCache(CACHE_FPS))
 
         self.__ranks = [self.__motion[i] + self.__blur[i] +
                         self.__text[i] + self.__audio[i] for i in range(self.__rankLength)]
@@ -137,10 +143,6 @@ class Analytics:
             Log.w("There are not good enough portions to cut. Try changing the configurations.")
             return
 
-        outputLength = getOutputVideoLength(self.__timestamps)
-        actualLength = abs(
-            self.__cache.readDataFromCache(CACHE_FRAME_COUNT) / self.__cache.readDataFromCache(CACHE_FPS))
-
-        Log.i(f"Clipping a total of {len(self.__timestamps)} sub portions.")
-        Log.i(f"Output video length would be approx. :: {outputLength}")
-        Log.i(f"Percent of video trimmed :: {(actualLength / outputLength) * 100} %")
+        Log.i(f"Clipping a total of {len(self.__timestamps)} sub portion(s).")
+        Log.i(f"Output video length would be approx. :: {self.__outputLength} s or {round(self.__outputLength / 60)} m")
+        Log.i(f"Percent of video trimmed :: {100 - ((self.__outputLength * 100) / self.__actualLength)} %")

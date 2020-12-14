@@ -44,7 +44,7 @@ class Donut:
                           (0.40, QtGui.QColor(177, 123, 129)),
                           (0.95, QtGui.QColor(72, 58, 78))]
         self.bar.setDataColors(gradientPoints)
-        self.bar.setValue(100)
+        self.bar.setValue(0.1)
 
         return self.bar
 

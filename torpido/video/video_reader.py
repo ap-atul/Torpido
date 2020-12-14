@@ -1,6 +1,7 @@
 import gc
 from queue import Queue, Empty
 from threading import Thread
+from time import sleep
 
 import cv2
 
@@ -63,6 +64,10 @@ class VideoGet:
 
                 frame = resize(frame, width=VIDEO_WIDTH)
                 self.__Q.put(frame)
+
+            else:
+                while self.__Q.empty():
+                    sleep(0.1)
 
     def read(self):
         """

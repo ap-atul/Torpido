@@ -4,7 +4,7 @@ that have motion in it, saves in the dictionary with frame numbers
 this dictionary is then saved in a joblib file defined in constants.py
 """
 
-import time
+from time import sleep
 
 import cv2
 import numpy as np
@@ -146,7 +146,7 @@ class Visual:
         myClip = self.__videoGetter.stream
 
         if self.__videoGetter.getQueueSize() == 0:
-            time.sleep(1)
+            sleep(1)
             Log.d(f"Waiting for the buffer to fill up.")
 
         fps = myClip.get(cv2.CAP_PROP_FPS)
@@ -215,7 +215,7 @@ class Visual:
 
         # completing the progress
         if pipe is not None:
-            pipe.send(100.0)
+            pipe.send(99.0)
 
         # clearing memory
         myClip.release()

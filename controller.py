@@ -8,9 +8,9 @@ object would be shared in functions
 import gc
 import os
 import sys
-import time
 from multiprocessing import Process, Pipe, Queue
 from threading import Thread
+from time import sleep
 
 from torpido import Auditory, FFMPEG, Textual, Visual
 from torpido.analytics import Analytics
@@ -33,8 +33,6 @@ def logo():
     ________________________________________
     
     """)
-
-    time.sleep(1)
 
 
 class Controller:
@@ -276,6 +274,9 @@ class Controller:
         else:
             return
 
+        self.__ffmpeg.cleanUp()
+        self.__App.setPercentComplete(100.0)
+
     def clean(self):
         """ clean up """
 
@@ -295,10 +296,6 @@ class Controller:
 
         if self.__progressChildPipe is not None:
             self.__progressChildPipe.close()
-
-        # deleting files created by processing modules
-        if self.__ffmpeg is not None:
-            self.__ffmpeg.cleanUp()
 
         Log.d("Terminating the processes")
         Log.d(f"Garbage collecting .. {gc.collect()}")
@@ -339,10 +336,13 @@ class Controller:
             if self.__App is not None and value is not None:
                 self.__App.setPercentComplete(value)
 
-                if value == 100:
+                if value == 99.0:
                     self.__App.setVideoClose()
                     self.__closeCommunication()
                     break
+
+            else:
+                sleep(0.1)
 
     def setLog(self):
         """ Send the signal to the ui with the log of the processing """
@@ -353,6 +353,8 @@ class Controller:
                 # checking whether the request is from UI
                 if self.__App is not None and message is not None:
                     self.__App.setMessageLog(message)
+                else:
+                    sleep(0.3)
             except EOFError as _:
                 pass
 
@@ -365,6 +367,8 @@ class Controller:
                 # checking whether the request is from UI
                 if self.__App is not None and frame is not None:
                     self.__App.setVideoFrame(frame)
+                else:
+                    sleep(0.2)
             except EOFError as _:
                 pass
 

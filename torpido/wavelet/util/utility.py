@@ -92,6 +92,11 @@ def snr(data, axis=0, ddof=0):
         return np.where(sd == 0, 0, m / sd)
 
 
+def rme(amp):
+    """ Root mean square error """
+    return np.sqrt(np.mean(np.square(amp), axis=-1))
+
+
 def amp_to_db(S, ref=1.0, min_value=1e-5, top_db=80.0):
     """
     Convert an amplitude spectrogram to dB-scaled spectrogram.

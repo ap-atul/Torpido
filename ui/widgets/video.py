@@ -37,15 +37,18 @@ class QVideoWidget(QtWidgets.QWidget):
         self.setMaximumSize(width, height)
 
         self._frame = None
+        self.__stopped = False
 
     def setFrame(self, frame: np.ndarray):
         """ Set the frame to the window """
-        self._frame = frame
-        cv2.imshow("Video Output", self._frame)
+        if not self.__stopped:
+            self._frame = frame
+            cv2.imshow("Video Output", self._frame)
 
     def end(self):
         """ Close all the windows """
         cv2.destroyAllWindows()
+        self.__stopped = True
 
     def changeEvent(self, event: QtCore.QEvent) -> None:
         if event.type() == QtCore.QEvent.EnabledChange:
