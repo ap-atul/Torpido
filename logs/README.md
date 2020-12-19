@@ -20,6 +20,21 @@
 
 # Logs
 
+### Log 38, 19-12
+```AP```
+* Theme management created
+* Color management
+* Theme selection in setting and config
+* Added multiple themes
+
+----------------------------------------
+### Log 37, 17-12
+```AP```
+* Report completion
+* Report content improvement
+* Minor mistakes resolved
+
+----------------------------------------
 ### Log 36, 11-12
 ```AP```
 * Added settings page

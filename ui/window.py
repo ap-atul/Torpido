@@ -21,17 +21,21 @@ TEX = SYS_THEME[Color.TEX][Type.RGB]
 
 SYS_STYLESHEET = getStyleSheet(THEME)
 
-NOT_SELECTED = ("background-color:" + SYS_THEME[Color.PRI][Type.HEX] + ";"
+NOT_SELECTED = ("QLabel { "
+                "background-color:" + SYS_THEME[Color.PRI][Type.HEX] + ";"
                                                                        "border-radius: 5px;"
                                                                        "border-style: dashed;"
                                                                        "border-color: #8B8C8D;"
-                                                                       "border-width: 1.5px;")
+                                                                       "border-width: 1.5px;"
+                                                                       "}")
 
-SELECTED = ("background-color:" + SYS_THEME[Color.PRI][Type.HEX] + ";"
+SELECTED = ("QLabel {"
+            "background-color:" + SYS_THEME[Color.PRI][Type.HEX] + ";"
                                                                    "border-style: solid;"
                                                                    "border-color: #BEBFC0;"
                                                                    "border-radius: 5px;"
-                                                                   "border-width: 1.5px;")
+                                                                   "border-width: 1.5px;"
+                                                                   "}")
 
 
 def getShadow():
