@@ -55,6 +55,9 @@ TEXT_SKIP_FRAMES = 10
 # delay to check the CPU and MEM usage (in secs)
 WATCHER_DELAY = 5
 
+# theme for torpido
+THEME = "default"
+
 
 class File:
     """
@@ -85,7 +88,9 @@ class File:
                    ("TEXT_SKIP_FRAMES" + SEPARATOR + str(TEXT_SKIP_FRAMES) + "\n"),
                    ("WAVELET" + SEPARATOR + str(WAVELET) + "\n"),
 
-                   ("WATCHER_DELAY" + SEPARATOR + str(WATCHER_DELAY)),
+                   ("WATCHER_DELAY" + SEPARATOR + str(WATCHER_DELAY) + "\n"),
+
+                   ("THEME" + SEPARATOR + str(THEME))
                    ]
 
         with open(CONFIG_FILE, "w") as config:

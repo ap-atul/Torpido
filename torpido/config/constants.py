@@ -117,3 +117,7 @@ WINDOW_TITLE = "Video Editing Automation (aka. Torpido)"
 # ******************** LOG **************************
 # log file
 LOG_FILE = "torpido.log"
+
+# ***************** THEME *************************
+# theme for the system
+THEME = Config.read("THEME", str)

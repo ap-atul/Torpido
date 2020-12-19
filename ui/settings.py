@@ -5,6 +5,7 @@ from PyQt5.QtWidgets import (QComboBox, QWidget,
                              QLabel, QLineEdit, QPushButton, QVBoxLayout)
 
 from torpido.config.constants import *
+from ui.style.theme import getAllThemes, getStyleSheet
 
 WAVELETS_NAMES = ['Daubechies2',
                   'Daubechies3',
@@ -125,6 +126,8 @@ WAVELETS_VALUES = ['db2',
                    'bior5.5',
                    'bior6.8',
                    'meyer']
+THEMES = getAllThemes()
+STYLESHEET = getStyleSheet(THEME)
 
 
 class SettingsDialog(QWidget):
@@ -135,7 +138,7 @@ class SettingsDialog(QWidget):
         self.reboot = reboot
 
         # setting the theme
-        theme = QtCore.QFile("./ui/theme/style.qss")
+        theme = QtCore.QFile(STYLESHEET)
         theme.open(QtCore.QIODevice.ReadOnly)
 
         self.setStyleSheet(QtCore.QTextStream(theme).readAll())
@@ -155,6 +158,7 @@ class SettingsDialog(QWidget):
         self.textSkipFramesInput = None
         self.waveletInput = None
         self.watcherDelayInput = None
+        self.theme = None
 
         self.save = None
         self.exit = None
@@ -217,6 +221,11 @@ class SettingsDialog(QWidget):
         self.watcherDelayInput = QLineEdit()
         self.watcherDelayInput.setText(str(WATCHER_DELAY))
 
+        self.theme = QComboBox()
+        self.theme.addItems(THEMES)
+        self.theme.setCurrentIndex(THEMES.index(THEME))
+
+        formLayout.addRow(QLabel("Theme for the system:"), self.theme)
         formLayout.addRow(QLabel("The rank of motion:"), self.rankMotionInput)
         formLayout.addRow(QLabel("The rank of blur:"), self.rankBlurInput)
         formLayout.addRow(QLabel("The rank of audio:"), self.rankAudioInput)
@@ -262,7 +271,8 @@ class SettingsDialog(QWidget):
                   'AUDIO_BLOCK_PER': self.audioBlockInput.text(),
                   'TEXT_SKIP_FRAMES': self.textSkipFramesInput.text(),
                   'WAVELET': WAVELETS_VALUES[self.waveletInput.currentIndex()],
-                  'WATCHER_DELAY': self.watcherDelayInput.text()
+                  'WATCHER_DELAY': self.watcherDelayInput.text(),
+                  'THEME': THEMES[self.theme.currentIndex()]
                   }
 
         Config.writeAll(config)

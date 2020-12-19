@@ -10,7 +10,28 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
 from torpido.config import *
 from ui.controller import Controller
 from ui.settings import SettingsDialog
+from ui.style.theme import Color, Type, getTheme, getStyleSheet
 from ui.widgets import QRoundProgressBar, QLabelAlternate, QVideoWindow
+
+SYS_THEME = getTheme(THEME)
+BGR = SYS_THEME[Color.BGR][Type.RGB]
+PRI = SYS_THEME[Color.PRI][Type.RGB]
+SEC = SYS_THEME[Color.SEC][Type.RGB]
+TEX = SYS_THEME[Color.TEX][Type.RGB]
+
+SYS_STYLESHEET = getStyleSheet(THEME)
+
+NOT_SELECTED = ("background-color:" + SYS_THEME[Color.PRI][Type.HEX] + ";"
+                                                                       "border-radius: 5px;"
+                                                                       "border-style: dashed;"
+                                                                       "border-color: #8B8C8D;"
+                                                                       "border-width: 1.5px;")
+
+SELECTED = ("background-color:" + SYS_THEME[Color.PRI][Type.HEX] + ";"
+                                                                   "border-style: solid;"
+                                                                   "border-color: #BEBFC0;"
+                                                                   "border-radius: 5px;"
+                                                                   "border-width: 1.5px;")
 
 
 def getShadow():
@@ -27,24 +48,24 @@ class Donut:
 
     def __init__(self, name, widget: QWidget):
         self.bar = QRoundProgressBar(widget)
+        self.bar.setBackground(BGR)
         self.bar.setObjectName(name)
 
     def get(self, text):
         palette = QPalette()
-        palette.setBrush(QPalette.AlternateBase, QtGui.QColor(42, 42, 50))
-        palette.setColor(QPalette.Text, QtGui.QColor(224, 224, 224))
+        palette.setBrush(QPalette.AlternateBase, QtGui.QColor(BGR))
+        palette.setColor(QPalette.Text, QtGui.QColor(210, 210, 210))
         self.bar.setPalette(palette)
         self.bar.setNullPosition(QRoundProgressBar.PositionLeft)
         self.bar.setDecimals(1)
         self.bar.setFormat(text)
 
         # progress bar gradient
-        gradientPoints = [(0, QtGui.QColor(179, 132, 103)),
-                          (0.2, QtGui.QColor(191, 141, 124)),
-                          (0.40, QtGui.QColor(177, 123, 129)),
-                          (0.95, QtGui.QColor(72, 58, 78))]
+        gradientPoints = [(0, TEX),
+                          (0.40, SEC),
+                          (0.98, PRI)]
         self.bar.setDataColors(gradientPoints)
-        self.bar.setValue(0.1)
+        self.bar.setValue(100)
 
         return self.bar
 
@@ -62,7 +83,7 @@ class App(QWidget):
         self.controller = Controller()
 
         # setting the theme
-        theme = QtCore.QFile("./ui/theme/style.qss")
+        theme = QtCore.QFile(SYS_STYLESHEET)
         theme.open(QtCore.QIODevice.ReadOnly)
 
         self.setStyleSheet(QtCore.QTextStream(theme).readAll())
@@ -70,10 +91,10 @@ class App(QWidget):
         self.setWindowTitle(WINDOW_TITLE)
         self.setWindowIcon(QIcon('./ui/assets/logo.png'))
 
-        self.videoPicNotSelected = QPixmap('./ui/assets/play-button-not-selected.png')
+        self.videoPicNotSelected = QPixmap('./ui/assets/no-video.png')
         self.videoPicNotSelected = self.videoPicNotSelected.scaledToWidth(120)
 
-        self.videoPicSelected = QPixmap('./ui/assets/play-button.png')
+        self.videoPicSelected = QPixmap('./ui/assets/video.png')
         self.videoPicSelected = self.videoPicSelected.scaledToWidth(120)
 
         self.settingPic = QPixmap('./ui/assets/settings.png')
@@ -81,7 +102,7 @@ class App(QWidget):
 
         self.videoImage = QLabelAlternate()
         self.introVideoImage = QLabelAlternate()
-        self.extroVideoImage = QLabelAlternate()
+        self.exitVideoImage = QLabelAlternate()
         self.settings = QLabelAlternate()
 
         self.mainProgress = None
@@ -141,9 +162,10 @@ class App(QWidget):
 
         self.videoImage.setPixmap(self.videoPicNotSelected)
         self.videoImage.setAlignment(QtCore.Qt.AlignLeft)
-        self.introVideoImage.setMaximumSize(120, 120)
+        self.videoImage.setMinimumSize(120, 120)
         self.videoImage.clicked.connect(self.selectFile)
         self.videoImage.setToolTip("Input video file")
+        self.videoImage.setStyleSheet(NOT_SELECTED)
 
         videoLayout = QHBoxLayout()
         videoLayout.setAlignment(QtCore.Qt.AlignLeft)
@@ -156,18 +178,20 @@ class App(QWidget):
         self.introVideoImage.setMaximumSize(120, 120)
         self.introVideoImage.clicked.connect(self.selectFile)
         self.introVideoImage.setToolTip("Intro video will be placed at the start")
+        self.introVideoImage.setStyleSheet(NOT_SELECTED)
         extraLayout.addWidget(self.introVideoImage)
 
-        self.extroVideoImage.setPixmap(self.videoPicNotSelected)
-        self.extroVideoImage.setMaximumSize(120, 120)
-        self.extroVideoImage.clicked.connect(self.selectFile)
-        self.extroVideoImage.setToolTip("Extro video will be placed at the end")
-        extraLayout.addWidget(self.extroVideoImage)
+        self.exitVideoImage.setPixmap(self.videoPicNotSelected)
+        self.exitVideoImage.setMaximumSize(120, 120)
+        self.exitVideoImage.clicked.connect(self.selectFile)
+        self.exitVideoImage.setToolTip("Exit video will be placed at the end")
+        self.exitVideoImage.setStyleSheet(NOT_SELECTED)
+        extraLayout.addWidget(self.exitVideoImage)
 
         extraLayout.setSpacing(20)
         extraLayout.setAlignment(QtCore.Qt.AlignLeft)
 
-        extraFrame = QGroupBox("Extro and Intro Videos [Optional]")
+        extraFrame = QGroupBox("Exit and Intro Videos [Optional]")
         extraFrame.setFlat(True)
         extraFrame.setLayout(extraLayout)
         fileLayout.addWidget(extraFrame)
@@ -263,6 +287,7 @@ class App(QWidget):
         # setting the data and ui image for video
         if len(name[0]) > 0:
             self.videoImage.setPixmap(self.videoPicSelected)
+            self.videoImage.setStyleSheet(SELECTED)
             self.videoImage.setToolTip(str(name[0]))
             self.inputVideoFile = str(name[0])
 
