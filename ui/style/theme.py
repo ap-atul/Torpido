@@ -113,6 +113,44 @@ THEME = {
             Type.RGB: QColor(20, 255, 236),
             Type.HEX: "#14ffec",
         }
+    },
+
+    "Light": {
+        Color.BGR: {
+            Type.RGB: QColor(243, 242, 218),
+            Type.HEX: "#f3f2da",
+        },
+        Color.PRI: {
+            Type.RGB: QColor(78, 141, 124),
+            Type.HEX: "#4e8d7c",
+        },
+        Color.SEC: {
+            Type.RGB: QColor(4, 87, 98),
+            Type.HEX: "#045762",
+        },
+        Color.TEX: {
+            Type.RGB: QColor(253, 58, 105),
+            Type.HEX: "#fd3a69",
+        }
+    },
+
+    "Light_Shadow": {
+        Color.BGR: {
+            Type.RGB: QColor(244, 244, 242),
+            Type.HEX: "#f4f4f2",
+        },
+        Color.PRI: {
+            Type.RGB: QColor(232, 232, 232),
+            Type.HEX: "#e8e8e8",
+        },
+        Color.SEC: {
+            Type.RGB: QColor(187, 191, 202),
+            Type.HEX: "#bbbfca",
+        },
+        Color.TEX: {
+            Type.RGB: QColor(73, 84, 100),
+            Type.HEX: "#495464",
+        }
     }
 }
 
@@ -121,7 +159,9 @@ STYLESHEET = {
     "XeTon": "./ui/theme/xeton.qss",
     "Crank": "./ui/theme/crank.qss",
     "Spider": "./ui/theme/spider.qss",
-    "Surajstan": "./ui/theme/surajstan.qss"
+    "Surajstan": "./ui/theme/surajstan.qss",
+    "Light": "./ui/theme/light.qss",
+    "Light_Shadow": "./ui/theme/shadow.qss",
 }
 
 

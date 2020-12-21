@@ -58,7 +58,11 @@ class Donut:
     def get(self, text):
         palette = QPalette()
         palette.setBrush(QPalette.AlternateBase, QtGui.QColor(BGR))
-        palette.setColor(QPalette.Text, QtGui.QColor(210, 210, 210))
+
+        if "Light" in THEME:
+            palette.setColor(QPalette.Text, QtGui.QColor(18, 18, 18))
+        else:
+            palette.setColor(QPalette.Text, QtGui.QColor(210, 210, 210))
         self.bar.setPalette(palette)
         self.bar.setNullPosition(QRoundProgressBar.PositionLeft)
         self.bar.setDecimals(1)

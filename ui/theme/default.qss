@@ -22,7 +22,7 @@ QLineEdit {
 QLineEdit {
 	border-width: 1px; border-radius: 4px;
 	border-color: #775157;
-	border-style: inset;
+	border-style: solid;
 	padding: 0 8px;
 	color: #B38467;
 	background:#2A2A32;
@@ -140,7 +140,7 @@ QProgressBar {
 	border-width: 1px; 
 	border-radius: 10px;
 	border-color: rgb(58, 58, 58);
-	border-style: inset;
+	border-style: solid;
 	background-color:#2A2A32;
 }
 QProgressBar::chunk {

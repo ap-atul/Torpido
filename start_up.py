@@ -2,10 +2,25 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from ui.window import App
+from ui import App
 
-if __name__ == '__main__':
+current = 101
+
+
+def start():
+    from torpido.config import constants
+    constants
     app = QApplication(sys.argv)
     torpido = App()
-    currentCode = app.exec_()
-    sys.exit(currentCode)
+
+    c = app.exec_()
+    del torpido
+    return c
+
+
+if __name__ == '__main__':
+
+    while current == 101:
+        current = start()
+
+    sys.exit(current)
