@@ -19,7 +19,13 @@
 -----------------------------------------------------------
 
 # Logs
+### Log 39, 21-12
+```AP```
+* Added new theme
+* Clean ups
+* Change border styles for widgets
 
+----------------------------------------
 ### Log 38, 19-12
 ```AP```
 * Theme management created
