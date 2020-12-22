@@ -2,7 +2,7 @@ from PyQt5 import QtCore
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QComboBox, QWidget,
                              QFormLayout, QGroupBox, QHBoxLayout,
-                             QLabel, QLineEdit, QPushButton, QVBoxLayout)
+                             QLabel, QLineEdit, QPushButton, QVBoxLayout, QMessageBox)
 
 from torpido.config.constants import *
 from ui.style.theme import getAllThemes, getStyleSheet
@@ -138,10 +138,11 @@ class SettingsDialog(QWidget):
         self.reboot = reboot
 
         # setting the theme
-        theme = QtCore.QFile(STYLESHEET)
-        theme.open(QtCore.QIODevice.ReadOnly)
+        self.theme_sheet = QtCore.QFile(STYLESHEET)
+        self.theme_sheet.open(QtCore.QIODevice.ReadOnly)
+        self.theme_sheet = QtCore.QTextStream(self.theme_sheet).readAll()
 
-        self.setStyleSheet(QtCore.QTextStream(theme).readAll())
+        self.setStyleSheet(self.theme_sheet)
         self.setWindowTitle("Settings")
         self.setWindowIcon(QIcon('./ui/assets/logo.png'))
 
@@ -162,6 +163,7 @@ class SettingsDialog(QWidget):
 
         self.save = None
         self.exit = None
+        self.messageBox = None
 
         self.buildLayouts()
         self.show()
@@ -276,5 +278,15 @@ class SettingsDialog(QWidget):
                   }
 
         Config.writeAll(config)
-        self.reboot.emit()
-        self.close()
+
+        self.messageBox = QMessageBox()
+        self.messageBox.setWindowIcon(QIcon('./ui/assets/logo.png'))
+        self.messageBox.setWindowTitle("Restart required")
+        self.messageBox.setText("This operation requires application restart.")
+        self.messageBox.setStyleSheet(self.theme_sheet)
+        self.messageBox.setStandardButtons(QMessageBox.Cancel | QMessageBox.Ok)
+        code = self.messageBox.exec_()
+
+        if code == QMessageBox.Ok:
+            self.reboot.emit()
+            self.close()

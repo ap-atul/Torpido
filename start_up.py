@@ -8,8 +8,6 @@ current = 101
 
 
 def start():
-    from torpido.config import constants
-    constants
     app = QApplication(sys.argv)
     torpido = App()
 
