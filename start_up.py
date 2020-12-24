@@ -2,12 +2,12 @@ import sys
 
 from PyQt5.QtWidgets import QApplication
 
-from ui import App
-
+# reboot code
 current = 101
 
 
 def start():
+    from ui import App
     app = QApplication(sys.argv)
     torpido = App()
 

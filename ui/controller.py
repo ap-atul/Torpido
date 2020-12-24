@@ -3,7 +3,7 @@
 import numpy as np
 from PyQt5.QtCore import pyqtSignal, QThread, pyqtSlot
 
-from controller import Controller as MainController
+from torpido.controller import Controller as MainController
 
 
 class Controller(QThread):

@@ -360,7 +360,7 @@ class Controller:
                 pass
 
     def setVideo(self):
-        """ Send the signal to the ui with the vidoe frame to display """
+        """ Send the signal to the ui with the video frame to display """
         while True:
             try:
                 frame = self.__videoPipe.get()

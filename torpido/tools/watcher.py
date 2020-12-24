@@ -130,9 +130,13 @@ class Watcher:
                 percent = ((ntotal - total) - (nidle - idle)) / (ntotal - total) * 100
 
             # cases when initial values are zero
-            except ZeroDivisionError or WatcherFileMissing:
+            except ZeroDivisionError:
                 percent = 0
+
+            # if anything happened, chances are very low
+            except WatcherFileMissing:
                 Log.e(WatcherFileMissing.cause)
+                percent = 0
 
             # sanity checks
             if percent < 0:
