@@ -19,6 +19,14 @@
 -----------------------------------------------------------
 
 # Logs
+### Log 40, 24-12
+```AP```
+* Watcher subprocess - files
+* Improved performance of the Watcher
+* Added support for multi-channels audio denoising
+* Clean ups and fail proof watcher
+
+----------------------------------------
 ### Log 39, 21-12
 ```AP```
 * Added new theme
