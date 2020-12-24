@@ -6,40 +6,38 @@ machine to retrieve the CPU and RAM usage manually
 
 May upgrade later to use `psutil`
 """
-import re
-import subprocess
-import time
+
+import os
 from threading import Thread
+from time import sleep
 
 from torpido.config.constants import WATCHER_DELAY
+from torpido.exceptions.custom import WatcherFileMissing
 from torpido.tools.logger import Log
 
 
-def getIdleTotal(stdout):
+def times(values):
     """
     Reads the stdout logs, calculates the various cpu times and creates a dictionary
     of idle time and the total time
 
     Parameters
     ----------
-    stdout : str
+    values : list
         output of the command from the std out logs
 
     Returns
     -------
-    dict
+    tuple
         idle and total time of the cpu
     """
-    stdout = stdout.replace('cpu  ', '').split(" ")
-    cpuLine = [float(i) for i in stdout[0:]]
-
-    user, nice, system, idle, io, irq, soft, steal, _, _ = cpuLine
+    user, nice, system, idle, io, irq, soft, steal, _, _ = values
 
     idle = idle + io
     nonIdle = user + nice + system + irq + soft + steal
     total = idle + nonIdle
 
-    return {'total': total, 'idle': idle}
+    return total, idle
 
 
 class Watcher:
@@ -64,128 +62,171 @@ class Watcher:
 
         - reading first 3 lines to get the available, free and total memory usage
 
+    Attributes
+    ----------
+    Watcher.CPU : str
+        name of the file for the cpu stats
+    Watcher.MEM : str
+        name of the file for the mem stats
+    Watcher.CLOCK : int
+        clocks of the system
+    __cpu : thread
+        thread for reading the cpu stats
+    __mem : thread
+        thread for reading the mem stats
+    __delay : float
+        ms to sleep the thread, stopping the thread from consuming resources
+    _app : controller
+        object of the controller to redirect the percent value to the UI
+    __enable : bool
+        to enable the Watcher for the stat reading
+    __stop : bool
+        to end the threads and reading of the stats
     """
 
+    # cpu stats file in Linux, default location
+    CPU = "/proc/stat"
+
+    # memory stats file in Linux, default location
+    MEM = "/proc/meminfo"
+
+    # clock ticks
+    CLOCK = os.sysconf("SC_CLK_TCK")
+
     def __init__(self):
-        self.__cpuCommandLine = "grep 'cpu ' /proc/stat"
-        self.__memCommandLine = "grep -m 3 ':' /proc/meminfo | awk '{print $2}'"
-        self.__cpuThread = None
-        self.__memThread = None
-        self.__stopped = False
+        self.__cpu = None
+        self.__mem = None
+
+        # delay for the thread
         self.__delay = WATCHER_DELAY
-        self.__exp = re.compile(r'(\d)')
-        self.__enable = True
-        self.__app = None
-        self.__memPipe = None
+
+        # ui controller
+        self._app = None
+        self.__enable = False
+        self.__stop = False
+
+    def _startCpu(self):
+        """
+        Starting the monitoring of the cpu usage. The cpu usage is not connected to the
+        current process but the entire system so the percent may vary. Hance, we are reading
+        the "proc" files of the system
+        """
+
+        total, idle = None, None
+
+        try:
+            stat = self.__readCpu()
+            total, idle = times(stat)
+        except WatcherFileMissing:
+            self.__stop = True
+            Log.e(WatcherFileMissing.cause)
+
+        while not self.__stop:
+
+            try:
+                nstat = self.__readCpu()
+                ntotal, nidle = times(nstat)
+
+                percent = ((ntotal - total) - (nidle - idle)) / (ntotal - total) * 100
+
+            # cases when initial values are zero
+            except ZeroDivisionError or WatcherFileMissing:
+                percent = 0
+                Log.e(WatcherFileMissing.cause)
+
+            # sanity checks
+            if percent < 0:
+                percent = 0
+            elif percent > 100:
+                percent = 100
+
+            Log.i(f"[CPU] :: {percent}")
+
+            # send to the UI
+            if self._app is not None:
+                self._app.setCpuComplete(percent)
+
+            # sleeping the thread
+            sleep(self.__delay)
+
+    def _startMem(self):
+        """
+        Starting the monitoring of the ram usage. This determines the ram used
+        by the entire system not only the current process. The ram usage may vary
+        by small units depends on the Watcher.__delay or the Config.delay
+        """
+
+        while not self.__stop:
+            try:
+                stat = self.__readMem()
+                percent = ((stat[0] - stat[2]) * 100) / stat[0]
+
+            except ZeroDivisionError or WatcherFileMissing:
+                percent = 0
+                Log.e(WatcherFileMissing.cause)
+
+            Log.i(f"[RAM] :: {percent}")
+
+            # send to the UI
+            if self._app is not None:
+                self._app.setMemComplete(percent)
+
+            # sleeping the thread
+            sleep(self.__delay)
+
+    def __readCpu(self):
+        """ Reads the file and returns the list of the values of the times of the cpu """
+        try:
+            with open(Watcher.CPU) as f:
+                values = f.readline().split()[1:]
+            values = [float(value) / Watcher.CLOCK for value in values]
+
+            return values
+
+        except FileNotFoundError:
+            self.__stop = False
+            raise WatcherFileMissing
+
+    def __readMem(self):
+        """ Reads the files and returns 3 values representing the available, total and free memory"""
+        values = list()
+
+        try:
+            with open(Watcher.MEM) as f:
+                lines = f.readlines()[0: 3]
+                for line in lines:
+                    values.append(int(line.split()[1]))
+
+            return values
+
+        except FileNotFoundError:
+            self.__stop = False
+            raise WatcherFileMissing
 
     def enable(self, app, enable=True):
-        """
-        Utility function to enable and disable the watcher
-
-        Parameters
-        ----------
-        app : ui controller
-            to set values to the ui
-        enable : bool, default=True
-            enables the watcher
-        """
+        """ Enables the watcher and the controller object is connected to receives the readings """
+        self._app = app
         self.__enable = enable
-        self.__app = app
 
     def start(self):
         """
-        Starting 2 threads that run the commands using suprocess and reads the output to the UI and Logs
+        Starts the watcher, which starts 2 threads for the monitoring, if the cpu
+        usage is going high then try changing the delay value
         """
         if self.__enable:
-            self.__cpuThread = Thread(target=self.__runCpu, args=())
-            self.__memThread = Thread(target=self.__runMem, args=())
-            self.__cpuThread.start()
-            self.__memThread.start()
+            self.__cpu = Thread(target=self._startCpu, args=())
+            self.__mem = Thread(target=self._startMem, args=())
 
-    def __runCpu(self):
-        """
-        Run the CPU check command till the process is explicitly told to stop using the Watcher.stop()
-        function
-        """
-        cpuInfo = {}
-        percent = 0
+            self.__cpu.start()
+            self.__mem.start()
 
-        while not self.__stopped:
-            run = subprocess.Popen(args=self.__cpuCommandLine,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.STDOUT,
-                                   universal_newlines=True,
-                                   shell=True)
-
-            for stdout in iter(run.stdout.readline, ""):
-                if len(cpuInfo) == 0:
-                    cpuInfo.update(getIdleTotal(stdout))
-
-                else:
-                    current = getIdleTotal(stdout)
-                    total = current['total']
-                    prevTotal = cpuInfo['total']
-
-                    idle = current['idle']
-                    prevIdle = cpuInfo['idle']
-
-                    percent = ((total - prevTotal) - (idle - prevIdle)) / (total - prevTotal) * 100
-                    cpuInfo.update(current)
-
-                Log.i(f"[ CPU :: {round(percent)} % ]")
-
-                if self.__app is not None:
-                    self.__app.setCpuComplete(percent)
-
-            run.stdout.close()
-            if run.wait():
-                Log.e("Can't initiate Watcher for CPU")
-                self.__stopped = True
-
-            time.sleep(self.__delay)
-
-    def __runMem(self):
-        """
-        Run the RAM check command till the process is explicitly told to stop using the Watcher.stop()
-        function
-        """
-        while not self.__stopped:
-            run = subprocess.Popen(args=self.__memCommandLine,
-                                   stdout=subprocess.PIPE,
-                                   stderr=subprocess.STDOUT,
-                                   universal_newlines=True,
-                                   shell=True)
-
-            lines = []
-            for stdout in iter(run.stdout.readline, ""):
-                lines.append(int(stdout))
-
-            percent = round((lines[0] - lines[2]) * 100 / lines[0])
-
-            Log.i(f"[ RAM :: {percent} % ]")
-
-            if self.__app is not None:
-                self.__app.setMemComplete(percent)
-
-            run.stdout.close()
-            if run.wait():
-                Log.e("Can't initiate Watcher for RAM")
-                self.__stopped = True
-
-            time.sleep(self.__delay)
-
-    def end(self):
-        """
-        End both the processes
-        """
-        self.__stopped = True
-        Log.d("Stopping the watcher................")
+    def stop(self):
+        """ End the monitoring """
+        self.__stop = True
 
     def __del__(self):
-        """
-        clean up
-        """
-        if self.__memThread is not None:
-            del self.__memThread
-        if self.__cpuThread is not None:
-            del self.__cpuThread
+        """ Clean up """
+        if self.__mem is not None:
+            del self.__mem
+        if self.__cpu is not None:
+            del self.__cpu

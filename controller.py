@@ -255,7 +255,7 @@ class Controller:
         """
 
         if self.__watcher is not None:
-            self.__watcher.end()  # ending the watcher
+            self.__watcher.stop()  # ending the watcher
         data = readTheRankings()
 
         if self.__analyticsDisplay:
@@ -276,6 +276,7 @@ class Controller:
 
         self.__ffmpeg.cleanUp()
         self.__App.setPercentComplete(100.0)
+        Log.setHandler(None)
 
     def clean(self):
         """ clean up """

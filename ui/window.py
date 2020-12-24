@@ -332,6 +332,3 @@ class App(QWidget):
     def restart(self):
         self.exit()
         # QtGui.QGuiApplication.exit(self.REBOOT)
-
-    def __del__(self):
-        print("Bye !")
