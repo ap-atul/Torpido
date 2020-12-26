@@ -7,7 +7,6 @@ object would be shared in functions
 
 import gc
 import os
-import sys
 from multiprocessing import Process, Pipe, Queue
 from threading import Thread
 from time import sleep
@@ -15,7 +14,9 @@ from time import sleep
 from torpido import Auditory, FFMPEG, Textual, Visual
 from torpido.analytics import Analytics
 from torpido.config import Cache
+from torpido.config.constants import LINUX
 from torpido.exceptions import RankingOfFeatureMissing, EastModelEnvironmentMissing
+from torpido.manager.plimit import ManagerPool
 from torpido.tools import Watcher, Log
 from torpido.util import checkIfVideo, getTimestamps, readTheRankings
 
@@ -83,6 +84,8 @@ class Controller:
         object of the cache class to store the cache
     __watcher : Watcher
         object of the class watcher that monitors cpu and ram usage
+    __pool : ManagerPool
+        object of the class ManagerPool that sets nice value for the processes
     __progressParentPipe : link
         parent communication pipe for the progress bar
     __progressChildPipe : link
@@ -111,10 +114,13 @@ class Controller:
         self.__ffmpeg = FFMPEG()
         self.__analytics = Analytics()
         self.__cache = Cache()
+        self.__watcher = None
+        self.__pool = None
 
         # watcher is only available for Linux
-        if sys.platform.startswith("linux"):
+        if LINUX:
             self.__watcher = Watcher()
+            self.__pool = ManagerPool()
 
         # checking for EAST MODEL env var
         try:
@@ -130,10 +136,6 @@ class Controller:
 
         # communication for logs to ui
         Log.setHandler(self.__loggerPipe)
-
-        # watcher enable/disable
-        if self.__watcher is not None:
-            self.__watcher.enable(self, enable=False)
 
     def startProcessing(self, app, inputFile):
         """
@@ -235,10 +237,17 @@ class Controller:
                                         args=(self.__videoFile,
                                               self.__textDetectDisplay))
 
+        # starting the processes
         self.__audioProcess.start()
         self.__visualProcess.start()
         self.__textualProcess.start()
 
+        # adding the processes to the manager pool
+        self.__pool.add(self.__audioProcess.pid)
+        self.__pool.add(self.__visualProcess.pid)
+        self.__pool.add(self.__textualProcess.pid)
+
+        # waiting for the processes to terminate
         self.__audioProcess.join()
         self.__visualProcess.join()
         self.__textualProcess.join()
@@ -256,14 +265,15 @@ class Controller:
 
         if self.__watcher is not None:
             self.__watcher.stop()  # ending the watcher
-        data = readTheRankings()
 
+        rankings = readTheRankings()
         if self.__analyticsDisplay:
             #  separate process for analytics
-            Process(target=self.__analytics.analyze, args=(data,)).start()
+            Process(target=self.__analytics.analyze, args=(rankings,)).start()
 
+        # cache file got missing
         try:
-            timestamps = getTimestamps(data=data)
+            timestamps = getTimestamps(data=rankings)
         except RankingOfFeatureMissing:
             Log.e(RankingOfFeatureMissing.cause)
             return

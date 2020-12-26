@@ -6,7 +6,7 @@ class AudioStreamMissingException(Exception):
     When there is no audio in some input video files
     Exception will be raised along with the below message
     """
-    cause = "There is not audio in the video file."
+    cause = "There is no audio in the video file."
 
 
 class FFmpegProcessException(Exception):
@@ -22,7 +22,7 @@ class RankingOfFeatureMissing(Exception):
     When due to some issue ranking for some feature(s) was
     not created, then exception will be raised.
     """
-    cause = "Rank for some feature in missing."
+    cause = "Rank for some feature in missing. Cache file no longer exists."
 
 
 class EastModelEnvironmentMissing(Exception):
@@ -35,7 +35,18 @@ class EastModelEnvironmentMissing(Exception):
 
 class WatcherFileMissing(Exception):
     """
-    when is the watcher the system files for the stat is missing
+    When in the watcher the system files for the stat is missing
     this exception will be raised and will display the message
     """
-    cause = "System proc files are missing. Watcher is shutting down."
+    cause = "[Watcher] System proc files are missing. Watcher is shutting down."
+
+
+class ProcessDoesNotExists(Exception):
+    """
+    When process registered in the Manager (plimit.py), but the process
+    does not exists or is terminates, this exception will be raised.
+    This is alternative for the ProcessLookUpError.
+    """
+
+    def __init__(self, pid):
+        self.cause = f"[Process Manager] The process with pid:{pid} is either terminated or does not exists."

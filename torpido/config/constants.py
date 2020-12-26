@@ -1,8 +1,15 @@
 import os
+from sys import platform
 
 from torpido.config.config import Config
 
 # file to save all the constants that are to be used
+# os type
+LINUX = platform.startswith("linux")
+
+# process priority ((20 − 15)/(20 − 0) = 0.25)
+NICE = 15
+
 # ******************* CACHE PART *************************
 # cache store dir
 CACHE_DIR = "torpido_tmp/"
