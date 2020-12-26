@@ -2,7 +2,7 @@
 
 from os import setpriority, PRIO_PROCESS
 
-from torpido.config.constants import NICE
+from torpido.config.constants import NICE, NICE_MAX
 from torpido.exceptions.custom import ProcessDoesNotExists
 from torpido.tools.logger import Log
 
@@ -101,7 +101,6 @@ class ManagerPool:
     Keeps track of all processes and their niceness. Used to handle multiple
     requests to the processes and also to distribute the amount of priority
     over to all the processes.
-    TODO: distribution
 
     Attributes
     ----------
@@ -112,8 +111,37 @@ class ManagerPool:
     """
 
     def __init__(self):
-        self.__manager = Manager()
+        self.__max = NICE_MAX
         self.__pool = dict()
+
+        # manager object
+        self.__manager = Manager()
+
+    def __get_max(self):
+        """
+        Calculates the distributed niceness for all the processes under the same
+        system. Since the max nice is a default value the processes has to get
+        their share using the formula below
+
+            np * max
+                np : no of processes
+                max : max nice value
+
+            ex: np = 3; max = 3
+                3 * 3 = 9; each process will have the nice value of 9
+
+        Returns
+        -------
+        int
+            nice value for the distribution
+        """
+        np = len(self.__pool)
+        nice = np * self.__max
+
+        if nice >= 19:
+            nice = 18
+
+        return int(nice)
 
     def add(self, pid, nice=None):
         """
@@ -137,7 +165,8 @@ class ManagerPool:
         if pid not in self.__pool:
             self.__pool[pid] = nice
 
-        self.__manager.register(pid, nice)
+            # resetting the nice value
+            self.reset(nice=self.__get_max())
 
     def remove(self, pid, nice=None):
         """
@@ -163,6 +192,9 @@ class ManagerPool:
         if pid in self.__pool:
             self.__manager.unregister(pid, nice)
             self.__pool.pop(pid)
+
+            # resetting the nice value
+            self.reset(nice=self.__get_max())
 
     def get(self):
         """
@@ -190,7 +222,7 @@ class ManagerPool:
         nice : int
             nice value
         """
-        for pid, _ in self.__pool:
+        for pid, _ in self.__pool.items():
             self.__manager.register(pid, nice)
 
     def clean(self):
@@ -200,7 +232,7 @@ class ManagerPool:
 
         Useful while testing or for some other purposes.
         """
-        for pid, _ in self.__pool:
+        for pid, _ in self.__pool.items():
             self.__manager.unregister(pid)
 
         # re creating empty dictionary

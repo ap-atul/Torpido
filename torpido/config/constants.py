@@ -7,8 +7,11 @@ from torpido.config.config import Config
 # os type
 LINUX = platform.startswith("linux")
 
-# process priority ((20 − 15)/(20 − 0) = 0.25)
+# process priority ((20 − nice)/(20 − 0) = %)
 NICE = 15
+
+# max priority for the entire app (max * np = < 19)
+NICE_MAX = 5
 
 # ******************* CACHE PART *************************
 # cache store dir
