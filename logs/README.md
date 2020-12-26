@@ -19,6 +19,16 @@
 -----------------------------------------------------------
 
 # Logs
+
+
+### Log 41, 26-12
+```AP```
+* Process manager
+* Setting niceness for the processes
+* Manager pool : distribution of nice value
+* Performance improvement, priority for other apps too
+
+----------------------------------------
 ### Log 40, 24-12
 ```AP```
 * Watcher subprocess - files
