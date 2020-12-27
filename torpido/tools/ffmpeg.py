@@ -5,7 +5,7 @@ Function to build the commands live here.
 
 import subprocess
 
-from torpido.exceptions import AudioStreamMissingException, FFmpegProcessException
+from torpido.exceptions.custom import AudioStreamMissingException, FFmpegProcessException
 from torpido.tools.logger import Log
 
 
@@ -81,7 +81,7 @@ def split(inputFile, outputAudioFile):
         raise AudioStreamMissingException
 
 
-def buildMergeCommand(videoFile, audioFile, outputFile, timestamps):
+def buildMergeCommand(videoFile, audioFile, outputFile, timestamps, intro=None, extro=None):
     """
     Building a complex filter
     command line to clip portions based on the timestamps, the copies used
@@ -90,6 +90,10 @@ def buildMergeCommand(videoFile, audioFile, outputFile, timestamps):
 
     Parameters
     ----------
+    extro : str
+        exit video
+    intro : str
+        intro video
     videoFile : str
         original input video file
     audioFile : str
@@ -98,7 +102,6 @@ def buildMergeCommand(videoFile, audioFile, outputFile, timestamps):
         final output video file edited by Torpido
     timestamps : iterable
         start and end timestamps of the video clips to trim
-
     Returns
     -------
     str
@@ -135,52 +138,73 @@ def buildMergeCommand(videoFile, audioFile, outputFile, timestamps):
         '[]' :              labels for each stream
 
     """
-    filterString = 'ffmpeg' + \
-                   ' -y' + \
-                   ' -i ' + \
-                   str(videoFile) + \
-                   ' -i ' + \
-                   str(audioFile) + \
-                   ' -filter_complex ' + \
-                   '"[0:v]split=' + str(len(timestamps))
+    timestamp_length = len(timestamps)
 
-    for i in range(len(timestamps)):
-        filterString += '[vc%d]' % i
-    filterString += '; '
+    command = ['ffmpeg',
+               ' -y',
+               ' -i ',
+               str(videoFile),
+               ' -i ',
+               str(audioFile)]
 
-    for i in range(len(timestamps)):
-        startTime = timestamps[i][0]
-        endTime = timestamps[i][1]
-        filterString += '[vc%d]' % i
-        filterString += 'trim=start=%f:duration=%f,setpts=PTS-STARTPTS[v%d]; ' \
-                        % (startTime, (endTime - startTime), int(i))
+    if intro is not None:
+        command.append(' -i %s' % str(intro))
 
-    filterString += '[1:a]asplit=' + str(len(timestamps))
-    for i in range(len(timestamps)):
-        filterString += '[ac%d]' % i
-    filterString += '; '
+    if extro is not None:
+        command.append(' -i %s' % str(extro))
 
-    for i in range(len(timestamps)):
-        startTime = timestamps[i][0]
-        endTime = timestamps[i][1]
-        filterString += '[ac%d]' % i
-        filterString += 'atrim=start=%f:duration=%f,asetpts=PTS-STARTPTS[a%d]; ' \
-                        % (startTime, (endTime - startTime), int(i))
+    command.append(' -filter_complex "[0:v]split=' + str(timestamp_length))
 
-    for i in range(len(timestamps)):
-        filterString += '[v%d][a%d]' % (i, i)
-    filterString += 'concat=n=%d:v=1:a=1[video][audio]"' % (len(timestamps))
+    # creating splits
+    for i in range(timestamp_length):
+        command.append('[vc%d]' % i)
+    command.append('; ')
 
-    filterString += ' -map' + \
-                    ' "[video]"' + \
-                    ' -map' + \
-                    ' "[audio]" ' + \
-                    str(outputFile)
+    # making trims
+    for i in range(timestamp_length):
+        startTime, endTime = timestamps[i]
+        command.append(
+            '[vc%d]trim=start=%f:duration=%f,setpts=PTS-STARTPTS[v%d]; ' % (i, startTime, (endTime - startTime), int(i))
+        )
 
-    return filterString
+    # creating audio splits
+    command.append('[1:a]asplit=' + str(timestamp_length))
+    for i in range(timestamp_length):
+        command.append('[ac%d]' % i)
+    command.append('; ')
+
+    # making audio trims
+    for i in range(timestamp_length):
+        startTime, endTime = timestamps[i]
+        command.append(
+            '[ac%d]atrim=start=%f:duration=%f,asetpts=PTS-STARTPTS[a%d]; '
+            % (i, startTime, (endTime - startTime), int(i))
+        )
+
+    concat = timestamp_length
+    if intro is not None:
+        concat += 1
+        command.append('[2:v][2:a]')
+
+    for i in range(timestamp_length):
+        command.append('[v%d][a%d]' % (i, i))
+
+    if extro is not None:
+        concat += 1
+        command.append('[3:v][3:a]')
+
+    command.append('concat=n=%d:v=1:a=1[video][audio]"' % concat)
+
+    command.extend([' -map',
+                    ' "[video]"',
+                    ' -map',
+                    ' "[audio]" ',
+                    str(outputFile)])
+
+    return "".join(command)
 
 
-def merge(videoFile, audioFile, outputFile, timestamps):
+def merge(videoFile, audioFile, outputFile, timestamps, intro=None, extro=None):
     """
     Generate the command for complex filter according to the timestamps and encode the output video. Merge the
     input video file and replace the audio stream with the de-noised audio stream
@@ -203,6 +227,10 @@ def merge(videoFile, audioFile, outputFile, timestamps):
         final output video file
     timestamps : list
         list of clip time stamps with start and end times
+    intro : str
+        intro video file
+    extro : str
+        extro video file
 
     Yields
     -------
@@ -210,8 +238,8 @@ def merge(videoFile, audioFile, outputFile, timestamps):
         continuous std out logs
     """
     # print(f"[TIMESTAMPS] timestamps : {timestamps}")
-    command = buildMergeCommand(videoFile, audioFile, outputFile, timestamps)
-    # print(command)
+    command = buildMergeCommand(videoFile, audioFile, outputFile, timestamps, intro, extro)
+    print(command)
     run = subprocess.Popen(args=command,
                            shell=True,
                            stdout=subprocess.PIPE,

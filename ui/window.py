@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
                              QGraphicsDropShadowEffect, QPushButton,
                              QCheckBox, QPlainTextEdit, QFileDialog, QGroupBox)
 
-from torpido.config import *
+from torpido.config.constants import *
 from ui.controller import Controller
 from ui.settings import SettingsDialog
 from ui.style.theme import Color, Type, getTheme, getStyleSheet
@@ -118,6 +118,8 @@ class App(QWidget):
         self.memProgress = None
         self.logWindow = None
         self.inputVideoFile = None
+        self.intro = None
+        self.extro = None
         self.video = None
         self.videoDisplayCheckbox = None
         self.snrPlotDisplayCheckbox = None
@@ -184,14 +186,14 @@ class App(QWidget):
 
         self.introVideoImage.setPixmap(self.videoPicNotSelected)
         self.introVideoImage.setMaximumSize(120, 120)
-        self.introVideoImage.clicked.connect(self.selectFile)
+        self.introVideoImage.clicked.connect(self.selectIntroFile)
         self.introVideoImage.setToolTip("Intro video will be placed at the start")
         self.introVideoImage.setStyleSheet(NOT_SELECTED)
         extraLayout.addWidget(self.introVideoImage)
 
         self.exitVideoImage.setPixmap(self.videoPicNotSelected)
         self.exitVideoImage.setMaximumSize(120, 120)
-        self.exitVideoImage.clicked.connect(self.selectFile)
+        self.exitVideoImage.clicked.connect(self.selectExtroFile)
         self.exitVideoImage.setToolTip("Exit video will be placed at the end")
         self.exitVideoImage.setStyleSheet(NOT_SELECTED)
         extraLayout.addWidget(self.exitVideoImage)
@@ -299,11 +301,38 @@ class App(QWidget):
             self.videoImage.setToolTip(str(name[0]))
             self.inputVideoFile = str(name[0])
 
+    def selectExtroFile(self):
+        """ Starts a file explorer to select video file """
+        name = QFileDialog.getOpenFileName(None,
+                                           "Open File",
+                                           "~",
+                                           "Video Files (*.mp4 *.flv *.avi *.mov *.mpg *.mxf)")
+
+        # setting the data and ui image for video
+        if len(name[0]) > 0:
+            self.exitVideoImage.setPixmap(self.videoPicSelected)
+            self.exitVideoImage.setStyleSheet(SELECTED)
+            self.exitVideoImage.setToolTip(str(name[0]))
+            self.extro = str(name[0])
+
+    def selectIntroFile(self):
+        """ Starts a file explorer to select video file """
+        name = QFileDialog.getOpenFileName(None,
+                                           "Open File",
+                                           "~",
+                                           "Video Files (*.mp4 *.flv *.avi *.mov *.mpg *.mxf)")
+
+        # setting the data and ui image for video
+        if len(name[0]) > 0:
+            self.introVideoImage.setPixmap(self.videoPicSelected)
+            self.introVideoImage.setStyleSheet(SELECTED)
+            self.introVideoImage.setToolTip(str(name[0]))
+            self.intro = str(name[0])
+
     def start(self):
         """ Starting the processing """
-
         if self.inputVideoFile is not None:
-            self.controller.setVideo(self.inputVideoFile)
+            self.controller.setVideo(self.inputVideoFile, self.intro, self.extro)
             self.controller.start()
 
     def setVideoDisplay(self):

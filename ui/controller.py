@@ -46,14 +46,18 @@ class Controller(QThread):
         self.controller = MainController()
 
         self.videoFile = None
+        self.intro = None
+        self.extro = None
 
-    def setVideo(self, videoFile):
+    def setVideo(self, videoFile, intro, extro):
         """ Set the video file for processing """
         self.videoFile = videoFile
+        self.intro = intro
+        self.extro = extro
 
     def run(self):
         """ Start the processing on the input video file """
-        self.controller.startProcessing(self, self.videoFile)
+        self.controller.startProcessing(self, self.videoFile, intro=self.intro, extro=self.extro)
 
     def setVideoDisplay(self, value):
         """ Set up the video display request """

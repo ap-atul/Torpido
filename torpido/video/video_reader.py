@@ -5,8 +5,8 @@ from time import sleep
 
 import cv2
 
-from torpido.config import Log
 from torpido.config.constants import VIDEO_WIDTH
+from torpido.tools.logger import Log
 from torpido.util import resize
 
 

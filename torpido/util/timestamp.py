@@ -10,10 +10,11 @@ using ffmpeg.
 
 """
 
-import numpy as np
-
-from torpido.config import *
-from torpido.exceptions import RankingOfFeatureMissing
+from torpido.config.cache import Cache
+from torpido.config.constants import (CACHE_RANK_MOTION, CACHE_RANK_TEXT,
+                                      CACHE_RANK_BLUR, CACHE_RANK_AUDIO,
+                                      MIN_RANK_OUT_VIDEO)
+from torpido.exceptions.custom import RankingOfFeatureMissing
 
 
 def addPadding(rankList: list, length):
@@ -29,7 +30,7 @@ def addPadding(rankList: list, length):
     length : int
         required length
     """
-    rankList.extend([np.average(rankList)] * int(length - len(rankList)))
+    rankList.extend([sum(rankList) / len(rankList)] * int(length - len(rankList)))
 
 
 def readTheRankings():
@@ -51,9 +52,9 @@ def readTheRankings():
 
     # loading the read files
     motionRank = cache_rank.readDataFromCache(CACHE_RANK_MOTION)
-    blurRank = cache_rank.readDataFromCache(CACHE_RANK_MOTION)
-    textRank = cache_rank.readDataFromCache(CACHE_RANK_MOTION)
-    audioRank = cache_rank.readDataFromCache(CACHE_RANK_MOTION)
+    blurRank = cache_rank.readDataFromCache(CACHE_RANK_BLUR)
+    textRank = cache_rank.readDataFromCache(CACHE_RANK_TEXT)
+    audioRank = cache_rank.readDataFromCache(CACHE_RANK_AUDIO)
 
     if not all([motionRank, blurRank, textRank, audioRank]):
         raise RankingOfFeatureMissing

@@ -13,12 +13,13 @@ from time import sleep
 
 from torpido import Auditory, FFMPEG, Textual, Visual
 from torpido.analytics import Analytics
-from torpido.config import Cache
+from torpido.config.cache import Cache
 from torpido.config.constants import LINUX
 from torpido.exceptions import RankingOfFeatureMissing, EastModelEnvironmentMissing
 from torpido.manager.plimit import ManagerPool
 from torpido.tools import Watcher, Log
-from torpido.util import checkIfVideo, getTimestamps, readTheRankings
+from torpido.util import getTimestamps, readTheRankings
+from torpido.util.validate import checkIfVideo
 
 
 def logo():
@@ -137,7 +138,7 @@ class Controller:
         # communication for logs to ui
         Log.setHandler(self.__loggerPipe)
 
-    def startProcessing(self, app, inputFile):
+    def startProcessing(self, app, inputFile, intro=None, extro=None):
         """
         Process the input file call splitting function to split the input video file into
         audio and create 3 processes each for feature ranking, After completion of all the
@@ -150,6 +151,10 @@ class Controller:
             handles ui interactions
         inputFile : str
             input video file (validating if its in supported format)
+        intro : str
+            name of the intro video file
+        extro : str
+            name of the extro video file
 
         Notes
         ------
@@ -165,6 +170,12 @@ class Controller:
 
         """
         logo()
+
+        print(intro, extro)
+
+        # adding optional video file
+        self.__ffmpeg.setIntro(intro)
+        self.__ffmpeg.setExtro(extro)
 
         # saving the instance of the ui controller
         self.__App = app

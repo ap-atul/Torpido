@@ -110,6 +110,12 @@ OUT_AUDIO_FILE = "_audio_de_noised.wav"
 # supported video file formats
 SUPPORTED_VIDEO_FILES = [".mp4", ".webm", ".mkv", ".mov", ".flv", ".avi", ".ogg"]
 
+# fade in effect duration in seconds
+FADE_IN = 3
+
+# fade out effect duration in seconds
+FADE_OUT = 3
+
 # ********************* WATCHER ***********************************
 # delay to check the CPU and MEM usage (in secs)
 WATCHER_DELAY = Config.read("WATCHER_DELAY", int)

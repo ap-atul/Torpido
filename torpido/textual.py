@@ -12,8 +12,10 @@ import time
 import cv2
 import numpy as np
 
-from torpido.config import *
+from torpido.config.cache import Cache
+from torpido.config.constants import *
 from torpido.exceptions import EastModelEnvironmentMissing
+from torpido.tools.logger import Log
 from torpido.util import image
 from torpido.video import VideoGet
 

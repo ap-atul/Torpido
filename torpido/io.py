@@ -3,11 +3,12 @@ This file contains function to separate out video and audio using ffmpeg.
 It consists of two functions to split and merge video and audio
 using ffmpeg.
 """
+import os
 
-from torpido.config import *
+from torpido.config.constants import CACHE_DIR, CACHE_NAME, IN_AUDIO_FILE, OUT_AUDIO_FILE, OUT_VIDEO_FILE
 from torpido.exceptions import AudioStreamMissingException, FFmpegProcessException
 from torpido.progress import Progress
-from torpido.tools import split, merge
+from torpido.tools import split, merge, Log
 
 
 class FFMPEG:
@@ -30,6 +31,10 @@ class FFMPEG:
         de-noised audio file name
     __outputFilePath : str
         same as the input file path
+    __intro : str
+        name of the intro video file
+    __extro : str
+        name of the extro video file
     __extension : str
         name of the extension of the input file
     __progressBar : tqdm
@@ -42,8 +47,18 @@ class FFMPEG:
         self.__inputAudioFileName = None
         self.__outputAudioFileName = None
         self.__outputFilePath = None
+        self.__intro = None
+        self.__extro = None
         self.__extension = None
         self.__progressBar = None
+
+    def setIntro(self, intro):
+        """ Sets the intro video file """
+        self.__intro = intro
+
+    def setExtro(self, extro):
+        """ Sets the extro video file """
+        self.__extro = extro
 
     def getInputFileNamePath(self):
         """
@@ -179,8 +194,11 @@ class FFMPEG:
             for log in merge(os.path.join(self.__outputFilePath, self.__inputFileName),
                              os.path.join(self.__outputFilePath, self.__outputAudioFileName),
                              os.path.join(self.__outputFilePath, self.__outputVideoFileName),
-                             timestamps):
+                             timestamps,
+                             intro=self.__intro,
+                             extro=self.__extro):
                 self.__progressBar.displayProgress(log)
+                print(log)
 
             if not os.path.isfile(os.path.join(self.__outputFilePath, self.__outputVideoFileName)):
                 raise FFmpegProcessException

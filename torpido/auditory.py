@@ -10,7 +10,9 @@ import numpy as np
 import soundfile
 from matplotlib import pyplot as plt
 
-from torpido.config import *
+from torpido.config.cache import Cache
+from torpido.config.constants import *
+from torpido.tools.logger import Log
 from torpido.wavelet import FastWaveletTransform, getExponent, VisuShrinkCompressor, snr
 
 matplotlib.use("TkAgg")
