@@ -18,7 +18,7 @@ NICE_MAX = 5
 CACHE_DIR = "torpido_tmp/"
 
 # cache file name
-CACHE_NAME = "vea_cache.tmp"
+CACHE_NAME = ".vea_cache.tmp"
 
 # cache keys
 # video fps key
@@ -99,7 +99,7 @@ TEXT_EAST_MODEL_PATH = os.environ['EAST_MODEL']
 
 # ****************** FFMPEG *************************************
 # output video file name extension
-OUT_VIDEO_FILE = "_edited_by_torpido.mp4"
+OUT_VIDEO_FILE = "_edited_by_torpido"
 
 # input audio name to process
 IN_AUDIO_FILE = "_audio.wav"

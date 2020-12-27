@@ -30,6 +30,8 @@ class FFMPEG:
         de-noised audio file name
     __outputFilePath : str
         same as the input file path
+    __extension : str
+        name of the extension of the input file
     __progressBar : tqdm
         object of tqdm to display a progress bar
     """
@@ -40,6 +42,7 @@ class FFMPEG:
         self.__inputAudioFileName = None
         self.__outputAudioFileName = None
         self.__outputFilePath = None
+        self.__extension = None
         self.__progressBar = None
 
     def getInputFileNamePath(self):
@@ -121,9 +124,12 @@ class FFMPEG:
         self.__inputFilePath = os.path.dirname(inputFile)
         self.__outputFilePath = self.__inputFilePath
         self.__inputFileName = os.path.basename(inputFile)
-        self.__outputVideoFileName = os.path.splitext(self.__inputFileName)[0] + OUT_VIDEO_FILE
-        self.__inputAudioFileName = os.path.splitext(self.__inputFileName)[0] + IN_AUDIO_FILE
-        self.__outputAudioFileName = os.path.splitext(self.__inputFileName)[0] + OUT_AUDIO_FILE
+
+        _, self.__extension = os.path.splitext(self.__inputFileName)
+        self.__outputVideoFileName = "".join([self.__inputFileName, OUT_VIDEO_FILE, self.__extension])
+
+        self.__inputAudioFileName = self.__inputFileName + IN_AUDIO_FILE
+        self.__outputAudioFileName = self.__inputFileName + OUT_AUDIO_FILE
 
         # call ffmpeg tool to do the splitting
         try:

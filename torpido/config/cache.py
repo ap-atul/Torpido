@@ -1,7 +1,6 @@
 """
 A simple cache storage helper to store minimal amount of data
-in the dictionary, if data exists it will return the val or
-None
+in the dictionary, if data exists it will return the val or None
 """
 
 from joblib import dump, load
@@ -12,7 +11,7 @@ from torpido.tools.logger import Log
 
 class Cache:
     """
-    Stores a dictionary asa file using joblib. Key-value pair of any object type can be saved.
+    Stores a dictionary as a file using joblib. Key-value pair of any object type can be saved.
 
     Attributes
     ----------
