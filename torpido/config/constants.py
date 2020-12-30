@@ -42,6 +42,12 @@ CACHE_RANK_BLUR = "CACHE_RANK_BLUR"
 # ranking for text
 CACHE_RANK_TEXT = "CACHE_RANK_TEXT"
 
+# video width
+CACHE_VIDEO_WIDTH = "CACHE_VIDEO_WIDTH"
+
+# video height
+CACHE_VIDEO_HEIGHT = "CACHE_VIDEO_HEIGHT"
+
 # ******************* RANKS ****************************
 # ranking for motion in video
 RANK_MOTION = Config.read("RANK_MOTION", float)

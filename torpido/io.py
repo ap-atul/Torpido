@@ -8,7 +8,8 @@ import os
 from torpido.config.constants import CACHE_DIR, CACHE_NAME, IN_AUDIO_FILE, OUT_AUDIO_FILE, OUT_VIDEO_FILE
 from torpido.exceptions import AudioStreamMissingException, FFmpegProcessException
 from torpido.progress import Progress
-from torpido.tools import split, merge, Log
+from torpido.tools.ffmpeg import split, merge
+from torpido.tools.logger import Log
 
 
 class FFMPEG:

@@ -158,6 +158,8 @@ class Visual:
         self.__frameCount = totalFrames
         self.__setVideoFps()
         self.__setVideoFrameCount()
+        self.__cache.writeDataToCache(CACHE_VIDEO_WIDTH, cv2.CAP_PROP_FRAME_WIDTH)
+        self.__cache.writeDataToCache(CACHE_VIDEO_HEIGHT, cv2.CAP_PROP_FRAME_HEIGHT)
 
         # printing some info
         Log.d(f"Total count of video frames :: {totalFrames}")

@@ -11,15 +11,13 @@ from multiprocessing import Process, Pipe, Queue
 from threading import Thread
 from time import sleep
 
+from torpido import Analytics
 from torpido import Auditory, FFMPEG, Textual, Visual
-from torpido.analytics import Analytics
-from torpido.config.cache import Cache
-from torpido.config.constants import LINUX
+from torpido.config import Cache, LINUX
 from torpido.exceptions import RankingOfFeatureMissing, EastModelEnvironmentMissing
-from torpido.manager.plimit import ManagerPool
+from torpido.manager import ManagerPool
 from torpido.tools import Watcher, Log
-from torpido.util import getTimestamps, readTheRankings
-from torpido.util.validate import checkIfVideo
+from torpido.util import getTimestamps, readTheRankings, checkIfVideo
 
 
 def logo():

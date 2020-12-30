@@ -158,13 +158,14 @@ def buildMergeCommand(videoFile, audioFile, outputFile, timestamps, intro=None, 
     # creating splits
     for i in range(timestamp_length):
         command.append('[vc%d]' % i)
-    command.append('; ')
+        command.append('; ')
 
     # making trims
     for i in range(timestamp_length):
         startTime, endTime = timestamps[i]
         command.append(
-            '[vc%d]trim=start=%f:duration=%f,setpts=PTS-STARTPTS[v%d]; ' % (i, startTime, (endTime - startTime), int(i))
+            '[vc%d]trim=start=%f:duration=%f,setpts=PTS-STARTPTS,scale=1920:-1,crop=1920:1080:0:0[v%d]; '
+            % (i, startTime, (endTime - startTime), int(i))
         )
 
     # creating audio splits
@@ -182,16 +183,18 @@ def buildMergeCommand(videoFile, audioFile, outputFile, timestamps, intro=None, 
         )
 
     concat = timestamp_length
-    if intro is not None:
+    if intro is not None and extro is not None:
         concat += 1
-        command.append('[2:v][2:a]')
+        command.append('[2:v]scale=1920:-1,crop=1920:1080:0:0[intro];')
+        command.append('[3:v]scale=1920:-1,crop=1920:1080:0:0[extro];')
+        command.append('[intro][2:a]')
 
     for i in range(timestamp_length):
         command.append('[v%d][a%d]' % (i, i))
 
     if extro is not None:
         concat += 1
-        command.append('[3:v][3:a]')
+        command.append('[extro][3:a]')
 
     command.append('concat=n=%d:v=1:a=1[video][audio]"' % concat)
 
@@ -252,3 +255,4 @@ def merge(videoFile, audioFile, outputFile, timestamps, intro=None, extro=None):
     if run.wait():
         Log.e(f"The merging process has caused an error.")
         raise FFmpegProcessException
+
