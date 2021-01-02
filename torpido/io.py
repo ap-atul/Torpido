@@ -199,7 +199,6 @@ class FFMPEG:
                              intro=self.__intro,
                              extro=self.__extro):
                 self.__progressBar.displayProgress(log)
-                print(log)
 
             if not os.path.isfile(os.path.join(self.__outputFilePath, self.__outputVideoFileName)):
                 raise FFmpegProcessException

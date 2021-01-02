@@ -61,6 +61,7 @@ class Compressor:
         data = np.asanyarray(data).flatten()
         noOfZeros = np.count_nonzero(data == 0)
 
+        # avoiding division by zero
         if noOfZeros == 0:
             return noOfZeros
 

@@ -11,7 +11,11 @@ class Manager:
     """
     Process with a nice value determines the priority for the process
     on the operating system. If correct enough value is set then the process
-    won't lock the performance of the system and other applications
+    won't lock the performance of the system and other applications.
+
+    Improves the performance of the overall application with the contrast
+    to other apps that require more priority over other apps and system
+    performance decreases if not allowed to do so
 
     NOTE: Only for Linux and Unix
 

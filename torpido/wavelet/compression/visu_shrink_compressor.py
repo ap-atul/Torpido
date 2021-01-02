@@ -1,4 +1,4 @@
-""" Compression using Universal Threhold """
+""" Compression using Universal Threshold """
 
 import numpy as np
 

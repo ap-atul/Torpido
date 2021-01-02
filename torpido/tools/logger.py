@@ -86,7 +86,7 @@ class Log:
 
                 f.close()
 
-        except Exception as _:
+        except FileNotFoundError as _:
             pass
 
     @staticmethod
