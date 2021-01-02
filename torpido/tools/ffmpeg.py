@@ -240,7 +240,6 @@ def merge(videoFile, audioFile, outputFile, timestamps, intro=None, extro=None):
     str
         continuous std out logs
     """
-    # print(f"[TIMESTAMPS] timestamps : {timestamps}")
     command = buildMergeCommand(videoFile, audioFile, outputFile, timestamps, intro, extro)
     print(command)
     run = subprocess.Popen(args=command,
@@ -255,4 +254,3 @@ def merge(videoFile, audioFile, outputFile, timestamps, intro=None, extro=None):
     if run.wait():
         Log.e(f"The merging process has caused an error.")
         raise FFmpegProcessException
-
