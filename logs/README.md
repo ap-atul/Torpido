@@ -20,7 +20,14 @@
 
 # Logs
 
+### Log 42, 01-01
+```AP```
+* Started working on the ffmpeg wrapper
+* Command line arguments can be designed using a graph
+* Worked on signal to noise ratio calculations
+* Further activities discussed.
 
+----------------------------------------
 ### Log 41, 26-12
 ```AP```
 * Process manager
