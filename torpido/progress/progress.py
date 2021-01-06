@@ -15,17 +15,17 @@ class Progress:
 
     Attributes
     ----------
-    __progressBar : object
+    __progress_bar : object
         tqdm progress bar
-    __totalProgress : int
+    __total_progress : int
         maintaining the current progress
     __extractor : object
         extractor object to read the stdout logs and parse them
     """
 
     def __init__(self):
-        self.__progressBar = tqdm(total=100)
-        self.__totalProgress = 0
+        self.__progress_bar = tqdm(total=100)
+        self.__total_progress = 0
         self.__extractor = StdExtractor()
 
     def display(self, log, displayLog=False):
@@ -47,9 +47,9 @@ class Progress:
 
         if time is not None:
             currentProgress = self.get_current_progress(duration, time)
-            if currentProgress > self.__totalProgress:
-                self.__progressBar.update(currentProgress - self.__totalProgress)
-                self.__totalProgress = currentProgress
+            if currentProgress > self.__total_progress:
+                self.__progress_bar.update(currentProgress - self.__total_progress)
+                self.__total_progress = currentProgress
 
         # display log is true then it will print if errors
         elif displayLog:
@@ -82,18 +82,18 @@ class Progress:
         """
         explicitly complete the progress bar
         """
-        self.__progressBar.update(100)
+        self.__progress_bar.update(100)
 
     def clear(self):
         """
         On occurrence of any error clear the progress bar
         """
-        self.__progressBar.clear()
+        self.__progress_bar.clear()
 
     def __del__(self):
         """
         clean up
         """
-        self.__progressBar.close()
-        del self.__progressBar
+        self.__progress_bar.close()
+        del self.__progress_bar
         del self.__extractor

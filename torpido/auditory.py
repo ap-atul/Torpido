@@ -26,7 +26,7 @@ class Auditory:
 
     Attributes
     ----------
-    __fileName : str
+    __file_name : str
         input audio file
     __rate : int
         sample rate of the audio signal in frequency
@@ -36,11 +36,11 @@ class Auditory:
         sound file object having the info of the audio file
     __energy : list
         list of the ranks for the audio signal
-    __snrBefore : list
+    __snr_before : list
         list to store the snr of the original audio
-    __snrAfter : list
+    __snr_after : list
         list to store the snr of the de-noised audio
-    __silenceThreshold : int
+    __silence_threshold : int
         threshold value to determine the rank
     __cache : Cache
         object of the cache to store the audio file info
@@ -50,15 +50,15 @@ class Auditory:
         performs visu shrink thresholding on the coefficients
     """
     def __init__(self):
-        self.__fileName = None
+        self.__file_name = None
         self.__rate = None
         self.__data = None
         self.__plot = False
         self.__info = None
         self.__energy = None
-        self.__snrBefore = list()
-        self.__snrAfter = list()
-        self.__silenceThreshold = SILENCE_THRESHOlD
+        self.__snr_before = list()
+        self.__snr_after = list()
+        self.__silence_threshold = SILENCE_THRESHOlD
         self.__cache = Cache()
         self.__fwt = FastWaveletTransform(WAVELET)
         self.__compressor = VisuShrinkCompressor()
@@ -80,7 +80,7 @@ class Auditory:
         int
             rank for the portion which is then set for all the portion of data
         """
-        if np.sqrt(np.mean(block ** 2)) > self.__silenceThreshold:
+        if np.sqrt(np.mean(block ** 2)) > self.__silence_threshold:
             return RANK_AUDIO
         return 0
 
@@ -100,9 +100,9 @@ class Auditory:
         """
 
         width = 0.1
-        x_orig = np.arange(len(self.__snrBefore))
-        plt.bar(x_orig - width / 2, np.abs(self.__snrBefore), width=width, label='Original')
-        plt.bar(x_orig + width / 2, np.abs(self.__snrAfter), width=width, label='De-noised')
+        x_orig = np.arange(len(self.__snr_before))
+        plt.bar(x_orig - width / 2, np.abs(self.__snr_before), width=width, label='Original')
+        plt.bar(x_orig + width / 2, np.abs(self.__snr_after), width=width, label='De-noised')
 
         plt.title("Signal to noise ratios SNR(dB)")
         plt.legend(loc=0)
@@ -147,8 +147,8 @@ class Auditory:
             Log.e(f"File {inputFile} does not exists")
             return
 
-        self.__fileName = inputFile
-        self.__info = soundfile.info(self.__fileName)
+        self.__file_name = inputFile
+        self.__info = soundfile.info(self.__file_name)
         self.__set_audio_info()
         self.__rate = self.__info.samplerate
         self.__energy = []
@@ -156,7 +156,7 @@ class Auditory:
 
         # creating and opening the output audio file
         with soundfile.SoundFile(outputFile, mode="w", samplerate=self.__rate, channels=1) as out:
-            for block in soundfile.blocks(self.__fileName, int(self.__rate * self.__info.duration * AUDIO_BLOCK_PER)):
+            for block in soundfile.blocks(self.__file_name, int(self.__rate * self.__info.duration * AUDIO_BLOCK_PER)):
                 # processing only single channel
                 if block.ndim > 1:
                     block = block[:, 0]
@@ -174,8 +174,8 @@ class Auditory:
                 out.write(cleaned)
 
                 # collecting the signal to noise ratios
-                self.__snrBefore.append(snr(block))
-                self.__snrAfter.append(snr(cleaned))
+                self.__snr_before.append(snr(block))
+                self.__snr_after.append(snr(cleaned))
 
                 # calculating the audio rank
                 self.__energy.extend([self.__get_energy_rms(cleaned)] * max(1, int(len(cleaned) / self.__rate)))

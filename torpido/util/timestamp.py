@@ -17,7 +17,7 @@ from torpido.config.constants import (CACHE_RANK_MOTION, CACHE_RANK_TEXT,
 from torpido.exceptions.custom import RankingOfFeatureMissing
 
 
-def add_padding(rankList: list, length):
+def add_padding(rank_list: list, length):
     """
     Function to add padding to the ranks if there length is lower than that of the
     required length
@@ -25,12 +25,12 @@ def add_padding(rankList: list, length):
 
     Parameters
     ----------
-    rankList : list
+    rank_list : list
         feature rank list
     length : int
         required length
     """
-    rankList.extend([sum(rankList) / len(rankList)] * int(length - len(rankList)))
+    rank_list.extend([sum(rank_list) / len(rank_list)] * int(length - len(rank_list)))
 
 
 def read_rankings():
@@ -51,27 +51,27 @@ def read_rankings():
     cache_rank = Cache()
 
     # loading the read files
-    motionRank = cache_rank.read_data(CACHE_RANK_MOTION)
-    blurRank = cache_rank.read_data(CACHE_RANK_BLUR)
-    textRank = cache_rank.read_data(CACHE_RANK_TEXT)
-    audioRank = cache_rank.read_data(CACHE_RANK_AUDIO)
+    motion = cache_rank.read_data(CACHE_RANK_MOTION)
+    blur = cache_rank.read_data(CACHE_RANK_BLUR)
+    text = cache_rank.read_data(CACHE_RANK_TEXT)
+    audio = cache_rank.read_data(CACHE_RANK_AUDIO)
 
-    if not all([motionRank, blurRank, textRank, audioRank]):
+    if not all([motion, blur, text, audio]):
         raise RankingOfFeatureMissing
 
     # max length for ranking
     # NOTE: FFmpeg does not get bothered by greater values, not lower though
-    maxRank = int(max(len(motionRank), len(blurRank),
-                      len(audioRank), len(textRank)))
+    maxRank = int(max(len(motion), len(blur),
+                      len(audio), len(text)))
 
     # padding the ranks of each feature
-    add_padding(motionRank, maxRank)
-    add_padding(blurRank, maxRank)
-    add_padding(audioRank, maxRank)
-    add_padding(textRank, maxRank)
+    add_padding(motion, maxRank)
+    add_padding(blur, maxRank)
+    add_padding(audio, maxRank)
+    add_padding(text, maxRank)
 
-    return [motionRank, blurRank,
-            textRank, audioRank]
+    return [motion, blur,
+            text, audio]
 
 
 def trim_by_rank(ranks):
@@ -143,14 +143,14 @@ def get_timestamps(data):
     else:
         raise RankingOfFeatureMissing
 
-    finalTimestamp = []
+    final_timestamp = []
 
     # validating if there are 2 values in list
     for clip in timestamps:
         if len(clip) % 2 == 0:
-            finalTimestamp.append(clip)
+            final_timestamp.append(clip)
 
-    return finalTimestamp
+    return final_timestamp
 
 
 def get_output_video_length(timestamps: list):
@@ -181,11 +181,11 @@ def get_output_video_length(timestamps: list):
     to get final length
         finalLength += end[i] - start[i] ; i: 0 -> len(timestamps)
     """
-    videoLength = 0
+    video_length = 0
     if len(timestamps) < 0:
         return 0
 
     for start, end in timestamps:
-        videoLength += abs(end - start)
+        video_length += abs(end - start)
 
-    return videoLength
+    return video_length

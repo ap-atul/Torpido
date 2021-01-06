@@ -23,13 +23,13 @@ class Visual:
 
     Attributes
     ----------
-    self.__blurThreshold : int
+    self.__blur_threshold : int
         threshold to rank the blur feature
-    self.__motionThreshold : int
+    self.__motion_threshold : int
         threshold to rank the motion feature
     self.__fps : float
         input video fps
-    self.__frameCount : int
+    self.__frame_count : int
         number of frames
     self.__motion : list
         list of the ranks for the motion feature
@@ -37,21 +37,21 @@ class Visual:
         list of the ranks for the blur feature
     self.__cache : Cache
         cache object to store the data
-    self.__videoGetter : VideoGet
+    self.__video_getter : VideoGet
         video reader object to read the video and save it in thread
     """
 
     def __init__(self):
         cv2.setUseOptimized(True)
-        self.__blurThreshold = BLUR_THRESHOLD
-        self.__motionThreshold = MOTION_THRESHOLD
+        self.__blur_threshold = BLUR_THRESHOLD
+        self.__motion_threshold = MOTION_THRESHOLD
         self.__fps = None
-        self.__frameCount = None
+        self.__frame_count = None
         self.__motion = None
         self.__blur = None
         self.__cache = Cache()
-        self.__videoGetter = None
-        self.__videoPipe = None
+        self.__video_getter = None
+        self.__video_pipe = None
 
     def __detect_blur(self, image):
         """
@@ -65,7 +65,7 @@ class Visual:
             frame from the video file
         """
         # if blur rank is 0 else RANK_BLUR
-        if cv2.Laplacian(image, cv2.CV_64F).var() >= self.__blurThreshold:
+        if cv2.Laplacian(image, cv2.CV_64F).var() >= self.__blur_threshold:
             return 0
         return RANK_BLUR
 
@@ -84,19 +84,19 @@ class Visual:
         mean/average as the rank for the 1 sec
 
         """
-        motionNormalize = []
-        blurNormalize = []
-        for i in range(0, int(self.__frameCount), int(self.__fps)):
+        motion_normalize = []
+        blur_normalize = []
+        for i in range(0, int(self.__frame_count), int(self.__fps)):
             if len(self.__motion) >= (i + int(self.__fps)):
-                motionNormalize.append(np.mean(self.__motion[i: i + int(self.__fps)]))
-                blurNormalize.append(np.mean(self.__blur[i: i + int(self.__fps)]))
+                motion_normalize.append(np.mean(self.__motion[i: i + int(self.__fps)]))
+                blur_normalize.append(np.mean(self.__blur[i: i + int(self.__fps)]))
             else:
                 break
 
         # saving all processed stuffs
-        self.__cache.write_data(CACHE_RANK_MOTION, motionNormalize)
-        self.__cache.write_data(CACHE_RANK_BLUR, blurNormalize)
-        Log.d(f"Visual rank length {len(motionNormalize)}  {len(blurNormalize)}")
+        self.__cache.write_data(CACHE_RANK_MOTION, motion_normalize)
+        self.__cache.write_data(CACHE_RANK_BLUR, blur_normalize)
+        Log.d(f"Visual rank length {len(motion_normalize)}  {len(blur_normalize)}")
         Log.i(f"Visual ranking saved .............")
 
     def __set_video_fps(self):
@@ -109,15 +109,15 @@ class Visual:
         """
         Function to set the original video frame count to cache
         """
-        self.__cache.write_data(CACHE_FRAME_COUNT, self.__frameCount)
+        self.__cache.write_data(CACHE_FRAME_COUNT, self.__frame_count)
 
     def __del__(self):
         """
         Clean ups
         """
         del self.__cache
-        if self.__videoGetter is not None:
-            del self.__videoGetter
+        if self.__video_getter is not None:
+            del self.__video_getter
 
         Log.d("Cleaning up.")
 
@@ -144,36 +144,36 @@ class Visual:
         self.__motion = list()
         self.__blur = list()
 
-        self.__videoGetter = VideoGet(str(inputFile)).start()
-        myClip = self.__videoGetter.stream
+        self.__video_getter = VideoGet(str(inputFile)).start()
+        my_clip = self.__video_getter.stream
 
-        if self.__videoGetter.get_queue_size() == 0:
+        if self.__video_getter.get_queue_size() == 0:
             sleep(1)
             Log.d(f"Waiting for the buffer to fill up.")
 
-        fps = myClip.get(cv2.CAP_PROP_FPS)
-        totalFrames = myClip.get(cv2.CAP_PROP_FRAME_COUNT)
+        fps = my_clip.get(cv2.CAP_PROP_FPS)
+        total_frames = my_clip.get(cv2.CAP_PROP_FRAME_COUNT)
 
         self.__fps = fps
-        self.__frameCount = totalFrames
+        self.__frame_count = total_frames
         self.__set_video_fps()
         self.__set_video_frame_count()
         self.__cache.write_data(CACHE_VIDEO_WIDTH, cv2.CAP_PROP_FRAME_WIDTH)
         self.__cache.write_data(CACHE_VIDEO_HEIGHT, cv2.CAP_PROP_FRAME_HEIGHT)
 
         # printing some info
-        Log.d(f"Total count of video frames :: {totalFrames}")
+        Log.d(f"Total count of video frames :: {total_frames}")
         Log.i(f"Video fps :: {fps}")
         Log.i(f"Bit rate :: {cv2.CAP_PROP_BITRATE}")
         Log.i(f"Video format :: {cv2.CAP_PROP_FORMAT}")
         Log.i(f"Video four cc :: {cv2.CAP_PROP_FOURCC}")
 
         count = 0
-        firstFrame = self.__videoGetter.read()
-        firstFrameProcessed = True
+        first_frame = self.__video_getter.read()
+        first_frame_processed = True
 
-        while self.__videoGetter.more():
-            frame = self.__videoGetter.read()
+        while self.__video_getter.more():
+            frame = self.__video_getter.read()
 
             if frame is None:
                 break
@@ -185,13 +185,13 @@ class Visual:
             self.__blur.append(self.__detect_blur(frame))
             frame = cv2.GaussianBlur(frame, (21, 21), 0)
 
-            if firstFrameProcessed:
-                firstFrame = cv2.cvtColor(firstFrame, cv2.COLOR_BGR2GRAY)
-                firstFrame = cv2.GaussianBlur(firstFrame, (21, 21), 0)
-                firstFrameProcessed = False
+            if first_frame_processed:
+                first_frame = cv2.cvtColor(first_frame, cv2.COLOR_BGR2GRAY)
+                first_frame = cv2.GaussianBlur(first_frame, (21, 21), 0)
+                first_frame_processed = False
 
-            frameDelta = cv2.absdiff(firstFrame, frame)
-            thresh = cv2.threshold(frameDelta, self.__motionThreshold, 255, cv2.THRESH_BINARY)[1]
+            frameDelta = cv2.absdiff(first_frame, frame)
+            thresh = cv2.threshold(frameDelta, self.__motion_threshold, 255, cv2.THRESH_BINARY)[1]
 
             threshMax = np.max(thresh)
             if threshMax > 0:
@@ -202,8 +202,8 @@ class Visual:
             if display:
 
                 # adding the frame to the pipe
-                if self.__videoPipe is not None:
-                    self.__videoPipe.put(original)
+                if self.__video_pipe is not None:
+                    self.__video_pipe.put(original)
 
                 # not a ui request, so this works
                 else:
@@ -211,19 +211,19 @@ class Visual:
                     # if the `q` key is pressed, break from the loop
 
             # assigning the processed frame as the first frame to cal diff later on
-            firstFrame = frame
+            first_frame = frame
 
             # setting progress on the ui
             if pipe is not None:
-                pipe.send(float((count / totalFrames) * 100))
+                pipe.send(float((count / total_frames) * 100))
 
         # completing the progress
         if pipe is not None:
             pipe.send(99.0)
 
         # clearing memory
-        myClip.release()
-        self.__videoGetter.stop()
+        my_clip.release()
+        self.__video_getter.stop()
 
         # calling the normalization of ranking
         self.__timed_ranking_normalize()
@@ -239,4 +239,4 @@ class Visual:
         pipe : some queue
             add frames and continuous read to the ui display
         """
-        self.__videoPipe = pipe
+        self.__video_pipe = pipe

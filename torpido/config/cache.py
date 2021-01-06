@@ -15,14 +15,14 @@ class Cache:
 
     Attributes
     ----------
-    __fileName : str
+    __file_name : str
         file path and name for the cache file to store the data
     """
 
     def __init__(self):
         if os.path.isdir(os.path.join(os.getcwd(), CACHE_DIR)) is False:
             os.mkdir(os.path.join(os.getcwd(), CACHE_DIR))
-        self.__fileName = os.path.join(os.getcwd(), CACHE_DIR, CACHE_NAME)
+        self.__file_name = os.path.join(os.getcwd(), CACHE_DIR, CACHE_NAME)
 
     def write_data(self, key, value):
         """
@@ -37,14 +37,14 @@ class Cache:
             Value to store any object can be store
 
         """
-        if os.path.isfile(self.__fileName):
-            data = load(self.__fileName)
+        if os.path.isfile(self.__file_name):
+            data = load(self.__file_name)
             data[key] = value
-            dump(data, self.__fileName)
+            dump(data, self.__file_name)
         else:
             data = dict()
             data[key] = value
-            dump(data, self.__fileName)
+            dump(data, self.__file_name)
 
         Log.d(f"[CACHE] : {key} is stored")
 
@@ -63,8 +63,8 @@ class Cache:
         result
             if exists cache else None
         """
-        if os.path.isfile(self.__fileName):
-            data = load(self.__fileName)
+        if os.path.isfile(self.__file_name):
+            data = load(self.__file_name)
             if key in data:
                 return data[key]
             else:

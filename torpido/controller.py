@@ -47,27 +47,27 @@ class Controller:
     ----------
     __App : ui controller
         middleware of the controller and the ui
-    __videoFile : str
+    __video_file : str
         input video file to process
-    __outputFile : str
+    __output_file : str
         output video file generated
-    __audioFile : str
+    __audio_file : str
         input audio file split from the video file
-    __audioProcess : Process
+    __audio_process : Process
         process to perform audio processing
-    __visualProcess : Process
+    __visual_process : Process
         process to perform video processing
-    __textualProcess : Process
+    __textual_process : Process
         process to perform video text detection
-    __deNoisedAudioFile : str
+    __de_noised_audio_file : str
         output audio file from the audio processing
-    __videoDisplay : bool
+    __video_display : bool
         displays the output video
-    __textDetectDisplay : bool
+    __text_detect_display : bool
         displays the output video when text is detected
-    __snrPlotDisplay : bool
+    __snr_plot_display : bool
         displays the snr plot for the audio
-    __analyticsDisplay : bool
+    __analytics_display : bool
         displays the analytics of the processing
     __visual : Visual
         object of the video processing class
@@ -85,29 +85,29 @@ class Controller:
         object of the class watcher that monitors cpu and ram usage
     __pool : ManagerPool
         object of the class ManagerPool that sets nice value for the processes
-    __progressParentPipe : link
+    __progress_parent_pipe : link
         parent communication pipe for the progress bar
-    __progressChildPipe : link
+    __progress_child_pipe : link
         child communication pipe for the progress bar
-    __loggerPipe : link / queue
+    __logger_pipe : link / queue
         communication link between the logs and the ui
-    __videoPipe : link
+    __video_pipe : link
         communication pipe for the video display in the gui thread
     """
 
     def __init__(self):
         self.__App = None
-        self.__videoFile = None
-        self.__outputFile = None
-        self.__audioFile = None
-        self.__audioProcess = None
-        self.__visualProcess = None
-        self.__textualProcess = None
-        self.__deNoisedAudioFile = None
-        self.__videoDisplay = False
-        self.__textDetectDisplay = False
-        self.__snrPlotDisplay = False
-        self.__analyticsDisplay = False
+        self.__video_file = None
+        self.__output_file = None
+        self.__audio_file = None
+        self.__audio_process = None
+        self.__visual_process = None
+        self.__textual_process = None
+        self.__de_noised_audio_file = None
+        self.__video_display = False
+        self.__text_detect_display = False
+        self.__snr_plot_display = False
+        self.__analytics_display = False
         self.__visual = Visual()
         self.__auditory = Auditory()
         self.__ffmpeg = FFMPEG()
@@ -129,14 +129,14 @@ class Controller:
             return
 
         # communication links
-        self.__progressParentPipe, self.__progressChildPipe = None, None
-        self.__loggerPipe = Queue()
-        self.__videoPipe = None
+        self.__progress_parent_pipe, self.__progress_child_pipe = None, None
+        self.__logger_pipe = Queue()
+        self.__video_pipe = None
 
         # communication for logs to ui
-        Log.set_handler(self.__loggerPipe)
+        Log.set_handler(self.__logger_pipe)
 
-    def start_processing(self, app, inputFile, intro=None, extro=None):
+    def start_processing(self, app, input_file, intro=None, extro=None):
         """
         Process the input file call splitting function to split the input video file into
         audio and create 3 processes each for feature ranking, After completion of all the
@@ -147,7 +147,7 @@ class Controller:
         ----------
         app : some controller object
             handles ui interactions
-        inputFile : str
+        input_file : str
             input video file (validating if its in supported format)
         intro : str
             name of the intro video file
@@ -169,8 +169,6 @@ class Controller:
         """
         logo()
 
-        print(intro, extro)
-
         # adding optional video file
         self.__ffmpeg.set_intro_video(intro)
         self.__ffmpeg.set_outro_video(extro)
@@ -185,40 +183,40 @@ class Controller:
                 self.__watcher.enable(self, enable=True)
 
             # creating pipe for progress bar communication
-            self.__progressParentPipe, self.__progressChildPipe = Pipe()
+            self.__progress_parent_pipe, self.__progress_child_pipe = Pipe()
 
             # starting listening on the communication link
             Thread(target=self.set_percent, args=()).start()
             Thread(target=self.set_log, args=()).start()
 
             # initialize the queue and thread
-            if self.__videoDisplay:
-                self.__videoPipe = Queue()
-                self.__visual.set_pipe(self.__videoPipe)
+            if self.__video_display:
+                self.__video_pipe = Queue()
+                self.__visual.set_pipe(self.__video_pipe)
                 Thread(target=self.set_video, args=()).start()
 
         # if from terminal
         else:
-            self.__textDetectDisplay = True
+            self.__text_detect_display = True
 
-        if not os.path.isfile(inputFile):
+        if not os.path.isfile(input_file):
             Log.e(f"Video file does not exists.")
             return
 
-        if not check_type_video(inputFile):
+        if not check_type_video(input_file):
             return
 
-        if self.__ffmpeg.split_video_audio(inputFile):
+        if self.__ffmpeg.split_video_audio(input_file):
             Log.d("The input video has been split successfully")
         # something went wrong [mostly video does not contain any audio]
         else:
             Log.e("Logging out")
             return
 
-        self.__videoFile = inputFile
-        self.__outputFile = self.__ffmpeg.get_output_file_name_path()
-        self.__audioFile = self.__ffmpeg.get_input_audio_file_name_path()
-        self.__deNoisedAudioFile = self.__ffmpeg.get_output_audio_file_name_path()
+        self.__video_file = input_file
+        self.__output_file = self.__ffmpeg.get_output_file_name_path()
+        self.__audio_file = self.__ffmpeg.get_input_audio_file_name_path()
+        self.__de_noised_audio_file = self.__ffmpeg.get_output_audio_file_name_path()
 
         # starting the sub processes
         self.__start_modules()
@@ -232,34 +230,34 @@ class Controller:
         if self.__watcher is not None:
             self.__watcher.start()  # starting the watcher
 
-        self.__audioProcess = Process(target=self.__auditory.start_processing,
-                                      args=(self.__audioFile,
-                                            self.__deNoisedAudioFile,
-                                            self.__snrPlotDisplay))
+        self.__audio_process = Process(target=self.__auditory.start_processing,
+                                       args=(self.__audio_file,
+                                             self.__de_noised_audio_file,
+                                             self.__snr_plot_display))
 
-        self.__visualProcess = Process(target=self.__visual.start_processing,
-                                       args=(self.__progressChildPipe,
-                                             self.__videoFile,
-                                             self.__videoDisplay))
+        self.__visual_process = Process(target=self.__visual.start_processing,
+                                        args=(self.__progress_child_pipe,
+                                              self.__video_file,
+                                              self.__video_display))
 
-        self.__textualProcess = Process(target=self.__textual.start_processing,
-                                        args=(self.__videoFile,
-                                              self.__textDetectDisplay))
+        self.__textual_process = Process(target=self.__textual.start_processing,
+                                         args=(self.__video_file,
+                                               self.__text_detect_display))
 
         # starting the processes
-        self.__audioProcess.start()
-        self.__visualProcess.start()
-        self.__textualProcess.start()
+        self.__audio_process.start()
+        self.__visual_process.start()
+        self.__textual_process.start()
 
         # adding the processes to the manager pool
-        self.__pool.add(self.__audioProcess.pid)
-        self.__pool.add(self.__visualProcess.pid)
-        self.__pool.add(self.__textualProcess.pid)
+        self.__pool.add(self.__audio_process.pid)
+        self.__pool.add(self.__visual_process.pid)
+        self.__pool.add(self.__textual_process.pid)
 
         # waiting for the processes to terminate
-        self.__audioProcess.join()
-        self.__visualProcess.join()
-        self.__textualProcess.join()
+        self.__audio_process.join()
+        self.__visual_process.join()
+        self.__textual_process.join()
 
         # running the final pass
         self.__completed()
@@ -276,7 +274,7 @@ class Controller:
             self.__watcher.stop()  # ending the watcher
 
         rankings = read_rankings()
-        if self.__analyticsDisplay:
+        if self.__analytics_display:
             #  separate process for analytics
             Process(target=self.__analytics.analyze, args=(rankings,)).start()
 
@@ -301,21 +299,21 @@ class Controller:
         """ clean up """
 
         # terminating all processing tasks
-        if self.__visualProcess is not None:
-            self.__visualProcess.terminate()
+        if self.__visual_process is not None:
+            self.__visual_process.terminate()
 
-        if self.__audioProcess is not None:
-            self.__audioProcess.terminate()
+        if self.__audio_process is not None:
+            self.__audio_process.terminate()
 
-        if self.__textualProcess is not None:
-            self.__textualProcess.terminate()
+        if self.__textual_process is not None:
+            self.__textual_process.terminate()
 
         # closing all communication links
-        if self.__progressParentPipe is not None:
-            self.__progressParentPipe.close()
+        if self.__progress_parent_pipe is not None:
+            self.__progress_parent_pipe.close()
 
-        if self.__progressChildPipe is not None:
-            self.__progressChildPipe.close()
+        if self.__progress_child_pipe is not None:
+            self.__progress_child_pipe.close()
 
         Log.d("Terminating the processes")
         Log.d(f"Garbage collecting .. {gc.collect()}")
@@ -326,10 +324,10 @@ class Controller:
 
     def __close_comm(self):
         """ Close all the pipes """
-        if self.__progressParentPipe is not None:
-            self.__progressParentPipe.close()
-        if self.__progressChildPipe is not None:
-            self.__progressChildPipe.close()
+        if self.__progress_parent_pipe is not None:
+            self.__progress_parent_pipe.close()
+        if self.__progress_child_pipe is not None:
+            self.__progress_child_pipe.close()
 
     def set_save_logs(self, value=False):
         """ Save all the logs to a file """
@@ -337,20 +335,20 @@ class Controller:
 
     def set_video_display(self, value=False):
         """ Display the processing video output """
-        self.__videoDisplay = value
+        self.__video_display = value
 
     def set_snr_plot(self, value=False):
         """ Display the snr plot for the audio """
-        self.__snrPlotDisplay = value
+        self.__snr_plot_display = value
 
     def set_ranking_plot(self, value=False):
         """ Display the analytics """
-        self.__analyticsDisplay = value
+        self.__analytics_display = value
 
     def set_percent(self):
         """ Send the signal to the ui with the percentage of processing """
         while True:
-            value = self.__progressParentPipe.recv()
+            value = self.__progress_parent_pipe.recv()
 
             # checking whether the request is from UI
             if self.__App is not None and value is not None:
@@ -368,7 +366,7 @@ class Controller:
         """ Send the signal to the ui with the log of the processing """
         while True:
             try:
-                message = self.__loggerPipe.get()
+                message = self.__logger_pipe.get()
 
                 # checking whether the request is from UI
                 if self.__App is not None and message is not None:
@@ -382,7 +380,7 @@ class Controller:
         """ Send the signal to the ui with the video frame to display """
         while True:
             try:
-                frame = self.__videoPipe.get()
+                frame = self.__video_pipe.get()
 
                 # checking whether the request is from UI
                 if self.__App is not None and frame is not None:

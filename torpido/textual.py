@@ -33,41 +33,41 @@ class Textual:
     ----------
     __fps : float
         video fps
-    __frameCount : int
+    __frame_count : int
         number of frames in the video
-    __textRanks : list
+    __text_ranks : list
         list of the ranks
-    __videoGetter : VideoGet
+    __video_getter : VideoGet
         object of the video get to read the video through thread
     __cache : Cache
         object of the Cache to store the ranking
-    __minConfidence : int
+    __min_confidence : int
         minimum confidence to determine if the video contains text
     __WIDTH : int, default=320
         the east model requires the frame to be size of multiple of 32x32
     __HEIGHT : int, default=320
         height of the frame
-    __skipFrames : int
+    __skip_frames : int
         no of frames to skip
     __net : object
         loaded east model
-    __textDetectLayerName
+    __text_detect_layer_name
         layer name to detect the text in the video and return the code
-    __textDisplayLayerNames
+    __text_display_layer_names
         layers to detect and return the coordinates of the boxes of text detected
     """
 
     def __init__(self):
         cv2.setUseOptimized(True)
         self.__fps = None
-        self.__frameCount = None
-        self.__textRanks = None
-        self.__videoGetter = None
+        self.__frame_count = None
+        self.__text_ranks = None
+        self.__video_getter = None
         self.__cache = Cache()
-        self.__minConfidence = TEXT_MIN_CONFIDENCE
+        self.__min_confidence = TEXT_MIN_CONFIDENCE
         self.__WIDTH = 320  # this val should be multiple of 32
         self.__HEIGHT = 320  # same thing for this
-        self.__skipFrames = TEXT_SKIP_FRAMES
+        self.__skip_frames = TEXT_SKIP_FRAMES
 
         # initializing the model
         # reading the model in the memory
@@ -77,10 +77,10 @@ class Textual:
             raise EastModelEnvironmentMissing
 
         # adding output layer to only return confidence for text
-        self.__textDetectLayerName = ["feature_fusion/Conv_7/Sigmoid"]
+        self.__text_detect_layer_name = ["feature_fusion/Conv_7/Sigmoid"]
 
         # adding output layers to the model with text detected boxes
-        self.__textDisplayLayerNames = ["feature_fusion/Conv_7/Sigmoid",
+        self.__text_display_layer_names = ["feature_fusion/Conv_7/Sigmoid",
                                         "feature_fusion/concat_3"]
 
     def __run_text_detect(self, blob):
@@ -99,15 +99,15 @@ class Textual:
             True denotes text detected
         """
         self.__net.setInput(blob)
-        scores = self.__net.forward(self.__textDetectLayerName)
-        numRows, numCols = np.asarray(scores).shape[3: 5]
+        scores = self.__net.forward(self.__text_detect_layer_name)
+        num_rows, num_cols = np.asarray(scores).shape[3: 5]
         confidences = []
 
         # since image is 320x320 the output is 80x80 (scores)
-        for x in range(0, numRows):
+        for x in range(0, num_rows):
             scoreData = scores[0][0][0][x]
-            for y in range(0, numCols):
-                if scoreData[y] < self.__minConfidence:
+            for y in range(0, num_cols):
+                if scoreData[y] < self.__min_confidence:
                     continue
 
                 confidences.append(scoreData[y])
@@ -138,14 +138,14 @@ class Textual:
         """
         # running the model
         self.__net.setInput(blob=blob)
-        scores, geometry = self.__net.forward(self.__textDisplayLayerNames)
+        scores, geometry = self.__net.forward(self.__text_display_layer_names)
 
-        numRows, numCols = scores.shape[2:4]
+        num_rows, num_cols = scores.shape[2:4]
         rect = []
         confidences = []
 
         # since image is 320x320 the output is 80x80 (scores)
-        for y in range(0, numRows):
+        for y in range(0, num_rows):
             scoresData = scores[0, 0, y]
             xData0 = geometry[0, 0, y]
             xData1 = geometry[0, 1, y]
@@ -153,9 +153,9 @@ class Textual:
             xData3 = geometry[0, 3, y]
             anglesData = geometry[0, 4, y]
 
-            for x in range(0, numCols):
+            for x in range(0, num_cols):
                 # if our score does not have sufficient probability, ignore it
-                if scoresData[x] < self.__minConfidence:
+                if scoresData[x] < self.__min_confidence:
                     continue
 
                 # compute the offset factor as our resulting feature maps will
@@ -219,16 +219,16 @@ class Textual:
         we will read the list and slice the video to get 1 sec of frames and get
         mean/average as the rank for the 1 sec
         """
-        textNormalize = []
-        for i in range(0, int(self.__frameCount), int(self.__fps)):
-            if len(self.__textRanks) >= (i + int(self.__fps)):
-                textNormalize.append(np.mean(self.__textRanks[i: i + int(self.__fps)]))
+        text_normalize = []
+        for i in range(0, int(self.__frame_count), int(self.__fps)):
+            if len(self.__text_ranks) >= (i + int(self.__fps)):
+                text_normalize.append(np.mean(self.__text_ranks[i: i + int(self.__fps)]))
             else:
                 break
 
         # saving all processed stuffs
-        self.__cache.write_data(CACHE_RANK_TEXT, textNormalize)
-        Log.d(f"Textual rank length {len(textNormalize)}")
+        self.__cache.write_data(CACHE_RANK_TEXT, text_normalize)
+        Log.d(f"Textual rank length {len(text_normalize)}")
         Log.i("Textual ranking saved .............")
 
     def __del__(self):
@@ -236,7 +236,7 @@ class Textual:
         clean ups
         """
         del self.__net
-        del self.__videoGetter
+        del self.__video_getter
         Log.d("Cleaning up.")
 
     def start_processing(self, inputFile, display=False):
@@ -256,23 +256,23 @@ class Textual:
             Log.e(f"File {inputFile} does not exists")
             return
 
-        self.__videoGetter = VideoGet(str(inputFile)).start()
-        myClip = self.__videoGetter.stream
+        self.__video_getter = VideoGet(str(inputFile)).start()
+        my_clip = self.__video_getter.stream
 
-        if self.__videoGetter.get_queue_size() == 0:
+        if self.__video_getter.get_queue_size() == 0:
             time.sleep(0.5)
             Log.d("Waiting for the buffer to fill up.")
 
-        self.__fps = myClip.get(cv2.CAP_PROP_FPS)
-        self.__frameCount = myClip.get(cv2.CAP_PROP_FRAME_COUNT)
-        self.__skipFrames = int(self.__fps * self.__skipFrames)
+        self.__fps = my_clip.get(cv2.CAP_PROP_FPS)
+        self.__frame_count = my_clip.get(cv2.CAP_PROP_FRAME_COUNT)
+        self.__skip_frames = int(self.__fps * self.__skip_frames)
 
         # maintaining the ranks for text detection
         count = 0
-        self.__textRanks = []
+        self.__text_ranks = []
 
-        while self.__videoGetter.more():
-            frame = self.__videoGetter.read()
+        while self.__video_getter.more():
+            frame = self.__video_getter.read()
 
             if frame is None:
                 break
@@ -286,7 +286,7 @@ class Textual:
             frame = cv2.resize(frame, (W, H))
             count += 1
 
-            if count % self.__skipFrames == 0:
+            if count % self.__skip_frames == 0:
 
                 #  making the image blob
                 blob = cv2.dnn.blobFromImage(frame,
@@ -303,15 +303,15 @@ class Textual:
 
                 # if text is detected
                 if detectedText:
-                    self.__textRanks.extend([RANK_TEXT] * int(self.__skipFrames))
+                    self.__text_ranks.extend([RANK_TEXT] * int(self.__skip_frames))
                     Log.d("Text detected.")
                 else:
-                    self.__textRanks.extend([0] * int(self.__skipFrames))
+                    self.__text_ranks.extend([0] * int(self.__skip_frames))
                     Log.d("No text detected.")
 
         # clearing the memory
-        myClip.release()
-        self.__videoGetter.stop()
+        my_clip.release()
+        self.__video_getter.stop()
         cv2.destroyAllWindows()
 
         # calling the normalization of ranking

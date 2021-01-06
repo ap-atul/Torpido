@@ -9,7 +9,7 @@ from torpido.exceptions.custom import AudioStreamMissingException, FFmpegProcess
 from torpido.tools.logger import Log
 
 
-def _build_split_command(inputFile, outputAudioFile):
+def _build_split_command(input_file, output_audio_file):
     """
     Creates a list for each bit of the command line to run
     since it is a list the command line is secure and can
@@ -18,9 +18,9 @@ def _build_split_command(inputFile, outputAudioFile):
 
     Parameters
     ----------
-    inputFile : str
+    input_file : str
         input video file name and path
-    outputAudioFile : str
+    output_audio_file : str
         output audio file name and path
 
     Returns
@@ -43,12 +43,12 @@ def _build_split_command(inputFile, outputAudioFile):
         'ffmpeg',
         '-y',
         '-i',
-        str(inputFile),
-        str(outputAudioFile)
+        str(input_file),
+        str(output_audio_file)
     ]
 
 
-def split(inputFile, outputAudioFile):
+def split(input_file, output_audio_file):
     """
     Splits the input video file into audio for Audio Processing.
 
@@ -57,9 +57,9 @@ def split(inputFile, outputAudioFile):
 
     Parameters
     ----------
-    inputFile : str
+    input_file : str
         name of the input video file
-    outputAudioFile : str
+    output_audio_file : str
         name of the output audio file
 
     Yields
@@ -67,7 +67,9 @@ def split(inputFile, outputAudioFile):
     str
         yields std out logs in string
     """
-    command = _build_split_command(inputFile, outputAudioFile)
+    command = _build_split_command(input_file, output_audio_file)
+    Log.i(command)
+
     run = subprocess.Popen(args=command,
                            stdout=subprocess.PIPE,
                            stderr=subprocess.STDOUT,
@@ -81,7 +83,7 @@ def split(inputFile, outputAudioFile):
         raise AudioStreamMissingException
 
 
-def _build_merge_command(videoFile, audioFile, outputFile, timestamps, intro=None, extro=None):
+def _build_merge_command(video_file, audio_file, output_file, timestamps, intro=None, extro=None):
     """
     Building a complex filter
     command line to clip portions based on the timestamps, the copies used
@@ -94,11 +96,11 @@ def _build_merge_command(videoFile, audioFile, outputFile, timestamps, intro=Non
         exit video
     intro : str
         intro video
-    videoFile : str
+    video_file : str
         original input video file
-    audioFile : str
+    audio_file : str
         processed audio file (de-noised)
-    outputFile : str
+    output_file : str
         final output video file edited by Torpido
     timestamps : iterable
         start and end timestamps of the video clips to trim
@@ -143,9 +145,9 @@ def _build_merge_command(videoFile, audioFile, outputFile, timestamps, intro=Non
     command = ['ffmpeg',
                ' -y',
                ' -i ',
-               str(videoFile),
+               str(video_file),
                ' -i ',
-               str(audioFile)]
+               str(audio_file)]
 
     if intro is not None:
         command.append(' -i %s' % str(intro))
@@ -202,12 +204,12 @@ def _build_merge_command(videoFile, audioFile, outputFile, timestamps, intro=Non
                     ' "[video]"',
                     ' -map',
                     ' "[audio]" ',
-                    str(outputFile)])
+                    str(output_file)])
 
     return "".join(command)
 
 
-def merge(videoFile, audioFile, outputFile, timestamps, intro=None, extro=None):
+def merge(video_file, audio_file, output_file, timestamps, intro=None, extro=None):
     """
     Generate the command for complex filter according to the timestamps and encode the output video. Merge the
     input video file and replace the audio stream with the de-noised audio stream
@@ -222,11 +224,11 @@ def merge(videoFile, audioFile, outputFile, timestamps, intro=None, extro=None):
 
     Parameters
     ----------
-    videoFile : str
+    video_file : str
         input video file
-    audioFile : str
+    audio_file : str
         de-noised audio file
-    outputFile : str
+    output_file : str
         final output video file
     timestamps : list
         list of clip time stamps with start and end times
@@ -240,8 +242,9 @@ def merge(videoFile, audioFile, outputFile, timestamps, intro=None, extro=None):
     str
         continuous std out logs
     """
-    command = _build_merge_command(videoFile, audioFile, outputFile, timestamps, intro, extro)
-    print(command)
+    command = _build_merge_command(video_file, audio_file, output_file, timestamps, intro, extro)
+    Log.i(command)
+
     run = subprocess.Popen(args=command,
                            shell=True,
                            stdout=subprocess.PIPE,

@@ -34,7 +34,7 @@ class Analytics:
         rank list for the text feature
     __audio : list
         rank list for the audio feature
-    __rankLength : int
+    __rank_length : int
         max length of the ranks
     __ranks : list
         sum of all the ranks
@@ -46,12 +46,12 @@ class Analytics:
 
     def __init__(self):
         self.__motion, self.__blur, self.__text, self.__audio = None, None, None, None
-        self.__rankLength = None
+        self.__rank_length = None
         self.__ranks = None
         self.__data = None
         self.__timestamps = None
-        self.__outputLength = None
-        self.__actualLength = None
+        self.__output_length = None
+        self.__actual_length = None
         self.__cache = Cache()
 
     def analyze(self, data):
@@ -66,10 +66,10 @@ class Analytics:
         """
         self.__data = data
         self.__motion, self.__blur, self.__text, self.__audio = self.__data
-        self.__rankLength = len(self.__motion)
+        self.__rank_length = len(self.__motion)
 
         self.__ranks = [self.__motion[i] + self.__blur[i] +
-                        self.__text[i] + self.__audio[i] for i in range(self.__rankLength)]
+                        self.__text[i] + self.__audio[i] for i in range(self.__rank_length)]
 
         try:
             self.__timestamps = get_timestamps(data=data)
@@ -77,9 +77,9 @@ class Analytics:
             Log.e(RankingOfFeatureMissing.cause)
             return
 
-        self.__outputLength = get_output_video_length(self.__timestamps)
-        self.__actualLength = abs(self.__cache.read_data(CACHE_FRAME_COUNT) /
-                                  self.__cache.read_data(CACHE_FPS))
+        self.__output_length = get_output_video_length(self.__timestamps)
+        self.__actual_length = abs(self.__cache.read_data(CACHE_FRAME_COUNT) /
+                                   self.__cache.read_data(CACHE_FPS))
 
         self.__plot_rank_line()
         self.__plot_sum_line()
@@ -90,7 +90,7 @@ class Analytics:
         Plotting the ranks of each feature in the sub plot, with
         legends and color specified
         """
-        numbers = [i for i in range(self.__rankLength)]
+        numbers = [i for i in range(self.__rank_length)]
         fig = plt.figure()
 
         ax = fig.add_subplot(411)
@@ -124,7 +124,7 @@ class Analytics:
         custom_lines = [Line2D([0], [0], color='red', lw=4),
                         Line2D([0], [0], color='green', lw=4)]
 
-        plt.plot([i for i in range(self.__rankLength)], self.__ranks)
+        plt.plot([i for i in range(self.__rank_length)], self.__ranks)
         plt.legend(custom_lines, ['Start time', 'End time'], loc=0)
         plt.title("Final summation of all ranks")
         plt.xlabel("Video duration (sec)")
@@ -144,5 +144,5 @@ class Analytics:
             return
 
         Log.i(f"Clipping a total of {len(self.__timestamps)} sub portion(s).")
-        Log.i(f"Output video length would be approx. :: {self.__outputLength} s or {float(self.__outputLength / 60)} m")
-        Log.i(f"Percent of video trimmed :: {100 - ((self.__outputLength * 100) / self.__actualLength)} %")
+        Log.i(f"Output video length would be approx. :: {self.__output_length} s or {float(self.__output_length / 60)} m")
+        Log.i(f"Percent of video trimmed :: {100 - ((self.__output_length * 100) / self.__actual_length)} %")
