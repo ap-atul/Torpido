@@ -126,47 +126,47 @@ class Controller:
             self.__textual = Textual()
         except EastModelEnvironmentMissing:
             Log.e(EastModelEnvironmentMissing.cause)
-            return
+			return
 
-        # communication links
-        self.__progressParentPipe, self.__progressChildPipe = None, None
-        self.__loggerPipe = Queue()
-        self.__videoPipe = None
+		# communication links
+		self.__progressParentPipe, self.__progressChildPipe = None, None
+		self.__loggerPipe = Queue()
+		self.__videoPipe = None
 
-        # communication for logs to ui
+		# communication for logs to ui
 		Log.set_handler(self.__loggerPipe)
 
 	def start_processing(self, app, inputFile, intro=None, extro=None):
 		"""
-		Process the input file call splitting function to split the input video file into
-		audio and create 3 processes each for feature ranking, After completion of all the
-		processes (waiting). Call the completed process method the start the timestamp
-		extraction from the ranks
+        Process the input file call splitting function to split the input video file into
+        audio and create 3 processes each for feature ranking, After completion of all the
+        processes (waiting). Call the completed process method the start the timestamp
+        extraction from the ranks
 
-		Parameters
-		----------
-		app : some controller object
-			handles ui interactions
-		inputFile : str
-			input video file (validating if its in supported format)
-		intro : str
-			name of the intro video file
-		extro : str
-			name of the extro video file
+        Parameters
+        ----------
+        app : some controller object
+            handles ui interactions
+        inputFile : str
+            input video file (validating if its in supported format)
+        intro : str
+            name of the intro video file
+        extro : str
+            name of the extro video file
 
-		Notes
-		------
-		Using Multi-processing instead of Multi-threading to avoid resources sharing,
-		resources like Queue that is used to reading the video using Thread. Threads
-		shared the Queue and caused skipping of lots of frames and messing with the
-		ranking system completely.
+        Notes
+        ------
+        Using Multi-processing instead of Multi-threading to avoid resources sharing,
+        resources like Queue that is used to reading the video using Thread. Threads
+        shared the Queue and caused skipping of lots of frames and messing with the
+        ranking system completely.
 
-		Difference between Threading and Processing
+        Difference between Threading and Processing
 
-			- Threading share data and variables without asking
-			- Processing won't to that unless told so
+            - Threading share data and variables without asking
+            - Processing won't to that unless told so
 
-		"""
+        """
 		logo()
 
 		print(intro, extro)
@@ -197,13 +197,13 @@ class Controller:
 				self.__visual.set_pipe(self.__videoPipe)
 				Thread(target=self.set_video, args=()).start()
 
-        # if from terminal
-        else:
-            self.__textDetectDisplay = True
+		# if from terminal
+		else:
+			self.__textDetectDisplay = True
 
-        if not os.path.isfile(inputFile):
-            Log.e(f"Video file does not exists.")
-            return
+		if not os.path.isfile(inputFile):
+			Log.e(f"Video file does not exists.")
+			return
 
 		if not check_type_video(inputFile):
 			return
@@ -225,9 +225,9 @@ class Controller:
 
 	def __start_modules(self):
 		"""
-		Creating 3 processes using the Process class of the multi-processing module.
-		FFmpeg separated files are referenced from the Controller public variables
-		"""
+        Creating 3 processes using the Process class of the multi-processing module.
+        FFmpeg separated files are referenced from the Controller public variables
+        """
 
 		if self.__watcher is not None:
 			self.__watcher.start()  # starting the watcher
@@ -246,42 +246,42 @@ class Controller:
 										args=(self.__videoFile,
 											  self.__textDetectDisplay))
 
-        # starting the processes
-        self.__audioProcess.start()
-        self.__visualProcess.start()
-        self.__textualProcess.start()
+		# starting the processes
+		self.__audioProcess.start()
+		self.__visualProcess.start()
+		self.__textualProcess.start()
 
-        # adding the processes to the manager pool
-        self.__pool.add(self.__audioProcess.pid)
-        self.__pool.add(self.__visualProcess.pid)
-        self.__pool.add(self.__textualProcess.pid)
+		# adding the processes to the manager pool
+		self.__pool.add(self.__audioProcess.pid)
+		self.__pool.add(self.__visualProcess.pid)
+		self.__pool.add(self.__textualProcess.pid)
 
-        # waiting for the processes to terminate
-        self.__audioProcess.join()
-        self.__visualProcess.join()
-        self.__textualProcess.join()
+		# waiting for the processes to terminate
+		self.__audioProcess.join()
+		self.__visualProcess.join()
+		self.__textualProcess.join()
 
-        # running the final pass
+		# running the final pass
 		self.__completed()
 
 	def __completed(self):
 		"""
-		Calls the merging function to merge the processed audio and the input
-		video file. Once completed final video is outputted and the audio files
-		generated are deleted as a part of the clean up process. Along with it
-		the garbage collection module does some clean ups too.
-		"""
+        Calls the merging function to merge the processed audio and the input
+        video file. Once completed final video is outputted and the audio files
+        generated are deleted as a part of the clean up process. Along with it
+        the garbage collection module does some clean ups too.
+        """
 
 		if self.__watcher is not None:
 			self.__watcher.stop()  # ending the watcher
 
 		rankings = read_rankings()
-        if self.__analyticsDisplay:
-            #  separate process for analytics
-            Process(target=self.__analytics.analyze, args=(rankings,)).start()
+		if self.__analyticsDisplay:
+			#  separate process for analytics
+			Process(target=self.__analytics.analyze, args=(rankings,)).start()
 
-        # cache file got missing
-        try:
+		# cache file got missing
+		try:
 			timestamps = get_timestamps(data=rankings)
 		except RankingOfFeatureMissing:
 			Log.e(RankingOfFeatureMissing.cause)
@@ -314,15 +314,15 @@ class Controller:
         if self.__progressParentPipe is not None:
             self.__progressParentPipe.close()
 
-        if self.__progressChildPipe is not None:
-            self.__progressChildPipe.close()
+		if self.__progressChildPipe is not None:
+			self.__progressChildPipe.close()
 
-        Log.d("Terminating the processes")
-        Log.d(f"Garbage collecting .. {gc.collect()}")
+		Log.d("Terminating the processes")
+		Log.d(f"Garbage collecting .. {gc.collect()}")
 
-    def __del__(self):
-        """ clean up """
-        self.clean()
+	def __del__(self):
+		""" clean up """
+		self.clean()
 
 	def __close_comm(self):
 		""" Close all the pipes """
@@ -361,8 +361,8 @@ class Controller:
 					self.__close_comm()
 					break
 
-            else:
-                sleep(0.1)
+			else:
+				sleep(0.1)
 
 	def set_log(self):
 		""" Send the signal to the ui with the log of the processing """
@@ -375,8 +375,8 @@ class Controller:
 					self.__App.set_message_log(message)
 				else:
 					sleep(0.3)
-            except EOFError as _:
-                pass
+			except EOFError as _:
+				pass
 
 	def set_video(self):
 		""" Send the signal to the ui with the video frame to display """
@@ -389,8 +389,8 @@ class Controller:
 					self.__App.set_video_frame(frame)
 				else:
 					sleep(0.2)
-            except EOFError as _:
-                pass
+			except EOFError as _:
+				pass
 
 	def set_cpu_complete(self, val):
 		""" Send the signal to the ui with the percent usage of the cpu """

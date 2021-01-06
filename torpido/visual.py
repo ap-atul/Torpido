@@ -54,62 +54,62 @@ class Visual:
         self.__videoPipe = None
 
     def __detect_blur(self, image):
-		"""
-		Laplacian take 2nd derivative of one channel of the image(gray scale)
-		It highlights regions of an image containing rapid intensity changes, much like the Sobel and Scharr operators.
-		And then calculates the variance (squared SD), then check if the variance satisfies the Threshold value/
+        """
+        Laplacian take 2nd derivative of one channel of the image(gray scale)
+        It highlights regions of an image containing rapid intensity changes, much like the Sobel and Scharr operators.
+        And then calculates the variance (squared SD), then check if the variance satisfies the Threshold value/
 
-		Parameters
-		---------
-		image : array
-			frame from the video file
-		"""
+        Parameters
+        ---------
+        image : array
+            frame from the video file
+        """
         # if blur rank is 0 else RANK_BLUR
         if cv2.Laplacian(image, cv2.CV_64F).var() >= self.__blurThreshold:
             return 0
         return RANK_BLUR
 
-	def __timed_ranking_normalize(self):
-		"""
-		Since ranking is added to frames, since frames are duration * fps
-		and audio frame system is different since frame are duration * rate
-		so we need to generalize the ranking system
-		sol: ranking sec of the video and audio, for than taking mean of the
-		frames to generate rank for video.
+    def __timed_ranking_normalize(self):
+        """
+        Since ranking is added to frames, since frames are duration * fps
+        and audio frame system is different since frame are duration * rate
+        so we need to generalize the ranking system
+        sol: ranking sec of the video and audio, for than taking mean of the
+        frames to generate rank for video.
 
-		Since ranking is 0 or 1, the mean will be different and we get more versatile
-		results.
+        Since ranking is 0 or 1, the mean will be different and we get more versatile
+        results.
 
-		We will read both the list and slice the video to get 1 sec of frames(1 * fps) and get
-		mean/average as the rank for the 1 sec
+        We will read both the list and slice the video to get 1 sec of frames(1 * fps) and get
+        mean/average as the rank for the 1 sec
 
-		"""
-		motionNormalize = []
-		blurNormalize = []
-		for i in range(0, int(self.__frameCount), int(self.__fps)):
-			if len(self.__motion) >= (i + int(self.__fps)):
-				motionNormalize.append(np.mean(self.__motion[i: i + int(self.__fps)]))
-				blurNormalize.append(np.mean(self.__blur[i: i + int(self.__fps)]))
-			else:
-				break
+        """
+        motionNormalize = []
+        blurNormalize = []
+        for i in range(0, int(self.__frameCount), int(self.__fps)):
+            if len(self.__motion) >= (i + int(self.__fps)):
+                motionNormalize.append(np.mean(self.__motion[i: i + int(self.__fps)]))
+                blurNormalize.append(np.mean(self.__blur[i: i + int(self.__fps)]))
+            else:
+                break
 
-		# saving all processed stuffs
-		self.__cache.write_data(CACHE_RANK_MOTION, motionNormalize)
-		self.__cache.write_data(CACHE_RANK_BLUR, blurNormalize)
-		Log.d(f"Visual rank length {len(motionNormalize)}  {len(blurNormalize)}")
-		Log.i(f"Visual ranking saved .............")
+        # saving all processed stuffs
+        self.__cache.write_data(CACHE_RANK_MOTION, motionNormalize)
+        self.__cache.write_data(CACHE_RANK_BLUR, blurNormalize)
+        Log.d(f"Visual rank length {len(motionNormalize)}  {len(blurNormalize)}")
+        Log.i(f"Visual ranking saved .............")
 
-	def __set_video_fps(self):
-		"""
-		Function to set the original video fps to cache
-		"""
-		self.__cache.write_data(CACHE_FPS, self.__fps)
+    def __set_video_fps(self):
+        """
+        Function to set the original video fps to cache
+        """
+        self.__cache.write_data(CACHE_FPS, self.__fps)
 
-	def __set_video_frame_count(self):
-		"""
-		Function to set the original video frame count to cache
-		"""
-		self.__cache.write_data(CACHE_FRAME_COUNT, self.__frameCount)
+    def __set_video_frame_count(self):
+        """
+        Function to set the original video frame count to cache
+        """
+        self.__cache.write_data(CACHE_FRAME_COUNT, self.__frameCount)
 
     def __del__(self):
         """
@@ -121,20 +121,20 @@ class Visual:
 
         Log.d("Cleaning up.")
 
-	def start_processing(self, pipe, inputFile, display=False):
-		"""
-		Function to run the processing on the Video file. Motion and Blur features are
-		detected and based on that ranking is set
+    def start_processing(self, pipe, inputFile, display=False):
+        """
+        Function to run the processing on the Video file. Motion and Blur features are
+        detected and based on that ranking is set
 
-		Parameters
-		----------
-		pipe : Communication link
-			set progress on the ui
-		inputFile : str
-			input video file
-		display : bool
-			True to display the video while processing
-		"""
+        Parameters
+        ----------
+        pipe : Communication link
+            set progress on the ui
+        inputFile : str
+            input video file
+        display : bool
+            True to display the video while processing
+        """
 
         if os.path.isfile(inputFile) is False:
             Log.e(f"File {inputFile} does not exists")
@@ -147,29 +147,29 @@ class Visual:
         self.__videoGetter = VideoGet(str(inputFile)).start()
         myClip = self.__videoGetter.stream
 
-		if self.__videoGetter.get_queue_size() == 0:
-			sleep(1)
-			Log.d(f"Waiting for the buffer to fill up.")
+        if self.__videoGetter.get_queue_size() == 0:
+            sleep(1)
+            Log.d(f"Waiting for the buffer to fill up.")
 
-		fps = myClip.get(cv2.CAP_PROP_FPS)
-		totalFrames = myClip.get(cv2.CAP_PROP_FRAME_COUNT)
+        fps = myClip.get(cv2.CAP_PROP_FPS)
+        totalFrames = myClip.get(cv2.CAP_PROP_FRAME_COUNT)
 
-		self.__fps = fps
-		self.__frameCount = totalFrames
-		self.__set_video_fps()
-		self.__set_video_frame_count()
-		self.__cache.write_data(CACHE_VIDEO_WIDTH, cv2.CAP_PROP_FRAME_WIDTH)
-		self.__cache.write_data(CACHE_VIDEO_HEIGHT, cv2.CAP_PROP_FRAME_HEIGHT)
+        self.__fps = fps
+        self.__frameCount = totalFrames
+        self.__set_video_fps()
+        self.__set_video_frame_count()
+        self.__cache.write_data(CACHE_VIDEO_WIDTH, cv2.CAP_PROP_FRAME_WIDTH)
+        self.__cache.write_data(CACHE_VIDEO_HEIGHT, cv2.CAP_PROP_FRAME_HEIGHT)
 
-		# printing some info
-		Log.d(f"Total count of video frames :: {totalFrames}")
-		Log.i(f"Video fps :: {fps}")
-		Log.i(f"Bit rate :: {cv2.CAP_PROP_BITRATE}")
-		Log.i(f"Video format :: {cv2.CAP_PROP_FORMAT}")
-		Log.i(f"Video four cc :: {cv2.CAP_PROP_FOURCC}")
+        # printing some info
+        Log.d(f"Total count of video frames :: {totalFrames}")
+        Log.i(f"Video fps :: {fps}")
+        Log.i(f"Bit rate :: {cv2.CAP_PROP_BITRATE}")
+        Log.i(f"Video format :: {cv2.CAP_PROP_FORMAT}")
+        Log.i(f"Video four cc :: {cv2.CAP_PROP_FOURCC}")
 
-		count = 0
-		firstFrame = self.__videoGetter.read()
+        count = 0
+        firstFrame = self.__videoGetter.read()
         firstFrameProcessed = True
 
         while self.__videoGetter.more():
@@ -182,7 +182,7 @@ class Visual:
             count += 1
 
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-			self.__blur.append(self.__detect_blur(frame))
+            self.__blur.append(self.__detect_blur(frame))
             frame = cv2.GaussianBlur(frame, (21, 21), 0)
 
             if firstFrameProcessed:
@@ -226,17 +226,17 @@ class Visual:
         self.__videoGetter.stop()
 
         # calling the normalization of ranking
-		self.__timed_ranking_normalize()
+        self.__timed_ranking_normalize()
 
-	def set_pipe(self, pipe):
-		"""
-		Send video frame to the ui threads for displaying, since open cv
-		is using the Qt backend, it should be in the main ui thread or else
-		the im show does not work in the sub process
+    def set_pipe(self, pipe):
+        """
+        Send video frame to the ui threads for displaying, since open cv
+        is using the Qt backend, it should be in the main ui thread or else
+        the im show does not work in the sub process
 
-		Parameters
-		----------
-		pipe : some queue
-			add frames and continuous read to the ui display
-		"""
+        Parameters
+        ----------
+        pipe : some queue
+            add frames and continuous read to the ui display
+        """
         self.__videoPipe = pipe

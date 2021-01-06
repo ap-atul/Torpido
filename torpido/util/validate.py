@@ -10,21 +10,21 @@ from torpido.tools.logger import Log
 
 
 def check_type_video(inputFile):
-	"""
-	Checks if the input file is a video and the file exists.
-	Prints error is the file is not a video and processing is not done until
-	the input file is a video file of the supported formats defined in the `constants` file
+    """
+    Checks if the input file is a video and the file exists.
+    Prints error is the file is not a video and processing is not done until
+    the input file is a video file of the supported formats defined in the `constants` file
 
-	Parameters
-	----------
-	inputFile : str
-		input video file
+    Parameters
+    ----------
+    inputFile : str
+        input video file
 
-	Returns
-	-------
-	bool
-		True is the input file is a video and it exists in the directory or the path
-	"""
+    Returns
+    -------
+    bool
+        True is the input file is a video and it exists in the directory or the path
+    """
     if os.path.isfile(inputFile) is False:
         Log.e("Input video file does not exists")
         return False

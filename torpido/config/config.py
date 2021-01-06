@@ -190,16 +190,16 @@ class Config:
         File.write(Config.configs)
 
     @staticmethod
-	def write_all(config: dict):
-		"""
-		Update the file for the config on the system. All values are written to the
-		file from scratch, so if any key-val is missing it won't appear while reading,
-		that will cause errors
+    def write_all(config: dict):
+        """
+        Update the file for the config on the system. All values are written to the
+        file from scratch, so if any key-val is missing it won't appear while reading,
+        that will cause errors
 
-		Parameters
-		----------
-		config : dict
-			key-val pairs
-		"""
+        Parameters
+        ----------
+        config : dict
+            key-val pairs
+        """
         Config.configs = config
         File.write(config)

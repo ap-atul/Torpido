@@ -49,13 +49,13 @@ class Controller(QThread):
         self.intro = None
         self.extro = None
 
-    def set_video(self, videoFile, intro, extro):
+	def set_video(self, videoFile, intro, extro):
 		""" Set the video file for processing """
 		self.videoFile = videoFile
 		self.intro = intro
 		self.extro = extro
 
-    def run(self):
+	def run(self):
 		""" Start the processing on the input video file """
 		self.controller.start_processing(self, self.videoFile, intro=self.intro, extro=self.extro)
 
@@ -105,10 +105,10 @@ class Controller(QThread):
 		""" Emits the signal to end the video display """
 		self.videoClose.emit()
 
-    def terminate(self) -> None:
-        """ Clean up """
-        self.controller.clean()
-        del Controller.percentComplete
-        del Controller.percentMem
-        del Controller.percentCpu
-        del Controller.logger
+	def terminate(self) -> None:
+		""" Clean up """
+		self.controller.clean()
+		del Controller.percentComplete
+		del Controller.percentMem
+		del Controller.percentCpu
+		del Controller.logger

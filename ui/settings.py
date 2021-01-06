@@ -1,8 +1,8 @@
 from PyQt5 import QtCore
 from PyQt5.QtGui import QIcon
 from PyQt5.QtWidgets import (QComboBox, QWidget,
-							 QFormLayout, QGroupBox, QHBoxLayout,
-							 QLabel, QLineEdit, QPushButton, QVBoxLayout, QMessageBox)
+                             QFormLayout, QGroupBox, QHBoxLayout,
+                             QLabel, QLineEdit, QPushButton, QVBoxLayout, QMessageBox)
 
 from torpido.config.constants import *
 from ui.style.theme import get_all_themes, get_style_sheet
@@ -67,45 +67,45 @@ WAVELETS_NAMES = ['Daubechies2',
                   'Biorthogonal68',
                   'Meyer']
 WAVELETS_VALUES = ['db2',
-				   'db3',
-				   'db4',
-				   'db5',
-				   'db6',
-				   'db7',
-				   'db8',
-				   'db9',
-				   'db10',
-				   'db11',
-				   'db12',
-				   'db13',
-				   'db14',
-				   'db15',
-				   'db16',
-				   'db17',
-				   'db18',
-				   'db19',
-				   'db20',
-				   'sym2',
-				   'sym3',
-				   'sym4',
-				   'sym5',
-				   'sym6',
-				   'sym7',
-				   'sym8',
-				   'sym9',
-				   'sym10',
-				   'sym11',
-				   'sym12'
+                   'db3',
+                   'db4',
+                   'db5',
+                   'db6',
+                   'db7',
+                   'db8',
+                   'db9',
+                   'db10',
+                   'db11',
+                   'db12',
+                   'db13',
+                   'db14',
+                   'db15',
+                   'db16',
+                   'db17',
+                   'db18',
+                   'db19',
+                   'db20',
+                   'sym2',
+                   'sym3',
+                   'sym4',
+                   'sym5',
+                   'sym6',
+                   'sym7',
+                   'sym8',
+                   'sym9',
+                   'sym10',
+                   'sym11',
+                   'sym12'
                    'sym13',
-				   'sym14',
-				   'sym15',
-				   'sym16',
-				   'sym17',
-				   'sym18',
-				   'sym19',
-				   'sym20',
-				   'haar',
-				   'coif1',
+                   'sym14',
+                   'sym15',
+                   'sym16',
+                   'sym17',
+                   'sym18',
+                   'sym19',
+                   'sym20',
+                   'haar',
+                   'coif1',
                    'coif2',
                    'coif3',
                    'coif4',
@@ -116,28 +116,28 @@ WAVELETS_VALUES = ['db2',
                    'bior2.2',
                    'bior2.4',
                    'bior2.6',
-				   'bior2.8',
-				   'bior3.1',
-				   'bior3.3',
-				   'bior3.5',
-				   'bior3.7',
-				   'bior3.9',
-				   'bior4.4',
-				   'bior5.5',
-				   'bior6.8',
-				   'meyer']
+                   'bior2.8',
+                   'bior3.1',
+                   'bior3.3',
+                   'bior3.5',
+                   'bior3.7',
+                   'bior3.9',
+                   'bior4.4',
+                   'bior5.5',
+                   'bior6.8',
+                   'meyer']
 THEMES = get_all_themes()
 STYLESHEET = get_style_sheet(THEME)
 
 
 class SettingsDialog(QWidget):
 
-	def __init__(self, reboot):
-		super().__init__()
+    def __init__(self, reboot):
+        super().__init__()
 
-		self.reboot = reboot
+        self.reboot = reboot
 
-		# setting the theme
+        # setting the theme
         self.theme_sheet = QtCore.QFile(STYLESHEET)
         self.theme_sheet.open(QtCore.QIODevice.ReadOnly)
         self.theme_sheet = QtCore.QTextStream(self.theme_sheet).readAll()
@@ -246,8 +246,8 @@ class SettingsDialog(QWidget):
         formFrame.setLayout(formLayout)
 
         self.save = QPushButton("Save")
-		self.save.setToolTip("Requires restart")
-		self.save.clicked.connect(self.save_settings)
+        self.save.setToolTip("Requires restart")
+        self.save.clicked.connect(self.save_settings)
 
         self.exit = QPushButton("Close")
         self.exit.clicked.connect(self.close)
@@ -260,24 +260,24 @@ class SettingsDialog(QWidget):
 
         self.setLayout(mainLayout)
 
-	def save_settings(self):
-		config = {'RANK_MOTION': self.rankMotionInput.text(),
-				  'RANK_BLUR': self.rankBlurInput.text(),
-				  'RANK_TEXT': self.rankTextInput.text(),
-				  'RANK_AUDIO': self.rankAudioInput.text(),
-				  'MIN_RANK_OUT_VIDEO': self.minRankInput.text(),
-				  'MOTION_THRESHOLD': self.motionThresholdInput.text(),
-				  'BLUR_THRESHOLD': self.blurThresholdInput.text(),
-				  'SILENCE_THRESHOlD': self.silenceThresholdInput.text(),
-				  'TEXT_MIN_CONFIDENCE': self.textThresholdInput.text(),
-				  'AUDIO_BLOCK_PER': self.audioBlockInput.text(),
+    def save_settings(self):
+        config = {'RANK_MOTION': self.rankMotionInput.text(),
+                  'RANK_BLUR': self.rankBlurInput.text(),
+                  'RANK_TEXT': self.rankTextInput.text(),
+                  'RANK_AUDIO': self.rankAudioInput.text(),
+                  'MIN_RANK_OUT_VIDEO': self.minRankInput.text(),
+                  'MOTION_THRESHOLD': self.motionThresholdInput.text(),
+                  'BLUR_THRESHOLD': self.blurThresholdInput.text(),
+                  'SILENCE_THRESHOlD': self.silenceThresholdInput.text(),
+                  'TEXT_MIN_CONFIDENCE': self.textThresholdInput.text(),
+                  'AUDIO_BLOCK_PER': self.audioBlockInput.text(),
                   'TEXT_SKIP_FRAMES': self.textSkipFramesInput.text(),
                   'WAVELET': WAVELETS_VALUES[self.waveletInput.currentIndex()],
                   'WATCHER_DELAY': self.watcherDelayInput.text(),
                   'THEME': THEMES[self.theme.currentIndex()]
                   }
 
-		Config.write_all(config)
+        Config.write_all(config)
 
         self.messageBox = QMessageBox()
         self.messageBox.setWindowIcon(QIcon('./ui/assets/logo.png'))
