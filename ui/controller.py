@@ -49,66 +49,67 @@ class Controller(QThread):
         self.intro = None
         self.extro = None
 
-	def set_video(self, videoFile, intro, extro):
-		""" Set the video file for processing """
-		self.videoFile = videoFile
-		self.intro = intro
-		self.extro = extro
+    def set_video(self, videoFile, intro, extro):
+        """ Set the video file for processing """
 
-	def run(self):
-		""" Start the processing on the input video file """
-		self.controller.start_processing(self, self.videoFile, intro=self.intro, extro=self.extro)
+        self.videoFile = videoFile
+        self.intro = intro
+        self.extro = extro
 
-	def set_video_display(self, value):
-		""" Set up the video display request """
-		self.controller.set_video_display(value)
+    def run(self):
+        """ Start the processing on the input video file """
+        self.controller.start_processing(self, self.videoFile, intro=self.intro, extro=self.extro)
 
-	def set_snr_plot(self, value):
-		""" Set up the plotting for SNR audio """
-		self.controller.set_snr_plot(value)
+    def set_video_display(self, value):
+        """ Set up the video display request """
+        self.controller.set_video_display(value)
 
-	def set_ranking_plot(self, value):
-		""" Set up the plotting of the analytics """
-		self.controller.set_ranking_plot(value)
+    def set_snr_plot(self, value):
+        """ Set up the plotting for SNR audio """
+        self.controller.set_snr_plot(value)
 
-	def set_save_logs(self, value):
-		""" Set up logging to use file to save logs"""
-		self.controller.set_save_logs(value)
+    def set_ranking_plot(self, value):
+        """ Set up the plotting of the analytics """
+        self.controller.set_ranking_plot(value)
 
-	@pyqtSlot()
-	def set_percent_complete(self, value):
-		""" Emits the signal with the percent for the progress bar """
-		self.percentComplete.emit(value)
+    def set_save_logs(self, value):
+        """ Set up logging to use file to save logs"""
+        self.controller.set_save_logs(value)
 
-	@pyqtSlot()
-	def set_cpu_complete(self, value: float):
-		""" Emits the signal with the cpu usage value """
-		self.percentCpu.emit(value)
+    @pyqtSlot()
+    def set_percent_complete(self, value):
+        """ Emits the signal with the percent for the progress bar """
+        self.percentComplete.emit(value)
 
-	@pyqtSlot()
-	def set_mem_complete(self, value: float):
-		""" Emits the signal with the memory usage value """
-		self.percentMem.emit(value)
+    @pyqtSlot()
+    def set_cpu_complete(self, value: float):
+        """ Emits the signal with the cpu usage value """
+        self.percentCpu.emit(value)
 
-	@pyqtSlot()
-	def set_message_log(self, message):
-		""" Emits the signal with the log to the ui """
-		self.logger.emit(message)
+    @pyqtSlot()
+    def set_mem_complete(self, value: float):
+        """ Emits the signal with the memory usage value """
+        self.percentMem.emit(value)
 
-	@pyqtSlot()
-	def set_video_frame(self, frame):
-		""" Emits the signal with the video frame to display """
-		self.videoFrame.emit(frame)
+    @pyqtSlot()
+    def set_message_log(self, message):
+        """ Emits the signal with the log to the ui """
+        self.logger.emit(message)
 
-	@pyqtSlot()
-	def set_video_close(self):
-		""" Emits the signal to end the video display """
-		self.videoClose.emit()
+    @pyqtSlot()
+    def set_video_frame(self, frame):
+        """ Emits the signal with the video frame to display """
+        self.videoFrame.emit(frame)
 
-	def terminate(self) -> None:
-		""" Clean up """
-		self.controller.clean()
-		del Controller.percentComplete
-		del Controller.percentMem
-		del Controller.percentCpu
-		del Controller.logger
+    @pyqtSlot()
+    def set_video_close(self):
+        """ Emits the signal to end the video display """
+        self.videoClose.emit()
+
+    def terminate(self) -> None:
+        """ Clean up """
+        self.controller.clean()
+        del Controller.percentComplete
+        del Controller.percentMem
+        del Controller.percentCpu
+        del Controller.logger
