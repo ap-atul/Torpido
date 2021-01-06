@@ -47,12 +47,12 @@ class Splash(QWidget):
 
         self.progress = None
         self.loading = None
-        self.worker.progress.connect(self.setProgress)
+        self.worker.progress.connect(self.set_progress)
 
-        self.buildLayout()
+        self.build_layout()
         self.show()
 
-    def buildLayout(self):
+    def build_layout(self):
         mainLayout = QVBoxLayout(self)
         mainLayout.setSpacing(10)
         mainLayout.setContentsMargins(10, 10, 10, 10)
@@ -102,14 +102,14 @@ class Splash(QWidget):
     def start(self):
         self.worker.start()
 
-    def setProgress(self, val):
+    def set_progress(self, val):
         self.progress.setValue(val)
         if val == 100:
             self.torpido = App()
             self.hide()
 
 
-def startSplash():
+def start_splash():
     """ entry point """
 
     # QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads)

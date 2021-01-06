@@ -84,27 +84,27 @@ class VideoGet:
             data = None
         return data
 
-    def getCapture(self):
-        """
-        Returns the video stream of open cv
+    def get_capture(self):
+		"""
+		Returns the video stream of open cv
 
-        Returns
-        -------
-        object
-            stream of the video
-        """
-        return self.stream
+		Returns
+		-------
+		object
+			stream of the video
+		"""
+		return self.stream
 
-    def getQueueSize(self):
-        """
-        Returns the size of the queue
+	def get_queue_size(self):
+		"""
+		Returns the size of the queue
 
-        Returns
-        -------
-        int
-            size of the queue
-        """
-        return self.__Q.qsize()
+		Returns
+		-------
+		int
+			size of the queue
+		"""
+		return self.__Q.qsize()
 
     def more(self):
         """

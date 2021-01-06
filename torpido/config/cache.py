@@ -24,7 +24,7 @@ class Cache:
             os.mkdir(os.path.join(os.getcwd(), CACHE_DIR))
         self.__fileName = os.path.join(os.getcwd(), CACHE_DIR, CACHE_NAME)
 
-    def writeDataToCache(self, key, value):
+    def write_data(self, key, value):
         """
         Write the kay-value in the Cache file. If the file exists it would append the data to the dict object. Once data
         is written Log is printed using `Log` class
@@ -48,7 +48,7 @@ class Cache:
 
         Log.d(f"[CACHE] : {key} is stored")
 
-    def readDataFromCache(self, key):
+    def read_data(self, key):
         """
         Read value for the key in cache if cache does not exists or cache file itself is not present the Log is
         printed stating that Cache does not exists

@@ -83,21 +83,21 @@ class Textual:
         self.__textDisplayLayerNames = ["feature_fusion/Conv_7/Sigmoid",
                                         "feature_fusion/concat_3"]
 
-    def __runTextDetect(self, blob):
-        """
-        Function to detect only text and no display. Gets the scores and calculates if the image
-        contains any text
+    def __run_text_detect(self, blob):
+		"""
+		Function to detect only text and no display. Gets the scores and calculates if the image
+		contains any text
 
-        Parameters
-        ----------
-        blob : blob
-            blob of the image
+		Parameters
+		----------
+		blob : blob
+			blob of the image
 
-        Returns
-        -------
-        bool
-            True denotes text detected
-        """
+		Returns
+		-------
+		bool
+			True denotes text detected
+		"""
         self.__net.setInput(blob)
         scores = self.__net.forward(self.__textDetectLayerName)
         numRows, numCols = np.asarray(scores).shape[3: 5]
@@ -117,25 +117,25 @@ class Textual:
             return True
         return False
 
-    def __runTextDetectDisplay(self, blob, rSize, original):
-        """
-        Function to detect text using layer for getting the rectangles
-        to display on the frame
+	def __run_text_detect_display(self, blob, rSize, original):
+		"""
+		Function to detect text using layer for getting the rectangles
+		to display on the frame
 
-        Parameters
-        ----------
-        blob : blob
-            blob of the image
-        rSize : tuple
-            real sizes of the images
-        original : image array
-            un-resized image to display
+		Parameters
+		----------
+		blob : blob
+			blob of the image
+		rSize : tuple
+			real sizes of the images
+		original : image array
+			un-resized image to display
 
-        Returns
-        -------
-        bool
-            True denotes text detected
-        """
+		Returns
+		-------
+		bool
+			True denotes text detected
+		"""
         # running the model
         self.__net.setInput(blob=blob)
         scores, geometry = self.__net.forward(self.__textDisplayLayerNames)
@@ -186,7 +186,7 @@ class Textual:
                 confidences.append(scoresData[x])
 
         # compressing the boxes or rectangles
-        boxes = image.nonMaxSuppression(np.array(rect), probs=confidences)
+		boxes = image.non_max_suppression(np.array(rect), probs=confidences)
 
         rW, rH = rSize
         for startX, startY, endX, endY in boxes:
@@ -205,20 +205,20 @@ class Textual:
             return True
         return False
 
-    def __timedRankingNormalize(self):
-        """
-        Since ranking is added to frames, since frames are duration * fps
-        and audio frame system is different since frame are duration * rate
-        so we need to generalize the ranking system
+	def __timed_ranking_normalize(self):
+		"""
+		Since ranking is added to frames, since frames are duration * fps
+		and audio frame system is different since frame are duration * rate
+		so we need to generalize the ranking system
 
-        sol: ranking sec of the video and audio, for than taking mean of the
-        frames to generate rank for video.
-        since ranking is 0 or 1, the mean will be different and we get more versatile
-        results.
+		sol: ranking sec of the video and audio, for than taking mean of the
+		frames to generate rank for video.
+		since ranking is 0 or 1, the mean will be different and we get more versatile
+		results.
 
-        we will read the list and slice the video to get 1 sec of frames and get
-        mean/average as the rank for the 1 sec
-        """
+		we will read the list and slice the video to get 1 sec of frames and get
+		mean/average as the rank for the 1 sec
+		"""
         textNormalize = []
         for i in range(0, int(self.__frameCount), int(self.__fps)):
             if len(self.__textRanks) >= (i + int(self.__fps)):
@@ -227,8 +227,8 @@ class Textual:
                 break
 
         # saving all processed stuffs
-        self.__cache.writeDataToCache(CACHE_RANK_TEXT, textNormalize)
-        Log.d(f"Textual rank length {len(textNormalize)}")
+		self.__cache.write_data(CACHE_RANK_TEXT, textNormalize)
+		Log.d(f"Textual rank length {len(textNormalize)}")
         Log.i("Textual ranking saved .............")
 
     def __del__(self):
@@ -239,18 +239,18 @@ class Textual:
         del self.__videoGetter
         Log.d("Cleaning up.")
 
-    def startProcessing(self, inputFile, display=False):
-        """
-        Function to perform the Textual Processing on the input video file.
-        The video can be displayed as the processing is going on.
+	def start_processing(self, inputFile, display=False):
+		"""
+		Function to perform the Textual Processing on the input video file.
+		The video can be displayed as the processing is going on.
 
-        Parameters
-        ----------
-        inputFile : str
-            input video file
-        display : bool
-            True to display the video while processing
-        """
+		Parameters
+		----------
+		inputFile : str
+			input video file
+		display : bool
+			True to display the video while processing
+		"""
 
         if os.path.isfile(inputFile) is False:
             Log.e(f"File {inputFile} does not exists")
@@ -259,9 +259,9 @@ class Textual:
         self.__videoGetter = VideoGet(str(inputFile)).start()
         myClip = self.__videoGetter.stream
 
-        if self.__videoGetter.getQueueSize() == 0:
-            time.sleep(0.5)
-            Log.d("Waiting for the buffer to fill up.")
+		if self.__videoGetter.get_queue_size() == 0:
+			time.sleep(0.5)
+			Log.d("Waiting for the buffer to fill up.")
 
         self.__fps = myClip.get(cv2.CAP_PROP_FPS)
         self.__frameCount = myClip.get(cv2.CAP_PROP_FRAME_COUNT)
@@ -297,9 +297,9 @@ class Textual:
 
                 # run text detection
                 if display:
-                    detectedText = self.__runTextDetectDisplay(blob, (rW, rH), original)
+					detectedText = self.__run_text_detect_display(blob, (rW, rH), original)
                 else:
-                    detectedText = self.__runTextDetect(blob)
+					detectedText = self.__run_text_detect(blob)
 
                 # if text is detected
                 if detectedText:
@@ -315,4 +315,4 @@ class Textual:
         cv2.destroyAllWindows()
 
         # calling the normalization of ranking
-        self.__timedRankingNormalize()
+		self.__timed_ranking_normalize()

@@ -9,36 +9,36 @@ from torpido.exceptions.custom import AudioStreamMissingException, FFmpegProcess
 from torpido.tools.logger import Log
 
 
-def buildSplitCommand(inputFile, outputAudioFile):
-    """
-    Creates a list for each bit of the command line to run
-    since it is a list the command line is secure and can
-    run with file names that are not formatted correctly.
-    or doesn't need any explicit formatting.
+def _build_split_command(inputFile, outputAudioFile):
+	"""
+	Creates a list for each bit of the command line to run
+	since it is a list the command line is secure and can
+	run with file names that are not formatted correctly.
+	or doesn't need any explicit formatting.
 
-    Parameters
-    ----------
-    inputFile : str
-        input video file name and path
-    outputAudioFile : str
-        output audio file name and path
+	Parameters
+	----------
+	inputFile : str
+		input video file name and path
+	outputAudioFile : str
+		output audio file name and path
 
-    Returns
-    ---------
-    _CMD
-        command line to pass to the subprocess
+	Returns
+	---------
+	_CMD
+		command line to pass to the subprocess
 
-    Examples
-    ----------
-    The command created spits the video file into an audio file, The file paths
-    are kept same. The command goes like this
+	Examples
+	----------
+	The command created spits the video file into an audio file, The file paths
+	are kept same. The command goes like this
 
-    `ffmpeg -y -i input.mkv output.wav`
+	`ffmpeg -y -i input.mkv output.wav`
 
-        '-y' : FFmpeg option for 'yes override'. Override the output file it exists
-        '-i' : FFmpeg option for 'input file'. Input file can be multiple
+		'-y' : FFmpeg option for 'yes override'. Override the output file it exists
+		'-i' : FFmpeg option for 'input file'. Input file can be multiple
 
-    """
+	"""
     return [
         'ffmpeg',
         '-y',
@@ -67,11 +67,11 @@ def split(inputFile, outputAudioFile):
     str
         yields std out logs in string
     """
-    command = buildSplitCommand(inputFile, outputAudioFile)
-    run = subprocess.Popen(args=command,
-                           stdout=subprocess.PIPE,
-                           stderr=subprocess.STDOUT,
-                           universal_newlines=True)
+	command = _build_split_command(inputFile, outputAudioFile)
+	run = subprocess.Popen(args=command,
+						   stdout=subprocess.PIPE,
+						   stderr=subprocess.STDOUT,
+						   universal_newlines=True)
     for stdout in iter(run.stdout.readline, ""):
         yield stdout
 
@@ -81,63 +81,63 @@ def split(inputFile, outputAudioFile):
         raise AudioStreamMissingException
 
 
-def buildMergeCommand(videoFile, audioFile, outputFile, timestamps, intro=None, extro=None):
-    """
-    Building a complex filter
-    command line to clip portions based on the timestamps, the copies used
-    to trim some portion depend on the length of the timestamps since that
-    will define the number of the trims
+def _build_merge_command(videoFile, audioFile, outputFile, timestamps, intro=None, extro=None):
+	"""
+	Building a complex filter
+	command line to clip portions based on the timestamps, the copies used
+	to trim some portion depend on the length of the timestamps since that
+	will define the number of the trims
 
-    Parameters
-    ----------
-    extro : str
-        exit video
-    intro : str
-        intro video
-    videoFile : str
-        original input video file
-    audioFile : str
-        processed audio file (de-noised)
-    outputFile : str
-        final output video file edited by Torpido
-    timestamps : iterable
-        start and end timestamps of the video clips to trim
-    Returns
-    -------
-    str
-        generated string from the complex filter built
+	Parameters
+	----------
+	extro : str
+		exit video
+	intro : str
+		intro video
+	videoFile : str
+		original input video file
+	audioFile : str
+		processed audio file (de-noised)
+	outputFile : str
+		final output video file edited by Torpido
+	timestamps : iterable
+		start and end timestamps of the video clips to trim
+	Returns
+	-------
+	str
+		generated string from the complex filter built
 
-    Examples
-    --------
-    The command line has following structure
+	Examples
+	--------
+	The command line has following structure
 
-    `
-    ffmpeg -y -i input.mkv -i input.wav -filter_complex
-    "[0:v]split=2[vc1][vc2];
-    [vc1]trim=start=304:duration=10.567,setpts=PTS-STARTPTS[v1];
-    [vc2]trim=start=100:duration=10.789,setpts=PTS-STARTPTS[v2];
+	`
+	ffmpeg -y -i input.mkv -i input.wav -filter_complex
+	"[0:v]split=2[vc1][vc2];
+	[vc1]trim=start=304:duration=10.567,setpts=PTS-STARTPTS[v1];
+	[vc2]trim=start=100:duration=10.789,setpts=PTS-STARTPTS[v2];
 
-    [1:a]asplit=2[ac1][ac2];
-    [ac1]atrim=start=0:duration=10.123,asetpts=PTS-STARTPTS[a1];
-    [ac2]atrim=start=304:duration=10,asetpts=PTS-STARTPTS[a2];
+	[1:a]asplit=2[ac1][ac2];
+	[ac1]atrim=start=0:duration=10.123,asetpts=PTS-STARTPTS[a1];
+	[ac2]atrim=start=304:duration=10,asetpts=PTS-STARTPTS[a2];
 
-    [v1][a1][v2][a2]concat=n=2:v=1:a=1[video][audio]"
-    -map "[video]" -map "[audio]" output_new.mkv
-    `
+	[v1][a1][v2][a2]concat=n=2:v=1:a=1[video][audio]"
+	-map "[video]" -map "[audio]" output_new.mkv
+	`
 
-        '-y' :              FFmpeg option for 'yes override'. Override the output file it exists
-        '-i' :              FFmpeg option for 'input file'. Input file to the command can be multiple
-        '-filter_complex' : create a complex filter
-        'split' :           split option of filter to split the video stream into n ; here n=2
-        'trim' :            trim option of filter to trim the video stream with
-                            start= and duration=, also setpts:presentation points
-        'asplit' :          audio stream split
-        'atrim' :           audio stream trim
-        'concat' :          concatenate input stream to output v=1:a=1 one video and one audio streams
-        'map' :             map the labels of stream to the output file
-        '[]' :              labels for each stream
+		'-y' :              FFmpeg option for 'yes override'. Override the output file it exists
+		'-i' :              FFmpeg option for 'input file'. Input file to the command can be multiple
+		'-filter_complex' : create a complex filter
+		'split' :           split option of filter to split the video stream into n ; here n=2
+		'trim' :            trim option of filter to trim the video stream with
+							start= and duration=, also setpts:presentation points
+		'asplit' :          audio stream split
+		'atrim' :           audio stream trim
+		'concat' :          concatenate input stream to output v=1:a=1 one video and one audio streams
+		'map' :             map the labels of stream to the output file
+		'[]' :              labels for each stream
 
-    """
+	"""
     timestamp_length = len(timestamps)
 
     command = ['ffmpeg',
@@ -240,7 +240,7 @@ def merge(videoFile, audioFile, outputFile, timestamps, intro=None, extro=None):
     str
         continuous std out logs
     """
-    command = buildMergeCommand(videoFile, audioFile, outputFile, timestamps, intro, extro)
+	command = _build_merge_command(videoFile, audioFile, outputFile, timestamps, intro, extro)
     print(command)
     run = subprocess.Popen(args=command,
                            shell=True,

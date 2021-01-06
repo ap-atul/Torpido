@@ -12,7 +12,7 @@ from torpido.config.cache import Cache
 from torpido.config.constants import CACHE_FPS, CACHE_FRAME_COUNT
 from torpido.exceptions import RankingOfFeatureMissing
 from torpido.tools.logger import Log
-from torpido.util.timestamp import getTimestamps, getOutputVideoLength
+from torpido.util.timestamp import get_timestamps, get_output_video_length
 
 # since, ui is using QTAgg, need to send the data to main gui thread
 # or just use Tk ;)
@@ -72,20 +72,20 @@ class Analytics:
                         self.__text[i] + self.__audio[i] for i in range(self.__rankLength)]
 
         try:
-            self.__timestamps = getTimestamps(data=data)
+            self.__timestamps = get_timestamps(data=data)
         except RankingOfFeatureMissing:
             Log.e(RankingOfFeatureMissing.cause)
             return
 
-        self.__outputLength = getOutputVideoLength(self.__timestamps)
-        self.__actualLength = abs(self.__cache.readDataFromCache(CACHE_FRAME_COUNT) /
-                                  self.__cache.readDataFromCache(CACHE_FPS))
+        self.__outputLength = get_output_video_length(self.__timestamps)
+        self.__actualLength = abs(self.__cache.read_data(CACHE_FRAME_COUNT) /
+                                  self.__cache.read_data(CACHE_FPS))
 
-        self.__plotRankLine()
-        self.__plotSumLine()
+        self.__plot_rank_line()
+        self.__plot_sum_line()
         self.__analytics()
 
-    def __plotRankLine(self):
+    def __plot_rank_line(self):
         """
         Plotting the ranks of each feature in the sub plot, with
         legends and color specified
@@ -112,7 +112,7 @@ class Analytics:
         plt.tight_layout()
         plt.show()
 
-    def __plotSumLine(self):
+    def __plot_sum_line(self):
         """
         Plotting the sub rank line graph, also adding the start and end timestamps
         dashed lines. The green
@@ -144,5 +144,5 @@ class Analytics:
             return
 
         Log.i(f"Clipping a total of {len(self.__timestamps)} sub portion(s).")
-        Log.i(f"Output video length would be approx. :: {self.__outputLength} s or {round(self.__outputLength / 60)} m")
+        Log.i(f"Output video length would be approx. :: {self.__outputLength} s or {float(self.__outputLength / 60)} m")
         Log.i(f"Percent of video trimmed :: {100 - ((self.__outputLength * 100) / self.__actualLength)} %")

@@ -63,7 +63,7 @@ class Auditory:
         self.__fwt = FastWaveletTransform(WAVELET)
         self.__compressor = VisuShrinkCompressor()
 
-    def __getEnergyRMS(self, block):
+    def __get_energy_rms(self, block):
         """
         RMS = Root Mean Square to calculate the signal data to the dB, if signal
         satisfies some threshold the ranking can be affected and audio portion
@@ -84,11 +84,11 @@ class Auditory:
             return RANK_AUDIO
         return 0
 
-    def __setAudioInfo(self):
+    def __set_audio_info(self):
         """ Storing audio info """
-        self.__cache.writeDataToCache(CACHE_AUDIO_INFO, self.__info)
+        self.__cache.write_data(CACHE_AUDIO_INFO, self.__info)
 
-    def __plotSNR(self):
+    def __plot_snr(self):
         """
         Plotting the snrs for the original and the de-noised signals, the snrs are collected
         during the processing, and the mean of the data is used to represent the final values
@@ -119,7 +119,7 @@ class Auditory:
 
         Log.d("Cleaning up.")
 
-    def startProcessing(self, inputFile, outputFile, plot=False):
+    def start_processing(self, inputFile, outputFile, plot=False):
         """
         Calculates the de noised signal based on the wavelets
         default wavelet is = db4, mode = per and thresh method = soft.
@@ -149,7 +149,7 @@ class Auditory:
 
         self.__fileName = inputFile
         self.__info = soundfile.info(self.__fileName)
-        self.__setAudioInfo()
+        self.__set_audio_info()
         self.__rate = self.__info.samplerate
         self.__energy = []
         Log.i(f"Audio duration is {self.__info.duration}.")
@@ -178,12 +178,12 @@ class Auditory:
                 self.__snrAfter.append(snr(cleaned))
 
                 # calculating the audio rank
-                self.__energy.extend([self.__getEnergyRMS(cleaned)] * max(1, int(len(cleaned) / self.__rate)))
+                self.__energy.extend([self.__get_energy_rms(cleaned)] * max(1, int(len(cleaned) / self.__rate)))
 
             if plot:
-                self.__plotSNR()
+                self.__plot_snr()
 
-        self.__cache.writeDataToCache(CACHE_RANK_AUDIO, self.__energy)
+        self.__cache.write_data(CACHE_RANK_AUDIO, self.__energy)
         Log.i("Audio de noised successfully")
         Log.d(f"Audio ranking length {len(self.__energy)}")
         Log.i("Audio ranking saved .............")

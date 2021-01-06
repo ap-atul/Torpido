@@ -28,25 +28,25 @@ class Progress:
         self.__totalProgress = 0
         self.__extractor = StdExtractor()
 
-    def displayProgress(self, log, displayLog=False):
-        """
-        Gets extracted time and duration from stdExtractor and updates the progress bar
+    def display(self, log, displayLog=False):
+		"""
+		Gets extracted time and duration from stdExtractor and updates the progress bar
 
-        Parameters
-        ----------
-        log : str
-            current log from the subprocess stdout
-        displayLog : bool
-            if True then all logs will be flushed in the console
+		Parameters
+		----------
+		log : str
+			current log from the subprocess stdout
+		displayLog : bool
+			if True then all logs will be flushed in the console
 
-        Returns
-        -------
+		Returns
+		-------
 
-        """
-        duration, time = self.__extractor.extractTimeDuration(log)
+		"""
+		duration, time = self.__extractor.extract_time_duration(log)
 
         if time is not None:
-            currentProgress = self.getCurrentProgress(duration, time)
+			currentProgress = self.get_current_progress(duration, time)
             if currentProgress > self.__totalProgress:
                 self.__progressBar.update(currentProgress - self.__totalProgress)
                 self.__totalProgress = currentProgress
@@ -55,28 +55,28 @@ class Progress:
         elif displayLog:
             print(log)
 
-    @staticmethod
-    def getCurrentProgress(duration, time):
-        """
-        Calculates the progress percentage from duration and time object of the Time class
+	@staticmethod
+	def get_current_progress(duration, time):
+		"""
+		Calculates the progress percentage from duration and time object of the Time class
 
-        Parameters
-        ----------
-        duration : Time
-            Time object of total duration of original clip
-        time : Time
-            Time object of current duration of decoded clip
+		Parameters
+		----------
+		duration : Time
+			Time object of total duration of original clip
+		time : Time
+			Time object of current duration of decoded clip
 
-        Returns
-        -------
-        float
-            Time in secs
-        """
-        durationInSec = duration.getTimeInSec()
+		Returns
+		-------
+		float
+			Time in secs
+		"""
+		durationInSec = duration.get_time_in_sec()
         if durationInSec == 0:
             return 100
 
-        return int(time.getTimeInSec() * 100 / durationInSec)
+		return int(time.get_time_in_sec() * 100 / durationInSec)
 
     def complete(self):
         """

@@ -26,16 +26,16 @@ class Time:
         self.__minute = None
         self.__second = None
 
-    def getTimeInSec(self):
-        """
-        Returning time in seconds
+    def get_time_in_sec(self):
+		"""
+		Returning time in seconds
 
-        Returns
-        -------
-        int
-            __time in secs
-        """
-        return (self.__hour * 60 * 60) + (self.__minute * 60) + self.__second
+		Returns
+		-------
+		int
+			__time in secs
+		"""
+		return (self.__hour * 60 * 60) + (self.__minute * 60) + self.__second
 
     def __del__(self):
         """
@@ -63,38 +63,38 @@ class StdExtractor:
         self.__duration = None
         self.__time = None
 
-    def extractTimeDuration(self, line):
-        """
-        Extracts time and duration from the stdout log from the sub process
+	def extract_time_duration(self, line):
+		"""
+		Extracts time and duration from the stdout log from the sub process
 
-        Parameters
-        ----------
-        line : str
-            output from the subprocess logs
+		Parameters
+		----------
+		line : str
+			output from the subprocess logs
 
-        Returns
-        -------
-        tuple
-            Time object of duration and time
-        """
-        return self.__extractDuration(line), self.__extractTime(line)
+		Returns
+		-------
+		tuple
+			Time object of duration and time
+		"""
+		return self.__extract_duration(line), self.__extract_time(line)
 
-    def __extractTime(self, line):
-        """
-        Searching for time clause in the FFmpeg logs
+	def __extract_time(self, line):
+		"""
+		Searching for time clause in the FFmpeg logs
 
-            Ex: time=00:01:13.22
+			Ex: time=00:01:13.22
 
-        Parameters
-        ----------
-        line : str
-            output from the subprocess logs
+		Parameters
+		----------
+		line : str
+			output from the subprocess logs
 
-        Returns
-        -------
-        __time : Time
-            Time object of output clip
-        """
+		Returns
+		-------
+		__time : Time
+			Time object of output clip
+		"""
         exp = re.compile(r'__time=(\d+):(\d+):(\d+)')
         exp = exp.search(line)
         if exp:
@@ -105,22 +105,22 @@ class StdExtractor:
 
         return self.__time
 
-    def __extractDuration(self, line):
-        """
-        Searching for duration clause in FFmpeg logs
-        since duration is displayed only once it is set
-        only once and later returned the same value
+	def __extract_duration(self, line):
+		"""
+		Searching for duration clause in FFmpeg logs
+		since duration is displayed only once it is set
+		only once and later returned the same value
 
-        Parameters
-        ----------
-        line : str
-            output from the subprocess logs
+		Parameters
+		----------
+		line : str
+			output from the subprocess logs
 
-        Returns
-        -------
-        __duration : Time
-            Time object of input clip
-        """
+		Returns
+		-------
+		__duration : Time
+			Time object of input clip
+		"""
         if self.__duration is not None:
             return self.__duration
 

@@ -42,14 +42,14 @@ class Log:
     pipe = None
 
     @staticmethod
-    def setToFile(value=False):
-        """ Save all logs to a file name from the config/constants.py """
-        Log.toFile = value
+	def set_to_file(value=False):
+		""" Save all logs to a file name from the config/constants.py """
+		Log.toFile = value
 
-    @staticmethod
-    def setHandler(pipe):
-        """ Log all logs directly to the ui, pipe communication used """
-        Log.pipe = pipe
+	@staticmethod
+	def set_handler(pipe):
+		""" Log all logs directly to the ui, pipe communication used """
+		Log.pipe = pipe
 
     @staticmethod
     def log(message, mode='INFO'):

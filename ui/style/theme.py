@@ -165,24 +165,24 @@ STYLESHEET = {
 }
 
 
-def getTheme(style: str):
-    """ Returns the colors for the theme style """
-    if style in THEME:
-        return THEME[style]
+def get_theme(style: str):
+	""" Returns the colors for the theme style """
+	if style in THEME:
+		return THEME[style]
 
-    # if some how style not found
-    return THEME["default"]
-
-
-def getAllThemes():
-    """ Returns the list of the themes """
-    return sorted(list(THEME.keys()))
+	# if some how style not found
+	return THEME["default"]
 
 
-def getStyleSheet(style):
-    """ Returns the path for the style sheet """
-    if style in STYLESHEET:
-        return STYLESHEET[style]
+def get_all_themes():
+	""" Returns the list of the themes """
+	return sorted(list(THEME.keys()))
 
-    # if some hot style not found
-    return STYLESHEET["default"]
+
+def get_style_sheet(style):
+	""" Returns the path for the style sheet """
+	if style in STYLESHEET:
+		return STYLESHEET[style]
+
+	# if some hot style not found
+	return STYLESHEET["default"]

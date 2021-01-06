@@ -17,78 +17,78 @@ from torpido.config.constants import (CACHE_RANK_MOTION, CACHE_RANK_TEXT,
 from torpido.exceptions.custom import RankingOfFeatureMissing
 
 
-def addPadding(rankList: list, length):
-    """
-    Function to add padding to the ranks if there length is lower than that of the
-    required length
-    Average of the rank is added as the padding data, mostly data is below 1
+def add_padding(rankList: list, length):
+	"""
+	Function to add padding to the ranks if there length is lower than that of the
+	required length
+	Average of the rank is added as the padding data, mostly data is below 1
 
-    Parameters
-    ----------
-    rankList : list
-        feature rank list
-    length : int
-        required length
-    """
+	Parameters
+	----------
+	rankList : list
+		feature rank list
+	length : int
+		required length
+	"""
     rankList.extend([sum(rankList) / len(rankList)] * int(length - len(rankList)))
 
 
-def readTheRankings():
-    """
-    Reads the ranking using the joblib files and calculate
-    the final sum ranks
+def read_rankings():
+	"""
+	Reads the ranking using the joblib files and calculate
+	the final sum ranks
 
-    Getting the ranking length for the ranks for the features from max
-    of all the ranks length
+	Getting the ranking length for the ranks for the features from max
+	of all the ranks length
 
-    Padding the ranks, so that every feature has equal range
+	Padding the ranks, so that every feature has equal range
 
-    Returns
-    -------
-    list
-        list of the sum of all ranks
-    """
-    cache_rank = Cache()
+	Returns
+	-------
+	list
+		list of the sum of all ranks
+	"""
+	cache_rank = Cache()
 
-    # loading the read files
-    motionRank = cache_rank.readDataFromCache(CACHE_RANK_MOTION)
-    blurRank = cache_rank.readDataFromCache(CACHE_RANK_BLUR)
-    textRank = cache_rank.readDataFromCache(CACHE_RANK_TEXT)
-    audioRank = cache_rank.readDataFromCache(CACHE_RANK_AUDIO)
+	# loading the read files
+	motionRank = cache_rank.read_data(CACHE_RANK_MOTION)
+	blurRank = cache_rank.read_data(CACHE_RANK_BLUR)
+	textRank = cache_rank.read_data(CACHE_RANK_TEXT)
+	audioRank = cache_rank.read_data(CACHE_RANK_AUDIO)
 
-    if not all([motionRank, blurRank, textRank, audioRank]):
-        raise RankingOfFeatureMissing
+	if not all([motionRank, blurRank, textRank, audioRank]):
+		raise RankingOfFeatureMissing
 
-    # max length for ranking
-    # NOTE: FFmpeg does not get bothered by greater values, not lower though
-    maxRank = int(max(len(motionRank), len(blurRank),
-                      len(audioRank), len(textRank)))
+	# max length for ranking
+	# NOTE: FFmpeg does not get bothered by greater values, not lower though
+	maxRank = int(max(len(motionRank), len(blurRank),
+					  len(audioRank), len(textRank)))
 
-    # padding the ranks of each feature
-    addPadding(motionRank, maxRank)
-    addPadding(blurRank, maxRank)
-    addPadding(audioRank, maxRank)
-    addPadding(textRank, maxRank)
+	# padding the ranks of each feature
+	add_padding(motionRank, maxRank)
+	add_padding(blurRank, maxRank)
+	add_padding(audioRank, maxRank)
+	add_padding(textRank, maxRank)
 
-    return [motionRank, blurRank,
-            textRank, audioRank]
+	return [motionRank, blurRank,
+			textRank, audioRank]
 
 
-def trimByRank(ranks):
-    """
-    Parse the ranks to generate timestamps. Ranks are per sec so the start rank will be start
-    timestamp for trimming
+def trim_by_rank(ranks):
+	"""
+	Parse the ranks to generate timestamps. Ranks are per sec so the start rank will be start
+	timestamp for trimming
 
-    Parameters
-    ----------
-    ranks : iterable
-        ranks of the video
+	Parameters
+	----------
+	ranks : iterable
+		ranks of the video
 
-    Returns
-    --------
-    timestamps : list
-        timestamps parsed from the ranks
-    """
+	Returns
+	--------
+	timestamps : list
+		timestamps parsed from the ranks
+	"""
     timestamps = []
     start = None
     end = None
@@ -120,26 +120,26 @@ def trimByRank(ranks):
     return timestamps
 
 
-def getTimestamps(data):
-    """
-    Returns parsed timestamps from the ranking of all 4 processing
+def get_timestamps(data):
+	"""
+	Returns parsed timestamps from the ranking of all 4 processing
 
-    Attributes
-    -----------
-    data: lol
-        list of list of ranks
+	Attributes
+	-----------
+	data: lol
+		list of list of ranks
 
-    Returns
-    -------
-    list of list
-        timestamps list containing start and emd timestamps
+	Returns
+	-------
+	list of list
+		timestamps list containing start and emd timestamps
 
-    """
+	"""
     motion, blur, text, audio = data
     ranks = [motion[i] + blur[i] + text[i] + audio[i] for i in range(len(motion))]
 
     if ranks is not None:
-        timestamps = trimByRank(ranks)
+		timestamps = trim_by_rank(ranks)
     else:
         raise RankingOfFeatureMissing
 
@@ -153,34 +153,34 @@ def getTimestamps(data):
     return finalTimestamp
 
 
-def getOutputVideoLength(timestamps: list):
-    """
-    Calculates the output video length from the timestamps, each portion
-    length would be end - start
+def get_output_video_length(timestamps: list):
+	"""
+	Calculates the output video length from the timestamps, each portion
+	length would be end - start
 
-    Parameters
-    ----------
-    timestamps : list
-        timestamps for the video to edit
+	Parameters
+	----------
+	timestamps : list
+		timestamps for the video to edit
 
-    Returns
-    -------
-    int
-        final video length
+	Returns
+	-------
+	int
+		final video length
 
-    References
-    ----------
+	References
+	----------
 
-    timestamps has list of start and end like :
+	timestamps has list of start and end like :
 
-        [[start, end], [start, end]]
+		[[start, end], [start, end]]
 
-    to get a length of each portion
-        end - start
+	to get a length of each portion
+		end - start
 
-    to get final length
-        finalLength += end[i] - start[i] ; i: 0 -> len(timestamps)
-    """
+	to get final length
+		finalLength += end[i] - start[i] ; i: 0 -> len(timestamps)
+	"""
     videoLength = 0
     if len(timestamps) < 0:
         return 0

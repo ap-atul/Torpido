@@ -53,85 +53,85 @@ class FFMPEG:
         self.__extension = None
         self.__progressBar = None
 
-    def setIntro(self, intro):
-        """ Sets the intro video file """
-        self.__intro = intro
+    def set_intro_video(self, intro):
+		""" Sets the intro video file """
+		self.__intro = intro
 
-    def setExtro(self, extro):
-        """ Sets the extro video file """
-        self.__extro = extro
+	def set_outro_video(self, extro):
+		""" Sets the extro video file """
+		self.__extro = extro
 
-    def getInputFileNamePath(self):
-        """
-        Returns file name that was used for processing
+	def get_input_file_name_path(self):
+		"""
+		Returns file name that was used for processing
 
-        Returns
-        --------
-        str
-            final name and path of the input video file
-        """
-        if self.__inputFileName is not None:
-            return os.path.join(self.__inputFilePath, self.__inputFileName)
+		Returns
+		--------
+		str
+			final name and path of the input video file
+		"""
+		if self.__inputFileName is not None:
+			return os.path.join(self.__inputFilePath, self.__inputFileName)
         return None
 
-    def getOutputFileNamePath(self):
-        """
-        Returns output file name generated from input
-        file name
+	def get_output_file_name_path(self):
+		"""
+		Returns output file name generated from input
+		file name
 
-        Returns
-        -------
-        str
-            output file name and path of the video file
-        """
-        if self.__outputVideoFileName is not None:
+		Returns
+		-------
+		str
+			output file name and path of the video file
+		"""
+		if self.__outputVideoFileName is not None:
             return os.path.join(self.__outputFilePath, self.__outputVideoFileName)
         return None
 
-    def getInputAudioFileNamePath(self):
-        """
-        Returns name and path of the input audio file that is split from the input video file
+	def get_input_audio_file_name_path(self):
+		"""
+		Returns name and path of the input audio file that is split from the input video file
 
-        Returns
-        -------
-        str
-            input audio file name and path ready to de-noise
-        """
-        if self.__inputAudioFileName is not None:
-            return os.path.join(self.__outputFilePath, self.__inputAudioFileName)
+		Returns
+		-------
+		str
+			input audio file name and path ready to de-noise
+		"""
+		if self.__inputAudioFileName is not None:
+			return os.path.join(self.__outputFilePath, self.__inputAudioFileName)
         return None
 
-    def getOutputAudioFileNamePath(self):
-        """
-        Returns the output audio file name and path that is de-noised
+	def get_output_audio_file_name_path(self):
+		"""
+		Returns the output audio file name and path that is de-noised
 
-        Returns
-        -------
-        str
-            returns the output audio file
-        """
-        if self.__outputAudioFileName is not None:
-            return os.path.join(self.__outputFilePath, self.__outputAudioFileName)
+		Returns
+		-------
+		str
+			returns the output audio file
+		"""
+		if self.__outputAudioFileName is not None:
+			return os.path.join(self.__outputFilePath, self.__outputAudioFileName)
         return None
 
-    def splitVideoAudio(self, inputFile):
-        """
-        Function to split the input video file into audio file using FFmpeg. Progress bar is
-        updated as the command is run
+	def split_video_audio(self, inputFile):
+		"""
+		Function to split the input video file into audio file using FFmpeg. Progress bar is
+		updated as the command is run
 
-        Note : No new video file is created, only audio file is created
+		Note : No new video file is created, only audio file is created
 
-        Parameters
-        ----------
-        inputFile : str
-            input video file
+		Parameters
+		----------
+		inputFile : str
+			input video file
 
-        Returns
-        -------
-        bool
-            returns True if success else Error
+		Returns
+		-------
+		bool
+			returns True if success else Error
 
-        """
+		"""
         if os.path.isfile(inputFile) is False:
             Log.e("File does not exists")
             return False
@@ -153,7 +153,7 @@ class FFMPEG:
             self.__progressBar = Progress()
             for log in split(inputFile,
                              os.path.join(self.__outputFilePath, self.__inputAudioFileName)):
-                self.__progressBar.displayProgress(log)
+				self.__progressBar.display(log)
 
             if not os.path.isfile(os.path.join(self.__outputFilePath, self.__inputAudioFileName)):
                 raise AudioStreamMissingException
@@ -168,22 +168,22 @@ class FFMPEG:
             self.__progressBar.clear()
             return False
 
-    def mergeAudioVideo(self, timestamps):
-        """
-        Function to merge the processed files using FFmpeg. The timestamps are used the trim
-        the original video file and the audio stream is replaced with the de-noised audio
-        file created by `Auditory`
+	def merge_video_audio(self, timestamps):
+		"""
+		Function to merge the processed files using FFmpeg. The timestamps are used the trim
+		the original video file and the audio stream is replaced with the de-noised audio
+		file created by `Auditory`
 
-        Parameters
-        ----------
-        timestamps : list
-            list of start and end timestamps
+		Parameters
+		----------
+		timestamps : list
+			list of start and end timestamps
 
-        Returns
-        -------
-        bool
-            True id success else error is raised
-        """
+		Returns
+		-------
+		bool
+			True id success else error is raised
+		"""
         if self.__inputFileName is None or self.__outputAudioFileName is None:
             Log.e("Files not found for merging")
             return False
@@ -198,7 +198,7 @@ class FFMPEG:
                              timestamps,
                              intro=self.__intro,
                              extro=self.__extro):
-                self.__progressBar.displayProgress(log)
+				self.__progressBar.display(log)
 
             if not os.path.isfile(os.path.join(self.__outputFilePath, self.__outputVideoFileName)):
                 raise FFmpegProcessException
@@ -212,17 +212,17 @@ class FFMPEG:
             self.__progressBar.clear()
             return False
 
-    def cleanUp(self):
-        """
-        Deletes extra files created while processing, deletes the ranking files
-        cache, etc.
-        """
+	def clean_up(self):
+		"""
+		Deletes extra files created while processing, deletes the ranking files
+		cache, etc.
+		"""
 
-        # processing is not yet started for something went wrong
-        if self.__inputFileName is not None:
+		# processing is not yet started for something went wrong
+		if self.__inputFileName is not None:
 
-            # original audio split from the video file
-            if os.path.isfile(os.path.join(self.__outputFilePath, self.__inputAudioFileName)):
+			# original audio split from the video file
+			if os.path.isfile(os.path.join(self.__outputFilePath, self.__inputAudioFileName)):
                 os.unlink(os.path.join(self.__outputFilePath, self.__inputAudioFileName))
 
             # de-noised audio file output of Auditory

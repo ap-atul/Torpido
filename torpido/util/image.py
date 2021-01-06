@@ -58,24 +58,24 @@ def resize(image, width=None, height=None, inter=cv2.INTER_AREA):
     return resized
 
 
-def nonMaxSuppression(boxes, probs=None, overlapThresh=0.3):
-    """
-    Supression for overlapping boxes from the co-ordinates
+def non_max_suppression(boxes, probs=None, overlapThresh=0.3):
+	"""
+	Supression for overlapping boxes from the co-ordinates
 
-    Parameters
-    ----------
-    boxes : box list
-        list of values
-    probs : list
-        value of the probability
-    overlapThresh : float
-        threshold that corrects the overlapping
+	Parameters
+	----------
+	boxes : box list
+		list of values
+	probs : list
+		value of the probability
+	overlapThresh : float
+		threshold that corrects the overlapping
 
-    Returns
-    -------
-    box list
-        cleaned co-ordinates
-    """
+	Returns
+	-------
+	box list
+		cleaned co-ordinates
+	"""
     # if there are no boxes, return an empty list
     if len(boxes) == 0:
         return []

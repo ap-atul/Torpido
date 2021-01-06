@@ -105,18 +105,18 @@ class Watcher:
         self.__enable = False
         self.__stop = False
 
-    def _startCpu(self):
-        """
-        Starting the monitoring of the cpu usage. The cpu usage is not connected to the
-        current process but the entire system so the percent may vary. Hance, we are reading
-        the "proc" files of the system
-        """
+    def _start_cpu(self):
+		"""
+		Starting the monitoring of the cpu usage. The cpu usage is not connected to the
+		current process but the entire system so the percent may vary. Hance, we are reading
+		the "proc" files of the system
+		"""
 
-        total, idle = None, None
+		total, idle = None, None
 
-        try:
-            stat = self.__readCpu()
-            total, idle = times(stat)
+		try:
+			stat = self.__read_cpu()
+			total, idle = times(stat)
         except WatcherFileMissing:
             self.__stop = True
             Log.e(WatcherFileMissing.cause)
@@ -124,8 +124,8 @@ class Watcher:
         while not self.__stop:
 
             try:
-                nstat = self.__readCpu()
-                ntotal, nidle = times(nstat)
+				nstat = self.__read_cpu()
+				ntotal, nidle = times(nstat)
 
                 percent = ((ntotal - total) - (nidle - idle)) / (ntotal - total) * 100
 
@@ -148,22 +148,22 @@ class Watcher:
 
             # send to the UI
             if self._app is not None:
-                self._app.setCpuComplete(percent)
+				self._app.set_cpu_complete(percent)
 
             # sleeping the thread
             sleep(self.__delay)
 
-    def _startMem(self):
-        """
-        Starting the monitoring of the ram usage. This determines the ram used
-        by the entire system not only the current process. The ram usage may vary
-        by small units depends on the Watcher.__delay or the Config.delay
-        """
+	def _start_mem(self):
+		"""
+		Starting the monitoring of the ram usage. This determines the ram used
+		by the entire system not only the current process. The ram usage may vary
+		by small units depends on the Watcher.__delay or the Config.delay
+		"""
 
-        while not self.__stop:
-            try:
-                stat = self.__readMem()
-                percent = ((stat[0] - stat[2]) * 100) / stat[0]
+		while not self.__stop:
+			try:
+				stat = self.__read_mem()
+				percent = ((stat[0] - stat[2]) * 100) / stat[0]
 
             except ZeroDivisionError or WatcherFileMissing:
                 percent = 0
@@ -173,35 +173,35 @@ class Watcher:
 
             # send to the UI
             if self._app is not None:
-                self._app.setMemComplete(percent)
+				self._app.set_mem_complete(percent)
 
             # sleeping the thread
             sleep(self.__delay)
 
-    def __readCpu(self):
-        """ Reads the file and returns the list of the values of the times of the cpu """
-        try:
-            with open(Watcher.CPU) as f:
-                values = f.readline().split()[1:]
-            values = [float(value) / Watcher.CLOCK for value in values]
+	def __read_cpu(self):
+		""" Reads the file and returns the list of the values of the times of the cpu """
+		try:
+			with open(Watcher.CPU) as f:
+				values = f.readline().split()[1:]
+			values = [float(value) / Watcher.CLOCK for value in values]
 
-            return values
+			return values
 
-        except FileNotFoundError:
-            self.__stop = False
+		except FileNotFoundError:
+			self.__stop = False
             raise WatcherFileMissing
 
-    def __readMem(self):
-        """ Reads the files and returns 3 values representing the available, total and free memory"""
-        values = list()
+	def __read_mem(self):
+		""" Reads the files and returns 3 values representing the available, total and free memory"""
+		values = list()
 
-        try:
-            with open(Watcher.MEM) as f:
-                lines = f.readlines()[0: 3]
-                for line in lines:
-                    values.append(int(line.split()[1]))
+		try:
+			with open(Watcher.MEM) as f:
+				lines = f.readlines()[0: 3]
+				for line in lines:
+					values.append(int(line.split()[1]))
 
-            return values
+			return values
 
         except FileNotFoundError:
             self.__stop = False
@@ -217,12 +217,12 @@ class Watcher:
         Starts the watcher, which starts 2 threads for the monitoring, if the cpu
         usage is going high then try changing the delay value
         """
-        if self.__enable:
-            self.__cpu = Thread(target=self._startCpu, args=())
-            self.__mem = Thread(target=self._startMem, args=())
+		if self.__enable:
+			self.__cpu = Thread(target=self._start_cpu, args=())
+			self.__mem = Thread(target=self._start_mem, args=())
 
-            self.__cpu.start()
-            self.__mem.start()
+			self.__cpu.start()
+			self.__mem.start()
 
     def stop(self):
         """ End the monitoring """
