@@ -151,6 +151,25 @@ THEME = {
             Type.RGB: QColor(73, 84, 100),
             Type.HEX: "#495464",
         }
+    },
+
+    "Heat": {
+        Color.BGR: {
+            Type.RGB: QColor(34, 40, 49),
+            Type.HEX: "#222831",
+        },
+        Color.PRI: {
+            Type.RGB: QColor(94, 49, 46),
+            Type.HEX: "#5E312E",
+        },
+        Color.SEC: {
+            Type.RGB: QColor(156, 77, 70),
+            Type.HEX: "#9C4D46",
+        },
+        Color.TEX: {
+            Type.RGB: QColor(240, 84, 84),
+            Type.HEX: "#f05454",
+        }
     }
 }
 
@@ -162,6 +181,7 @@ STYLESHEET = {
     "Surajstan": "./ui/theme/surajstan.qss",
     "Light": "./ui/theme/light.qss",
     "Light_Shadow": "./ui/theme/shadow.qss",
+    "Heat": "./ui/theme/heat.qss",
 }
 
 
