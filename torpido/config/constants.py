@@ -143,3 +143,14 @@ LOG_FILE = "torpido.log"
 # ***************** THEME *************************
 # theme for the system
 THEME = Config.read("THEME", str)
+
+
+def rinit():
+    """
+    This function can replace all the values with new ones, but takes a very bad approach,
+    currently no using it but it can be used any way.
+
+    The thing it does it whatever variables are defined here, it will update in the global
+    scope which will be accessible instantly without restart.
+    """
+    globals().update(locals())
