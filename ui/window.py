@@ -79,14 +79,13 @@ class Donut:
 
 
 class App(QWidget):
-    REBOOT = 101
-
     videoFrame = pyqtSignal(np.ndarray)
     videoClose = pyqtSignal()
     reboot = pyqtSignal()
 
     def __init__(self):
         super().__init__()
+
         # middleware class object
         self.controller = Controller()
 
@@ -360,4 +359,4 @@ class App(QWidget):
 
     def restart(self):
         self.exit()
-        # QtGui.QGuiApplication.exit(self.REBOOT)
+        # QtGui.QGuiApplication.exit(REBOOT)

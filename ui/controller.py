@@ -94,7 +94,7 @@ class Controller(QThread):
     @pyqtSlot()
     def set_message_log(self, message):
         """ Emits the signal with the log to the ui """
-        self.logger.emit(message)
+        self.logger.emit(str(message))
 
     @pyqtSlot()
     def set_video_frame(self, frame):
