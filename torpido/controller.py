@@ -7,15 +7,14 @@ object would be shared in functions
 
 import gc
 import os
-from multiprocessing import Process, Pipe, Queue
-from threading import Thread
-from time import sleep
+from multiprocessing import Process
 
 from torpido import Analytics
 from torpido import Auditory, FFMPEG, Textual, Visual
-from torpido.config import Cache, LINUX
+from torpido.config import Cache, LINUX, ID_COM_LOGGER, ID_COM_PROGRESS, ID_COM_VIDEO
 from torpido.exceptions import RankingOfFeatureMissing, EastModelEnvironmentMissing
 from torpido.manager import ManagerPool
+from torpido.pmpi import Communication
 from torpido.tools import Watcher, Log
 from torpido.util import get_timestamps, read_rankings, check_type_video
 
@@ -85,14 +84,10 @@ class Controller:
         object of the class watcher that monitors cpu and ram usage
     __pool : ManagerPool
         object of the class ManagerPool that sets nice value for the processes
-    __progress_parent_pipe : link
-        parent communication pipe for the progress bar
-    __progress_child_pipe : link
-        child communication pipe for the progress bar
-    __logger_pipe : link / queue
-        communication link between the logs and the ui
-    __video_pipe : link
-        communication pipe for the video display in the gui thread
+    _communication : Communication
+        object of the class Communication that manages pipe communication
+    _channel : Communication.Sender
+        object of the class Sender that provides ability to send data to pipe with an identifier
     """
 
     def __init__(self):
@@ -116,6 +111,13 @@ class Controller:
         self.__watcher = None
         self.__pool = None
 
+        # communication manager
+        self._communication = Communication()
+        self._communication.register(ID_COM_LOGGER, self.set_log)
+        self._communication.register(ID_COM_PROGRESS, self.set_percent)
+        self._communication.register(ID_COM_VIDEO, self.set_video)
+        self._channel = self._communication.sender()
+
         # watcher is only available for Linux
         if LINUX:
             self.__watcher = Watcher()
@@ -128,13 +130,8 @@ class Controller:
             Log.e(EastModelEnvironmentMissing.cause)
             return
 
-        # communication links
-        self.__progress_parent_pipe, self.__progress_child_pipe = None, None
-        self.__logger_pipe = Queue()
-        self.__video_pipe = None
-
         # communication for logs to ui
-        Log.set_handler(self.__logger_pipe)
+        Log.set_handler(self._channel)
 
     def start_processing(self, app, input_file, intro=None, extro=None):
         """
@@ -180,20 +177,11 @@ class Controller:
 
             # setting watcher to enabled
             if self.__watcher is not None:
-                self.__watcher.enable(self, enable=True)
-
-            # creating pipe for progress bar communication
-            self.__progress_parent_pipe, self.__progress_child_pipe = Pipe()
-
-            # starting listening on the communication link
-            Thread(target=self.set_percent, args=()).start()
-            Thread(target=self.set_log, args=()).start()
+                self.__watcher.enable(self)
 
             # initialize the queue and thread
             if self.__video_display:
-                self.__video_pipe = Queue()
-                self.__visual.set_pipe(self.__video_pipe)
-                Thread(target=self.set_video, args=()).start()
+                self.__visual.set_pipe(self._channel)
 
         # if from terminal
         else:
@@ -236,7 +224,7 @@ class Controller:
                                              self.__snr_plot_display))
 
         self.__visual_process = Process(target=self.__visual.start_processing,
-                                        args=(self.__progress_child_pipe,
+                                        args=(self._channel,
                                               self.__video_file,
                                               self.__video_display))
 
@@ -308,26 +296,17 @@ class Controller:
         if self.__textual_process is not None:
             self.__textual_process.terminate()
 
-        # closing all communication links
-        if self.__progress_parent_pipe is not None:
-            self.__progress_parent_pipe.close()
-
-        if self.__progress_child_pipe is not None:
-            self.__progress_child_pipe.close()
-
         Log.d("Terminating the processes")
         Log.d(f"Garbage collecting .. {gc.collect()}")
+
+        # closing the comm
+        Log.set_handler(None)
+        if self._communication:
+            self._communication.end()
 
     def __del__(self):
         """ clean up """
         self.clean()
-
-    def __close_comm(self):
-        """ Close all the pipes """
-        if self.__progress_parent_pipe is not None:
-            self.__progress_parent_pipe.close()
-        if self.__progress_child_pipe is not None:
-            self.__progress_child_pipe.close()
 
     def set_save_logs(self, value=False):
         """ Save all the logs to a file """
@@ -345,50 +324,21 @@ class Controller:
         """ Display the analytics """
         self.__analytics_display = value
 
-    def set_percent(self):
+    def set_percent(self, value):
         """ Send the signal to the ui with the percentage of processing """
-        while True:
-            value = self.__progress_parent_pipe.recv()
+        # checking whether the request is from UI
+        if self.__App is not None and value is not None:
+            self.__App.set_percent_complete(value)
 
-            # checking whether the request is from UI
-            if self.__App is not None and value is not None:
-                self.__App.set_percent_complete(value)
-
-                if value == 99.0:
-                    self.__App.set_video_close()
-                    self.__close_comm()
-                    break
-
-            else:
-                sleep(0.1)
-
-    def set_log(self):
+    def set_log(self, message):
         """ Send the signal to the ui with the log of the processing """
-        while True:
-            try:
-                message = self.__logger_pipe.get()
+        if self.__App is not None:
+            self.__App.set_message_log(message)
 
-                # checking whether the request is from UI
-                if self.__App is not None and message is not None:
-                    self.__App.set_message_log(message)
-                else:
-                    sleep(0.3)
-            except EOFError as _:
-                pass
-
-    def set_video(self):
+    def set_video(self, frame):
         """ Send the signal to the ui with the video frame to display """
-        while True:
-            try:
-                frame = self.__video_pipe.get()
-
-                # checking whether the request is from UI
-                if self.__App is not None and frame is not None:
-                    self.__App.set_video_frame(frame)
-                else:
-                    sleep(0.2)
-            except EOFError as _:
-                pass
+        if self.__App is not None and frame is not None:
+            self.__App.set_video_frame(frame)
 
     def set_cpu_complete(self, val):
         """ Send the signal to the ui with the percent usage of the cpu """

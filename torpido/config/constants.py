@@ -144,6 +144,11 @@ LOG_FILE = "torpido.log"
 # theme for the system
 THEME = Config.read("THEME", str)
 
+# ******************* IDENTIFIER COMM *****************
+ID_COM_LOGGER = "logger_communication_channel"
+ID_COM_PROGRESS = "progress_communication_channel"
+ID_COM_VIDEO = "video_communication_channel"
+
 
 def rinit():
     """

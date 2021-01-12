@@ -203,7 +203,7 @@ class Visual:
 
                 # adding the frame to the pipe
                 if self.__video_pipe is not None:
-                    self.__video_pipe.put(original)
+                    self.__video_pipe.send(ID_COM_VIDEO, original)
 
                 # not a ui request, so this works
                 else:
@@ -215,11 +215,11 @@ class Visual:
 
             # setting progress on the ui
             if pipe is not None:
-                pipe.send(float((count / total_frames) * 100))
+                pipe.send(ID_COM_PROGRESS, float((count / total_frames) * 100))
 
         # completing the progress
         if pipe is not None:
-            pipe.send(99.0)
+            pipe.send(ID_COM_PROGRESS, 99.0)
 
         # clearing memory
         my_clip.release()

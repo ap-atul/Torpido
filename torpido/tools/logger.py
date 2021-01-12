@@ -5,7 +5,7 @@ Android style logging system!
 """
 import os
 
-from torpido.config.constants import CACHE_DIR, LOG_FILE
+from torpido.config.constants import CACHE_DIR, LOG_FILE, ID_COM_LOGGER
 
 
 class Log:
@@ -74,7 +74,7 @@ class Log:
         try:
             # send to ui
             if Log.pipe is not None:
-                Log.pipe.put(message)
+                Log.pipe.send(ID_COM_LOGGER, message)
 
             # save to file
             if Log.toFile:
@@ -82,7 +82,7 @@ class Log:
                     os.mkdir(os.path.join(os.getcwd(), CACHE_DIR))
 
                 with open(os.path.join(CACHE_DIR, LOG_FILE), "a", encoding='utf-8') as f:
-                    f.write(message + "\n")
+                    f.write(str(message) + "\n")
 
                 f.close()
 
