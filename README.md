@@ -108,8 +108,6 @@ sequence.
 
 ## Screens
 
-![splash](https://github.com/AP-Atul/Torpido/blob/master/img/splash.png)
-
 ![window](https://github.com/AP-Atul/Torpido/blob/master/img/window.png)
 
 ## Docs
