@@ -5,6 +5,9 @@
    - FFmpeg : to split the video and audio AND to merge the video and audio
    - OpenCV : to process the video for Motion, Text, and Blur Detection
    - Wavelet : to process the audio for Audio De-nosing
+   - pympeg : ffmpeg command generator
+   - pmpi : python message passing interface, simple pipe communication
+   - manager : prlimit to add constraints on the process using the os module
 
 ### Min Notes
    - FFT is very slow ```O(n)```
@@ -19,7 +22,30 @@
 -----------------------------------------------------------
 
 # Logs
+### Log 45, 12-01
+```AP```
+* Add the pmpi module
+* Cleaned up all extra comm threads
+* Replaced all pipe and queue communication with pmpi
+* Benchmarking on small scale for pmpi done
 
+----------------------------------------
+### Log 44, 11-01
+```AP```
+* Added pympeg into the project
+* Fixed the ffmpeg progress bar
+* Constructed the ffmpeg command line to accept new changes
+* Minor clean up and bug fixes
+
+----------------------------------------
+### Log 43, 06-01
+```AP```
+* Changed project structures
+* Re thought on the file, function, var naming convection
+* Created multiple nodes in pympeg 
+* Further activities discussed.
+
+----------------------------------------
 ### Log 42, 01-01
 ```AP```
 * Started working on the ffmpeg wrapper
