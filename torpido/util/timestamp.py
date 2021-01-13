@@ -86,7 +86,7 @@ def trim_by_rank(ranks):
 
     Returns
     --------
-    timestamps : list
+    timestamps : list-any
         timestamps parsed from the ranks
     """
     timestamps = []
