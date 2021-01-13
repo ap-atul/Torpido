@@ -14,7 +14,7 @@ class MyTestCase(unittest.TestCase):
         output_shape = (1333, 500, 3)
         self.assertEqual(output_shape, resized_image.shape)
 
-    def test_image_resize_2(self):
+    def test_image_resize_gray(self):
         white_image = np.full(
             (500, 500),
             255,

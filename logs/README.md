@@ -22,6 +22,15 @@
 -----------------------------------------------------------
 
 # Logs
+
+### Log 46, 13-01
+```AP```
+* Creating unit tests for each module
+* Written multiple tests for timestamps, image, and video utils
+* Clean up
+* Discussed on the important activities
+
+----------------------------------------
 ### Log 45, 12-01
 ```AP```
 * Add the pmpi module

@@ -9,7 +9,7 @@ class MyTestCase(unittest.TestCase):
         add_padding(new_list, 10)
         self.assertListEqual(new_list, [1, 2, 3, 4, 5, 3.0, 3.0, 3.0, 3.0, 3.0])
 
-    def test_list_pad(self):
+    def test_list_return_type(self):
         list_test = [1, 2, 3, 4, 5]
         self.assertIsNone(add_padding(list_test, 20))
 
@@ -17,7 +17,7 @@ class MyTestCase(unittest.TestCase):
         ranks = [0, 0, 0, 10, 20, 30, 0, 0]
         self.assertListEqual([[3, 5]], trim_by_rank(ranks))
 
-    def test_trim_2(self):
+    def test_trim_multiple_location(self):
         ranks = [0, 10, 20, 0, 0, 0, 50, 60]
         # returns the index
 
@@ -33,7 +33,7 @@ class MyTestCase(unittest.TestCase):
 
         self.assertListEqual([[3, 5]], get_timestamps(ranks))
 
-    def test_timestamps_2(self):
+    def test_timestamps_big_range(self):
         ranks = [
             [10, 0.1, 10, 10, 10],
             [11, 21, 13, 41, 51],
