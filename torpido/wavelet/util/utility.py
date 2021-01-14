@@ -59,7 +59,7 @@ def threshold(data, value, substitute=0):
         # divide by zero okay as np.inf values get clipped, so ignore warning.
         thresholded = (1 - value / magnitude)
         thresholded.clip(min=0, max=None, out=thresholded)
-        thresholded = data * thresholded
+        thresholded *= data
 
     if substitute == 0:
         return thresholded

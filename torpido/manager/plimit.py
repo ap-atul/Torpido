@@ -236,8 +236,5 @@ class ManagerPool:
 
         Useful while testing or for some other purposes.
         """
-        for pid, _ in self.__pool.items():
-            self.__manager.unregister(pid)
-
         # re creating empty dictionary
         self.__pool = dict()

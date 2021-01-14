@@ -5,6 +5,7 @@ linked using the Label that identifies the stream and builds the
 filter and is understandable by the ffmpeg command line.
 """
 
+import os
 from subprocess import Popen, PIPE
 
 from ._builder import Stream
@@ -267,6 +268,9 @@ def input(*args, name):
     if name is None:
         raise InputParamsMissing("File name required in input function")
 
+    if not os.path.isfile(name):
+        raise FileExistsError(f"Input file {name} does not exits.")
+
     # creating a file input filter
     node = InputNode(name, s.count)
 
@@ -429,6 +433,9 @@ def arg(caller=None, args=None, outputs=None, inputs=None):
     if isinstance(outputs, list):
         for out in outputs:
             node.add_output(_get_label_param(out))
+    elif isinstance(outputs, int):
+        for _ in range(outputs):
+            node.add_output(Label())
     else:
         node.add_output(_get_label_param(outputs))
 

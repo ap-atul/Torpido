@@ -248,6 +248,7 @@ class Controller:
         self.__textual_process.join()
 
         # running the final pass
+        self.__pool.clean()
         self.__completed()
 
     def __completed(self):

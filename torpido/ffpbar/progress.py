@@ -37,6 +37,7 @@ class Progress:
     def complete(self):
         """ Completes the progress bar """
         self._bar.update(100)
+        self._percent = 100
 
     def __get_progress(self, duration, time):
         """ Returns the percent as percentage from duration and time """
@@ -49,6 +50,7 @@ class Progress:
     def clear(self):
         """ Clears the percent bar """
         self._bar.clear()
+        self._percent = 0
 
     def __del__(self):
         self._bar.close()
