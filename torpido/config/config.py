@@ -119,7 +119,7 @@ class File:
         """
         configs = dict()
 
-        with open(CONFIG_FILE, "r") as config:
+        with open(CONFIG_FILE) as config:
             for line in config.readlines():
                 key, value = line.split(SEPARATOR)
                 configs[key] = value.replace("\n", "")
