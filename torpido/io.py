@@ -50,7 +50,7 @@ class FFMPEG:
         self.__input_audio_file_name = None
         self.__output_audio_file_name = None
         self.__output_file_path = None
-        self.__thumnail_file = None
+        self.__thumbnail_file = None
         self.__intro = None
         self.__extro = None
         self.__extension = None
@@ -65,57 +65,24 @@ class FFMPEG:
         self.__extro = extro
 
     def get_input_file_name_path(self):
-        """
-        Returns file name that was used for processing
-
-        Returns
-        --------
-        str
-            final name and path of the input video file
-        """
+        """ Returns file name that was used for processing """
         if self.__input_file_name is not None:
             return os.path.join(self.__input_file_path, self.__input_file_name)
-        return None
 
     def get_output_file_name_path(self):
-        """
-        Returns output file name generated from input
-        file name
-
-        Returns
-        -------
-        str
-            output file name and path of the video file
-        """
+        """ Returns output file name generated from input file name """
         if self.__output_video_file_name is not None:
             return os.path.join(self.__output_file_path, self.__output_video_file_name)
-        return None
 
     def get_input_audio_file_name_path(self):
-        """
-        Returns name and path of the input audio file that is split from the input video file
-
-        Returns
-        -------
-        str
-            input audio file name and path ready to de-noise
-        """
+        """  Returns name and path of the input audio file that is split from the input video file  """
         if self.__input_audio_file_name is not None:
             return os.path.join(self.__output_file_path, self.__input_audio_file_name)
-        return None
 
     def get_output_audio_file_name_path(self):
-        """
-        Returns the output audio file name and path that is de-noised
-
-        Returns
-        -------
-        str
-            returns the output audio file
-        """
+        """ Returns the output audio file name and path that is de-noised """
         if self.__output_audio_file_name is not None:
             return os.path.join(self.__output_file_path, self.__output_audio_file_name)
-        return None
 
     def split_video_audio(self, input_file):
         """
@@ -150,7 +117,7 @@ class FFMPEG:
         self.__output_video_file_name = "".join([base_name, OUT_VIDEO_FILE, self.__extension])
         self.__input_audio_file_name = base_name + IN_AUDIO_FILE
         self.__output_audio_file_name = base_name + OUT_AUDIO_FILE
-        self.__thumnail_file = base_name + THUMBNAIL_FILE
+        self.__thumbnail_file = base_name + THUMBNAIL_FILE
 
         # call ffmpeg tool to do the splitting
         try:
@@ -218,16 +185,27 @@ class FFMPEG:
             return False
 
     def gen_thumbnail(self, time):
+        """
+        Generates the thumbnail from the timestamps. Since, the timestamps contains the best
+        of all the video, so picking a random int (sec) from a video and saving the frame
+        as the thumbnail, Later some kind of peak rank from the input data can be picked.
+
+        Notes
+        -----
+        To pick the max rank we can use the sum rank and easily get the max value and use
+        it to generate the thumbnail for the video.
+
+        """
         # call ffmpeg tool to merge the files
         try:
             self.__progress_bar = Progress()
             Log.i("Writing the output video file.")
             for log in thumbnail(os.path.join(self.__output_file_path, self.__input_file_name),
-                                 os.path.join(self.__output_file_path, self.__thumnail_file),
+                                 os.path.join(self.__output_file_path, self.__thumbnail_file),
                                  time):
                 self.__progress_bar.display(log)
 
-            if not os.path.isfile(os.path.join(self.__output_file_path, self.__thumnail_file)):
+            if not os.path.isfile(os.path.join(self.__output_file_path, self.__thumbnail_file)):
                 raise FFmpegProcessException
 
             self.__progress_bar.complete()

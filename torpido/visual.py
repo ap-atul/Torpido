@@ -45,11 +45,11 @@ class Visual:
         cv2.setUseOptimized(True)
         self.__blur_threshold = BLUR_THRESHOLD
         self.__motion_threshold = MOTION_THRESHOLD
+        self.__cache = Cache()
         self.__fps = None
         self.__frame_count = None
         self.__motion = None
         self.__blur = None
-        self.__cache = Cache()
         self.__video_getter = None
         self.__video_pipe = None
 
@@ -84,8 +84,8 @@ class Visual:
         mean/average as the rank for the 1 sec
 
         """
-        motion_normalize = []
-        blur_normalize = []
+        motion_normalize = list()
+        blur_normalize = list()
         for i in range(0, int(self.__frame_count), int(self.__fps)):
             if len(self.__motion) >= (i + int(self.__fps)):
                 motion_normalize.append(np.mean(self.__motion[i: i + int(self.__fps)]))
@@ -100,21 +100,15 @@ class Visual:
         Log.i(f"Visual ranking saved .............")
 
     def __set_video_fps(self):
-        """
-        Function to set the original video fps to cache
-        """
+        """ Function to set the original video fps to cache """
         self.__cache.write_data(CACHE_FPS, self.__fps)
 
     def __set_video_frame_count(self):
-        """
-        Function to set the original video frame count to cache
-        """
+        """ Function to set the original video frame count to cache """
         self.__cache.write_data(CACHE_FRAME_COUNT, self.__frame_count)
 
     def __del__(self):
-        """
-        Clean ups
-        """
+        """ Clean  ups """
         del self.__cache
         if self.__video_getter is not None:
             del self.__video_getter
@@ -141,8 +135,7 @@ class Visual:
             return
 
         # maintaining the motion and blur frames list
-        self.__motion = list()
-        self.__blur = list()
+        self.__motion, self.__blur = list(), list()
 
         self.__video_getter = VideoGet(str(inputFile)).start()
         my_clip = self.__video_getter.stream
@@ -171,6 +164,7 @@ class Visual:
         count = 0
         first_frame = self.__video_getter.read()
         first_frame_processed = True
+        original = None
 
         while self.__video_getter.more():
             frame = self.__video_getter.read()
@@ -178,7 +172,9 @@ class Visual:
             if frame is None:
                 break
 
-            original = frame
+            if display:
+                original = frame
+
             count += 1
 
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)

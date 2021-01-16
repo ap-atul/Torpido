@@ -69,6 +69,9 @@ class Textual:
         self.__HEIGHT = 320  # same thing for this
         self.__skip_frames = TEXT_SKIP_FRAMES
 
+        # saving the original dim of the frame
+        self._original_H, self._original_W = None, None
+
         # initializing the model
         # reading the model in the memory
         if TEXT_EAST_MODEL_PATH is not None:
@@ -81,7 +84,7 @@ class Textual:
 
         # adding output layers to the model with text detected boxes
         self.__text_display_layer_names = ["feature_fusion/Conv_7/Sigmoid",
-                                        "feature_fusion/concat_3"]
+                                           "feature_fusion/concat_3"]
 
     def __run_text_detect(self, blob):
         """
@@ -101,8 +104,9 @@ class Textual:
         self.__net.setInput(blob)
         scores = self.__net.forward(self.__text_detect_layer_name)
         num_rows, num_cols = np.asarray(scores).shape[3: 5]
-        confidences = []
+        confidences = list()
 
+        # make this faster some how ?
         # since image is 320x320 the output is 80x80 (scores)
         for x in range(0, num_rows):
             scoreData = scores[0][0][0][x]
@@ -115,9 +119,10 @@ class Textual:
         # if confidences contain some value
         if len(confidences) > 0:
             return True
+
         return False
 
-    def __run_text_detect_display(self, blob, rSize, original):
+    def __run_text_detect_display(self, blob, original):
         """
         Function to detect text using layer for getting the rectangles
         to display on the frame
@@ -126,8 +131,6 @@ class Textual:
         ----------
         blob : blob
             blob of the image
-        rSize : tuple
-            real sizes of the images
         original : image array
             un-resized image to display
 
@@ -141,8 +144,11 @@ class Textual:
         scores, geometry = self.__net.forward(self.__text_display_layer_names)
 
         num_rows, num_cols = scores.shape[2:4]
-        rect = []
-        confidences = []
+        rW = self._original_W / float(self.__WIDTH)
+        rH = self._original_H / float(self.__HEIGHT)
+        rSize = (rW, rH)
+        rect = list()
+        confidences = list()
 
         # since image is 320x320 the output is 80x80 (scores)
         for y in range(0, num_rows):
@@ -219,7 +225,7 @@ class Textual:
         we will read the list and slice the video to get 1 sec of frames and get
         mean/average as the rank for the 1 sec
         """
-        text_normalize = []
+        text_normalize = list()
         for i in range(0, int(self.__frame_count), int(self.__fps)):
             if len(self.__text_ranks) >= (i + int(self.__fps)):
                 text_normalize.append(np.mean(self.__text_ranks[i: i + int(self.__fps)]))
@@ -269,7 +275,8 @@ class Textual:
 
         # maintaining the ranks for text detection
         count = 0
-        self.__text_ranks = []
+        original = None
+        self.__text_ranks = list()
 
         while self.__video_getter.more():
             frame = self.__video_getter.read()
@@ -277,13 +284,15 @@ class Textual:
             if frame is None:
                 break
 
+            if self._original_H is None:
+                self._original_H, self._original_W = frame.shape[:2]
+
+            if display:
+                original = frame
+
             # resizing the frame to a multiple of 32 x 32
-            # resizing the frame
-            original = frame
-            (H, W) = frame.shape[:2]
-            rW = W / float(self.__WIDTH)
-            rH = H / float(self.__HEIGHT)
-            frame = cv2.resize(frame, (W, H))
+            frame = cv2.resize(frame, (self.__WIDTH, self.__HEIGHT))
+
             count += 1
 
             if count % self.__skip_frames == 0:
@@ -297,7 +306,7 @@ class Textual:
 
                 # run text detection
                 if display:
-                    detectedText = self.__run_text_detect_display(blob, (rW, rH), original)
+                    detectedText = self.__run_text_detect_display(blob, original)
                 else:
                     detectedText = self.__run_text_detect(blob)
 

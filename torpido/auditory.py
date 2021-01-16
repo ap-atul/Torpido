@@ -13,7 +13,7 @@ from matplotlib import pyplot as plt
 from torpido.config.cache import Cache
 from torpido.config.constants import *
 from torpido.tools.logger import Log
-from torpido.wavelet import FastWaveletTransform, getExponent, VisuShrinkCompressor, snr
+from torpido.wavelet import FastWaveletTransform, VisuShrinkCompressor, snr
 
 matplotlib.use("TkAgg")
 
@@ -154,9 +154,10 @@ class Auditory:
         self.__energy = []
         Log.i(f"Audio duration is {self.__info.duration}.")
 
+        to_read = int(self.__rate * self.__info.duration * AUDIO_BLOCK_PER)
         # creating and opening the output audio file
         with soundfile.SoundFile(outputFile, mode="w", samplerate=self.__rate, channels=self.__info.channels) as out:
-            for block in soundfile.blocks(self.__file_name, int(self.__rate * self.__info.duration * AUDIO_BLOCK_PER)):
+            for block in soundfile.blocks(self.__file_name, to_read):
 
                 # decomposition -> threshold -> reconstruction
                 coefficients = self.__fwt.wavedec(block)
