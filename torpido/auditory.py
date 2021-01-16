@@ -155,19 +155,13 @@ class Auditory:
         Log.i(f"Audio duration is {self.__info.duration}.")
 
         # creating and opening the output audio file
-        with soundfile.SoundFile(outputFile, mode="w", samplerate=self.__rate, channels=1) as out:
+        with soundfile.SoundFile(outputFile, mode="w", samplerate=self.__rate, channels=self.__info.channels) as out:
             for block in soundfile.blocks(self.__file_name, int(self.__rate * self.__info.duration * AUDIO_BLOCK_PER)):
-                # processing only single channel
-                if block.ndim > 1:
-                    block = block[:, 0]
-
-                # cal all coefficients
-                level = getExponent(len(block))
 
                 # decomposition -> threshold -> reconstruction
-                coefficients = self.__fwt.wavedec(block, level=level)
+                coefficients = self.__fwt.wavedec(block)
                 coefficients = self.__compressor.compress(coefficients)
-                cleaned = self.__fwt.waverec(coefficients, level=level)
+                cleaned = self.__fwt.waverec(coefficients)
 
                 # recreating the audio signal in original form and writing to the output file
                 cleaned = np.array(cleaned, dtype=np.float_)

@@ -90,33 +90,23 @@ def trim_by_rank(ranks):
     timestamps : list-any
         timestamps parsed from the ranks
     """
-    timestamps = []
-    start = None
-    end = None
-    prev_end = 0
-    for i in range(0, len(ranks)):
-        if ranks[i] > MIN_RANK_OUT_VIDEO:
-            if start is None:
-                start = i
-            prev_end += 1
+    timestamps = list()
+    start, end, prev_end, i = None, None, 0, 0
+    min_rank_out = MIN_RANK_OUT_VIDEO
 
-        else:
-            if end is None and start is not None:
-                end = start + prev_end - 1
-                if start == end:
-                    end = None
+    for i in range(len(ranks)):
+        if start is None and ranks[i] > min_rank_out:
+            start = i
+
+        if start is not None and end is None and ranks[i] <= min_rank_out:
+            end = i - 1
 
         if start is not None and end is not None:
-            start = start
-            end = end
             timestamps.append([start, end])
-            end = None
-            start = None
-            prev_end = 0
+            start, end = None, None
 
-    if start is not None and end is None:
-        end = len(ranks)
-        timestamps.append([start, end])
+    if end is None and start is not None:
+        timestamps.append([start, i])
 
     return timestamps
 

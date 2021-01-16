@@ -37,7 +37,7 @@ BLUR_THRESHOLD = 500
 
 # ******************* AUDIO PART *************************
 # reading 10 percent of audio file at a time
-AUDIO_BLOCK_PER = 0.2
+AUDIO_BLOCK_PER = 0.1
 
 # wavelet used to de noise/  Coiflet wavelet band
 WAVELET = "coif1"

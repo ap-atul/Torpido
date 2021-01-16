@@ -79,7 +79,7 @@ class VideoGet:
             returns the frame to process, if timeout(queue lock) occurs None is returned
         """
         try:
-            data = self.__Q.get(True, 3)
+            data = self.__Q.get()
         except Empty:
             data = None
         return data

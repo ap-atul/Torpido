@@ -48,8 +48,6 @@ class Controller:
         middleware of the controller and the ui
     __video_file : str
         input video file to process
-    __output_file : str
-        output video file generated
     __audio_file : str
         input audio file split from the video file
     __audio_process : Process
@@ -93,7 +91,6 @@ class Controller:
     def __init__(self):
         self.__App = None
         self.__video_file = None
-        self.__output_file = None
         self.__audio_file = None
         self.__audio_process = None
         self.__visual_process = None
@@ -202,7 +199,6 @@ class Controller:
             return
 
         self.__video_file = input_file
-        self.__output_file = self.__ffmpeg.get_output_file_name_path()
         self.__audio_file = self.__ffmpeg.get_input_audio_file_name_path()
         self.__de_noised_audio_file = self.__ffmpeg.get_output_audio_file_name_path()
 
