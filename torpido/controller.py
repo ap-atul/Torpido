@@ -16,7 +16,7 @@ from torpido.exceptions import RankingOfFeatureMissing, EastModelEnvironmentMiss
 from torpido.manager import ManagerPool
 from torpido.pmpi import Communication
 from torpido.tools import Watcher, Log
-from torpido.util import get_timestamps, read_rankings, check_type_video
+from torpido.util import get_timestamps, read_rankings, check_type_video, get_thumbnail_sec
 
 
 def logo():
@@ -279,6 +279,11 @@ class Controller:
             Log.d("Merged the final output video ...............")
         else:
             return
+
+        # doing it anyway
+        if True:
+            if self.__ffmpeg.gen_thumbnail(get_thumbnail_sec(timestamps)):
+                Log.d("Generated a thumbnail....")
 
         self.__ffmpeg.clean_up()
         self.__App.set_percent_complete(100.0)

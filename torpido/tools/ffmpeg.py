@@ -11,6 +11,7 @@ from torpido.tools.logger import Log
 
 
 def split(input_file, output_audio_file):
+    """ Splitting the input video file into audio """
     command = _build_split_command(input_file, output_audio_file)
     command = ' '.join(command)
     Log.i(command)
@@ -20,7 +21,17 @@ def split(input_file, output_audio_file):
 
 
 def merge(video_file, audio_file, output_file, timestamps, intro=None, extro=None):
+    """ Merging the final video using the denoised audio and the video stream """
     command = _build_merge_command_v2(video_file, audio_file, output_file, timestamps, intro, extro)
+    Log.i(command)
+
+    for log in _ffmpeg_runner(command):
+        yield log
+
+
+def thumbnail(video_file, output_file, sec):
+    """ Generates a thumnail for the video using the time in the video """
+    command = _build_thumbnail_gen(video_file, output_file, sec)
     Log.i(command)
 
     for log in _ffmpeg_runner(command):
@@ -38,7 +49,7 @@ def _ffmpeg_runner(command):
 
     run.stdout.close()
     if run.wait():
-        Log.e("The splitting process has caused an error.")
+        Log.e("FFMPEG has encounter an error!")
         raise AudioStreamMissingException
 
 
@@ -99,6 +110,7 @@ def get_width_height(video_file):
 
 
 def _build_merge_command_v2(video_file, audio_file, output_file, timestamps, intro=None, outro=None):
+    pympeg.init()
 
     # getting output video resolution using ffprobe
     output_width, output_height = get_width_height(video_file)
@@ -167,3 +179,19 @@ def _build_merge_command_v2(video_file, audio_file, output_file, timestamps, int
 
     # returning the command
     return pympeg.output([op[0], op[1]], name=output_file).command()
+
+
+def _build_thumbnail_gen(video_file, output_file, sec):
+    """ ffmpeg -i example_02.mp4 -ss 20 -frames 1 output.png """
+    pympeg.init()
+
+    command = (
+        pympeg
+        .option(tag="-ss", name=str(sec))
+        .option(tag="-frames", name="1")
+        .input(name=video_file)
+        .output(name=output_file, map_cmd="")
+        .command()
+    )
+
+    return command

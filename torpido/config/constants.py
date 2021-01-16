@@ -113,6 +113,9 @@ IN_AUDIO_FILE = "_audio.wav"
 # output audio name processes and cleaned
 OUT_AUDIO_FILE = "_audio_de_noised.wav"
 
+# thumbnail file name
+THUMBNAIL_FILE = "_thumbnail.jpg"
+
 # supported video file formats
 SUPPORTED_VIDEO_FILES = [".mp4", ".webm", ".mkv", ".mov", ".flv", ".avi", ".ogg"]
 

@@ -9,6 +9,7 @@ using ffmpeg.
     4. Returning a list of list containing (start -> end) time stamps
 
 """
+from random import randint
 
 from torpido.config.cache import Cache
 from torpido.config.constants import (CACHE_RANK_MOTION, CACHE_RANK_TEXT,
@@ -189,3 +190,14 @@ def get_output_video_length(timestamps: list):
         video_length += abs(end - start)
 
     return video_length
+
+
+def get_thumbnail_sec(timestamps: list):
+    """ Returns the sec for the thumnbail to generate """
+    if len(timestamps) == 0:
+        raise TypeError("There are no timestamps.")
+
+    first = timestamps[0]
+    start, end = first[0], first[1]
+
+    return randint(start, end)

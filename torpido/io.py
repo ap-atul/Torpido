@@ -5,10 +5,12 @@ using ffmpeg.
 """
 import os
 
-from torpido.config.constants import CACHE_DIR, CACHE_NAME, IN_AUDIO_FILE, OUT_AUDIO_FILE, OUT_VIDEO_FILE
+from torpido.config.constants import (CACHE_DIR, CACHE_NAME,
+                                      IN_AUDIO_FILE, OUT_AUDIO_FILE,
+                                      OUT_VIDEO_FILE, THUMBNAIL_FILE)
 from torpido.exceptions import AudioStreamMissingException, FFmpegProcessException
 from torpido.ffpbar import Progress
-from torpido.tools.ffmpeg import split, merge
+from torpido.tools.ffmpeg import split, merge, thumbnail
 from torpido.tools.logger import Log
 
 
@@ -48,6 +50,7 @@ class FFMPEG:
         self.__input_audio_file_name = None
         self.__output_audio_file_name = None
         self.__output_file_path = None
+        self.__thumnail_file = None
         self.__intro = None
         self.__extro = None
         self.__extension = None
@@ -147,6 +150,7 @@ class FFMPEG:
         self.__output_video_file_name = "".join([base_name, OUT_VIDEO_FILE, self.__extension])
         self.__input_audio_file_name = base_name + IN_AUDIO_FILE
         self.__output_audio_file_name = base_name + OUT_AUDIO_FILE
+        self.__thumnail_file = base_name + THUMBNAIL_FILE
 
         # call ffmpeg tool to do the splitting
         try:
@@ -202,6 +206,28 @@ class FFMPEG:
                 self.__progress_bar.display(log)
 
             if not os.path.isfile(os.path.join(self.__output_file_path, self.__output_video_file_name)):
+                raise FFmpegProcessException
+
+            self.__progress_bar.complete()
+            print("----------------------------------------------------------")
+            return True
+
+        except FFmpegProcessException:
+            Log.e(FFmpegProcessException.cause)
+            self.__progress_bar.clear()
+            return False
+
+    def gen_thumbnail(self, time):
+        # call ffmpeg tool to merge the files
+        try:
+            self.__progress_bar = Progress()
+            Log.i("Writing the output video file.")
+            for log in thumbnail(os.path.join(self.__output_file_path, self.__input_file_name),
+                                 os.path.join(self.__output_file_path, self.__thumnail_file),
+                                 time):
+                self.__progress_bar.display(log)
+
+            if not os.path.isfile(os.path.join(self.__output_file_path, self.__thumnail_file)):
                 raise FFmpegProcessException
 
             self.__progress_bar.complete()
