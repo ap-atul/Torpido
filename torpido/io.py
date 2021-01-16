@@ -141,11 +141,12 @@ class FFMPEG:
         self.__output_file_path = self.__input_file_path
         self.__input_file_name = os.path.basename(input_file)
 
-        _, self.__extension = os.path.splitext(self.__input_file_name)
-        self.__output_video_file_name = "".join([self.__input_file_name, OUT_VIDEO_FILE, self.__extension])
+        # get the base name without the extension
+        base_name, self.__extension = os.path.splitext(self.__input_file_name)
 
-        self.__input_audio_file_name = self.__input_file_name + IN_AUDIO_FILE
-        self.__output_audio_file_name = self.__input_file_name + OUT_AUDIO_FILE
+        self.__output_video_file_name = "".join([base_name, OUT_VIDEO_FILE, self.__extension])
+        self.__input_audio_file_name = base_name + IN_AUDIO_FILE
+        self.__output_audio_file_name = base_name + OUT_AUDIO_FILE
 
         # call ffmpeg tool to do the splitting
         try:
