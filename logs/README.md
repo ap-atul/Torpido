@@ -23,6 +23,15 @@
 
 # Logs
 
+### Log 47, 16-01
+```AP```
+* Minor clean up
+* Few bugs fixed
+* Added thumbnail generation
+* Fixed multi-channel audio issue
+* Thinking of integrating yacp.
+
+----------------------------------------
 ### Log 46, 13-01
 ```AP```
 * Creating unit tests for each module
