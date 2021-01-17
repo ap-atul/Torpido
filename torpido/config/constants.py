@@ -1,8 +1,6 @@
 import os
 from sys import platform
 
-from torpido.config.config import Config
-
 # file to save all the constants that are to be used
 # os type
 LINUX = platform.startswith("linux")
@@ -48,41 +46,12 @@ CACHE_VIDEO_WIDTH = "CACHE_VIDEO_WIDTH"
 # video height
 CACHE_VIDEO_HEIGHT = "CACHE_VIDEO_HEIGHT"
 
-# ******************* RANKS ****************************
-# ranking for motion in video
-RANK_MOTION = Config.read("RANK_MOTION", float)
-
-# ranking for blur in video
-RANK_BLUR = Config.read("RANK_BLUR", float)
-
-# ranking for audio silence
-RANK_AUDIO = Config.read("RANK_AUDIO", float)
-
-# ranking for text in video
-RANK_TEXT = Config.read("RANK_TEXT", float)
-
-# output video min rank
-MIN_RANK_OUT_VIDEO = Config.read("MIN_RANK_OUT_VIDEO", float)
-
 # ******************* VIDEO PART *************************
 # video width to keep while processing
 VIDEO_WIDTH = 500
 
-# threshold for video reading motion
-MOTION_THRESHOLD = Config.read("MOTION_THRESHOLD", int)
-
-# threshold for blur detection
-BLUR_THRESHOLD = Config.read("BLUR_THRESHOLD", int)
-
-# ******************* AUDIO PART *************************
-# reading 10 percent of audio file at a time
-AUDIO_BLOCK_PER = Config.read("AUDIO_BLOCK_PER", float)
-
 # window level in the wavelet level
 WAVELET_LEVEL = 1
-
-# wavelet used to de noise/  Coiflet wavelet band
-WAVELET = Config.read("WAVELET", str)
 
 # decomposition and re composition mode
 DEC_REC_MODE = "per"
@@ -90,15 +59,7 @@ DEC_REC_MODE = "per"
 # wave threshold method
 WAVE_THRESH = "soft"
 
-# silence threshold
-SILENCE_THRESHOlD = Config.read("SILENCE_THRESHOlD", float)
-
 # ********************** TEXTUAL PART ************************
-# min confidence of the text being detected
-TEXT_MIN_CONFIDENCE = Config.read("TEXT_MIN_CONFIDENCE", float)
-
-# text detection is slow so some frames are skipped (sec)
-TEXT_SKIP_FRAMES = Config.read("TEXT_SKIP_FRAMES", int)
 
 # text detection model directory
 TEXT_EAST_MODEL_PATH = os.environ['EAST_MODEL']
@@ -125,10 +86,6 @@ FADE_IN = 3
 # fade out effect duration in seconds
 FADE_OUT = 3
 
-# ********************* WATCHER ***********************************
-# delay to check the CPU and MEM usage (in secs)
-WATCHER_DELAY = Config.read("WATCHER_DELAY", int)
-
 # ******************** UI ***************************************
 # minimum height of window
 WINDOW_HEIGHT = 630
@@ -143,14 +100,12 @@ WINDOW_TITLE = "Video Editing Automation (aka. Torpido)"
 # log file
 LOG_FILE = "torpido.log"
 
-# ***************** THEME *************************
-# theme for the system
-THEME = Config.read("THEME", str)
-
 # ******************* IDENTIFIER COMM *****************
 ID_COM_LOGGER = "logger_communication_channel"
 ID_COM_PROGRESS = "progress_communication_channel"
 ID_COM_VIDEO = "video_communication_channel"
+
+REBOOT = 101
 
 
 def rinit():

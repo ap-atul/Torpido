@@ -1,205 +1,71 @@
 """
-File to load runtime config for the system. Integration for the
-settings features the UI and for other functionality as well.
-All constants are here defined in the file and can be loaded from there
-on runtime and can be changed at runtime, similar to YMAL files
+File to load runtime config for the system.
 """
 
 import os
 
+from torpido import yacp
+
 # text file storing all the configurations
 CONFIG_FILE = "config.torpido"
 
-# separator for the key & value in the text file
-SEPARATOR = ":"
-
-# ranking for motion in video
-RANK_MOTION = 3
-
-# ranking for blur in video
-RANK_BLUR = 2
-
-# ranking for audio silence
-RANK_AUDIO = 3
-
-# ranking for text in video
-RANK_TEXT = 5
-
-# output video min rank
-MIN_RANK_OUT_VIDEO = 3
-
-# ******************* VIDEO PART *************************
-# threshold for video reading motion
-MOTION_THRESHOLD = 50
-
-# threshold for blur detection
-BLUR_THRESHOLD = 500
-
-# ******************* AUDIO PART *************************
-# reading 10 percent of audio file at a time
-AUDIO_BLOCK_PER = 0.1
-
-# wavelet used to de noise/  Coiflet wavelet band
-WAVELET = "coif1"
-
-# silence threshold
-SILENCE_THRESHOlD = 0.005
-
-# ********************** TEXTUAL PART ************************
-# min confidence of the text being detected
-TEXT_MIN_CONFIDENCE = 0.5
-
-# text detection is slow so some frames are skipped (sec)
-TEXT_SKIP_FRAMES = 10
-
-# delay to check the CPU and MEM usage (in secs)
-WATCHER_DELAY = 5
-
-# theme for torpido
-THEME = "default"
+# syntax for parsing the config file
+SYNTAX = "%s=%s"
 
 
-class File:
-    """
-    All interactions with the config file would be handled by this class.
-    Responsible to write, read and initialize the configs.
-    """
+class _TorpidoSettings:
+    # ranking for motion in video
+    RANK_MOTION = 3
 
-    @staticmethod
-    def init():
-        """
-        Creates the file and writes all initials values, constants
-        to the initial following the file format.
-        All changes will be rewritten on request from the ui component
-        All constants bare same key aas their name mentioned
-        """
-        configs = [("RANK_MOTION" + SEPARATOR + str(RANK_MOTION) + "\n"),
-                   ("RANK_BLUR" + SEPARATOR + str(RANK_BLUR) + "\n"),
-                   ("RANK_TEXT" + SEPARATOR + str(RANK_TEXT) + "\n"),
-                   ("RANK_AUDIO" + SEPARATOR + str(RANK_AUDIO) + "\n"),
+    # ranking for blur in video
+    RANK_BLUR = 2
 
-                   ("MIN_RANK_OUT_VIDEO" + SEPARATOR + str(MIN_RANK_OUT_VIDEO) + "\n"),
-                   ("MOTION_THRESHOLD" + SEPARATOR + str(MOTION_THRESHOLD) + "\n"),
-                   ("BLUR_THRESHOLD" + SEPARATOR + str(BLUR_THRESHOLD) + "\n"),
-                   ("SILENCE_THRESHOlD" + SEPARATOR + str(SILENCE_THRESHOlD) + "\n"),
-                   ("TEXT_MIN_CONFIDENCE" + SEPARATOR + str(TEXT_MIN_CONFIDENCE) + "\n"),
+    # ranking for audio silence
+    RANK_AUDIO = 3
 
-                   ("AUDIO_BLOCK_PER" + SEPARATOR + str(AUDIO_BLOCK_PER) + "\n"),
-                   ("TEXT_SKIP_FRAMES" + SEPARATOR + str(TEXT_SKIP_FRAMES) + "\n"),
-                   ("WAVELET" + SEPARATOR + str(WAVELET) + "\n"),
+    # ranking for text in video
+    RANK_TEXT = 5
 
-                   ("WATCHER_DELAY" + SEPARATOR + str(WATCHER_DELAY) + "\n"),
+    # output video min rank
+    MIN_RANK_OUT_VIDEO = 3
 
-                   ("THEME" + SEPARATOR + str(THEME))
-                   ]
+    # ******************* VIDEO PART *************************
+    # threshold for video reading motion
+    MOTION_THRESHOLD = 50
 
-        with open(CONFIG_FILE, "w") as config:
-            config.writelines(configs)
-            config.close()
+    # threshold for blur detection
+    BLUR_THRESHOLD = 500
 
-    @staticmethod
-    def write(configs):
-        """
-        Write the entire dictionary containing the updated values
-        """
-        with open(CONFIG_FILE, "w") as config:
-            for key, value in configs.items():
-                config.write(str(key) + SEPARATOR + str(value) + "\n")
-            config.close()
+    # ******************* AUDIO PART *************************
+    # reading 10 percent of audio file at a time
+    AUDIO_BLOCK_PER = 0.1
 
-    @staticmethod
-    def get():
-        """
-        Read the file, parse the data in dictionary
+    # wavelet used to de noise/  Coiflet wavelet band
+    WAVELET = "coif1"
 
-        Returns
-        -------
-        dict
-            dictionary of all the constants and their values
-        """
-        configs = dict()
+    # silence threshold
+    SILENCE_THRESHOLD = 0.005
 
-        with open(CONFIG_FILE) as config:
-            for line in config.readlines():
-                key, value = line.split(SEPARATOR)
-                configs[key] = value.replace("\n", "")
+    # ********************** TEXTUAL PART ************************
+    # min confidence of the text being detected
+    TEXT_MIN_CONFIDENCE = 0.5
 
-        return configs
+    # text detection is slow so some frames are skipped (sec)
+    TEXT_SKIP_FRAMES = 10
+
+    # delay to check the CPU and MEM usage (in secs)
+    WATCHER_DELAY = 5
+
+    # theme for torpido
+    THEME = "default"
 
 
-class Config:
-    """
-    Manages the config for the system, interacts with the File
-    class for read / write and init
-    Make sures the config is present and update
+def write_config(cls):
+    yacp.dump(CONFIG_FILE, cls, syntax=SYNTAX)
 
-    Attributes
-    ----------
-    Config.configs : dict
-        dict that stores all the config for the system
-    """
 
-    if not os.path.isfile(CONFIG_FILE):
-        File.init()
+if not os.path.isfile(CONFIG_FILE):
+    yacp.dump(CONFIG_FILE, _TorpidoSettings, syntax=SYNTAX)
 
-    # stores the configurations
-    configs = File.get()
-
-    if len(configs) == 0:
-        File.init()
-        configs = File.get()
-
-    @staticmethod
-    def read(key, dtype):
-        """
-        Read the value for the key, since the api is internal their shouldn't
-        be any key that is not present
-        This function is called by the Constants file, so their is no
-        incorrectness of the key
-
-        Parameters
-        ----------
-        key : str
-            the value for the key to return
-        dtype : type
-            conversion of the value to the correct format
-
-        Returns
-        -------
-        val
-            value for the key
-        """
-        return dtype(Config.configs.get(key, None))
-
-    @staticmethod
-    def write(key, value):
-        """
-        Update the config for the system. All values will be rewritten to
-        the file, which will reflect in the system as in real-time
-        Easy integration with the UI
-
-        Parameters
-        ----------
-        key : str
-            value of the key, identifier from the Constants file
-        value : val
-            some value to store
-
-        """
-        Config.configs[key] = value
-        File.write(Config.configs)
-
-    @staticmethod
-    def write_all(config: dict):
-        """
-        Update the file for the config on the system. All values are written to the
-        file from scratch, so if any key-val is missing it won't appear while reading,
-        that will cause errors
-
-        Parameters
-        ----------
-        config : dict
-            key-val pairs
-        """
-        Config.configs = config
-        File.write(config)
+# simple object which is not a class
+Config = yacp.load(CONFIG_FILE, _TorpidoSettings, override=True, syntax=SYNTAX)
