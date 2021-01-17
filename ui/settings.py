@@ -4,7 +4,7 @@ from PyQt5.QtWidgets import (QComboBox, QWidget,
                              QFormLayout, QGroupBox, QHBoxLayout,
                              QLabel, QLineEdit, QPushButton, QVBoxLayout, QMessageBox)
 
-from torpido.config.constants import *
+from torpido.config.config import Config, write_config
 from ui.style.theme import get_all_themes, get_style_sheet
 
 WAVELETS_NAMES = ['Daubechies2',
@@ -127,7 +127,7 @@ WAVELETS_VALUES = ['db2',
                    'bior6.8',
                    'meyer']
 THEMES = get_all_themes()
-STYLESHEET = get_style_sheet(THEME)
+STYLESHEET = get_style_sheet(Config.THEME)
 
 
 class SettingsDialog(QWidget):
@@ -184,48 +184,48 @@ class SettingsDialog(QWidget):
 
         # WIDGETS
         self.rankMotionInput = QLineEdit()
-        self.rankMotionInput.setText(str(RANK_MOTION))
+        self.rankMotionInput.setText(str(Config.RANK_MOTION))
 
         self.rankBlurInput = QLineEdit()
-        self.rankBlurInput.setText(str(RANK_BLUR))
+        self.rankBlurInput.setText(str(Config.RANK_BLUR))
 
         self.rankTextInput = QLineEdit()
-        self.rankTextInput.setText(str(RANK_TEXT))
+        self.rankTextInput.setText(str(Config.RANK_TEXT))
 
         self.rankAudioInput = QLineEdit()
-        self.rankAudioInput.setText(str(RANK_MOTION))
+        self.rankAudioInput.setText(str(Config.RANK_MOTION))
 
         self.minRankInput = QLineEdit()
-        self.minRankInput.setText(str(MIN_RANK_OUT_VIDEO))
+        self.minRankInput.setText(str(Config.MIN_RANK_OUT_VIDEO))
 
         self.motionThresholdInput = QLineEdit()
-        self.motionThresholdInput.setText(str(MOTION_THRESHOLD))
+        self.motionThresholdInput.setText(str(Config.MOTION_THRESHOLD))
 
         self.blurThresholdInput = QLineEdit()
-        self.blurThresholdInput.setText(str(BLUR_THRESHOLD))
+        self.blurThresholdInput.setText(str(Config.BLUR_THRESHOLD))
 
         self.silenceThresholdInput = QLineEdit()
-        self.silenceThresholdInput.setText(str(SILENCE_THRESHOlD))
+        self.silenceThresholdInput.setText(str(Config.SILENCE_THRESHOLD))
 
         self.textThresholdInput = QLineEdit()
-        self.textThresholdInput.setText(str(TEXT_MIN_CONFIDENCE))
+        self.textThresholdInput.setText(str(Config.TEXT_MIN_CONFIDENCE))
 
         self.audioBlockInput = QLineEdit()
-        self.audioBlockInput.setText(str(AUDIO_BLOCK_PER))
+        self.audioBlockInput.setText(str(Config.AUDIO_BLOCK_PER))
 
         self.textSkipFramesInput = QLineEdit()
-        self.textSkipFramesInput.setText(str(TEXT_SKIP_FRAMES))
+        self.textSkipFramesInput.setText(str(Config.TEXT_SKIP_FRAMES))
 
         self.waveletInput = QComboBox()
         self.waveletInput.addItems(WAVELETS_NAMES)
-        self.waveletInput.setCurrentIndex(WAVELETS_VALUES.index(WAVELET))
+        self.waveletInput.setCurrentIndex(WAVELETS_VALUES.index(Config.WAVELET))
 
         self.watcherDelayInput = QLineEdit()
-        self.watcherDelayInput.setText(str(WATCHER_DELAY))
+        self.watcherDelayInput.setText(str(Config.WATCHER_DELAY))
 
         self.theme = QComboBox()
         self.theme.addItems(THEMES)
-        self.theme.setCurrentIndex(THEMES.index(THEME))
+        self.theme.setCurrentIndex(THEMES.index(Config.THEME))
 
         formLayout.addRow(QLabel("Theme for the system:"), self.theme)
         formLayout.addRow(QLabel("The rank of motion:"), self.rankMotionInput)
@@ -261,23 +261,22 @@ class SettingsDialog(QWidget):
         self.setLayout(mainLayout)
 
     def save_settings(self):
-        config = {'RANK_MOTION': self.rankMotionInput.text(),
-                  'RANK_BLUR': self.rankBlurInput.text(),
-                  'RANK_TEXT': self.rankTextInput.text(),
-                  'RANK_AUDIO': self.rankAudioInput.text(),
-                  'MIN_RANK_OUT_VIDEO': self.minRankInput.text(),
-                  'MOTION_THRESHOLD': self.motionThresholdInput.text(),
-                  'BLUR_THRESHOLD': self.blurThresholdInput.text(),
-                  'SILENCE_THRESHOlD': self.silenceThresholdInput.text(),
-                  'TEXT_MIN_CONFIDENCE': self.textThresholdInput.text(),
-                  'AUDIO_BLOCK_PER': self.audioBlockInput.text(),
-                  'TEXT_SKIP_FRAMES': self.textSkipFramesInput.text(),
-                  'WAVELET': WAVELETS_VALUES[self.waveletInput.currentIndex()],
-                  'WATCHER_DELAY': self.watcherDelayInput.text(),
-                  'THEME': THEMES[self.theme.currentIndex()]
-                  }
+        Config.RANK_MOTION = int(self.rankMotionInput.text())
+        Config.RANK_BLUR = int(self.rankBlurInput.text())
+        Config.RANK_AUDIO = int(self.rankAudioInput.text())
+        Config.RANK_TEXT = int(self.rankTextInput.text())
+        Config.MIN_RANK_OUT_VIDEO = int(self.minRankInput.text())
+        Config.MOTION_THRESHOLD = float(self.motionThresholdInput.text())
+        Config.BLUR_THRESHOLD = float(self.blurThresholdInput.text())
+        Config.AUDIO_BLOCK_PER = float(self.audioBlockInput.text())
+        Config.WAVELET = str(WAVELETS_VALUES[self.waveletInput.currentIndex()])
+        Config.SILENCE_THRESHOLD = float(self.silenceThresholdInput.text())
+        Config.TEXT_MIN_CONFIDENCE = float(self.textThresholdInput.text())
+        Config.TEXT_SKIP_FRAMES = int(self.textSkipFramesInput.text())
+        Config.WATCHER_DELAY = float(self.watcherDelayInput.text())
+        Config.THEME = str(THEMES[self.theme.currentIndex()])
 
-        Config.write_all(config)
+        write_config(Config)
 
         self.messageBox = QMessageBox()
         self.messageBox.setWindowIcon(QIcon('./ui/assets/logo.png'))

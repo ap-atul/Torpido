@@ -79,3 +79,6 @@ class Communication:
         data_arg = val
 
         fun_for_call(data_arg)
+
+    def __del__(self):
+        self._stopped = True

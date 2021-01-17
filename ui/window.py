@@ -7,19 +7,20 @@ from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
                              QGraphicsDropShadowEffect, QPushButton,
                              QCheckBox, QPlainTextEdit, QFileDialog, QGroupBox)
 
+from torpido.config.config import Config
 from torpido.config.constants import *
 from ui.controller import Controller
 from ui.settings import SettingsDialog
 from ui.style.theme import Color, Type, get_theme, get_style_sheet
 from ui.widgets import QRoundProgressBar, QLabelAlternate, QVideoWindow
 
-SYS_THEME = get_theme(THEME)
+SYS_THEME = get_theme(Config.THEME)
 BGR = SYS_THEME[Color.BGR][Type.RGB]
 PRI = SYS_THEME[Color.PRI][Type.RGB]
 SEC = SYS_THEME[Color.SEC][Type.RGB]
 TEX = SYS_THEME[Color.TEX][Type.RGB]
 
-SYS_STYLESHEET = get_style_sheet(THEME)
+SYS_STYLESHEET = get_style_sheet(Config.THEME)
 
 NOT_SELECTED = ("QLabel { "
                 "background-color:" + SYS_THEME[Color.PRI][Type.HEX] + ";"
@@ -59,10 +60,11 @@ class Donut:
         palette = QPalette()
         palette.setBrush(QPalette.AlternateBase, QtGui.QColor(BGR))
 
-        if "Light" in THEME:
+        if "Light" in Config.THEME:
             palette.setColor(QPalette.Text, QtGui.QColor(18, 18, 18))
         else:
             palette.setColor(QPalette.Text, QtGui.QColor(210, 210, 210))
+
         self.bar.setPalette(palette)
         self.bar.setNullPosition(QRoundProgressBar.PositionLeft)
         self.bar.setDecimals(1)
@@ -358,5 +360,5 @@ class App(QWidget):
         self.close()
 
     def restart(self):
-        self.exit()
-        # QtGui.QGuiApplication.exit(REBOOT)
+        # self.exit()
+        QtGui.QGuiApplication.exit(REBOOT)
