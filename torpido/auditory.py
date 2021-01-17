@@ -157,8 +157,11 @@ class Auditory:
 
         to_read = int(self.__rate * self.__info.duration * Config.AUDIO_BLOCK_PER)
         # creating and opening the output audio file
-        with soundfile.SoundFile(outputFile, mode="w", samplerate=self.__rate, channels=self.__info.channels) as out:
+        with soundfile.SoundFile(outputFile, mode="w", samplerate=self.__rate, channels=1) as out:
             for block in soundfile.blocks(self.__file_name, to_read):
+
+                if block.ndim > 1:
+                    block = block[:, 0]
 
                 # decomposition -> threshold -> reconstruction
                 coefficients = self.__fwt.wavedec(block)

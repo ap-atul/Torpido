@@ -1,6 +1,4 @@
 PyQt5
-pandas
-sklearn
 tqdm
 soundfile
 matplotlib

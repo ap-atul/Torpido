@@ -23,6 +23,15 @@
 
 # Logs
 
+### Log 48, 17-01
+```AP```
+* Minor clean up
+* Few bugs fixed
+* Integrated yacp
+* Fixed thread errors
+* Optimized imports
+
+----------------------------------------
 ### Log 47, 16-01
 ```AP```
 * Minor clean up
