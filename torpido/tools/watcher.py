@@ -11,9 +11,9 @@ import os
 from threading import Thread
 from time import sleep
 
-from torpido.config.constants import WATCHER_DELAY
-from torpido.exceptions.custom import WatcherFileMissing
-from torpido.tools.logger import Log
+from ..config.config import Config
+from ..exceptions.custom import WatcherFileMissing
+from ..tools.logger import Log
 
 
 def times(values):
@@ -98,7 +98,7 @@ class Watcher:
         self.__mem = None
 
         # delay for the thread
-        self.__delay = WATCHER_DELAY
+        self.__delay = Config.WATCHER_DELAY
 
         # ui controller
         self._app = None

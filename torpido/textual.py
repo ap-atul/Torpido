@@ -12,12 +12,13 @@ import time
 import cv2
 import numpy as np
 
-from torpido.config.cache import Cache
-from torpido.config.constants import *
-from torpido.exceptions import EastModelEnvironmentMissing
-from torpido.tools.logger import Log
-from torpido.util import image
-from torpido.video import VideoGet
+from .config.config import Config
+from .config.cache import Cache
+from .config.constants import *
+from .exceptions import EastModelEnvironmentMissing
+from .tools.logger import Log
+from .util import image
+from .video import VideoGet
 
 
 class Textual:
@@ -64,10 +65,10 @@ class Textual:
         self.__text_ranks = None
         self.__video_getter = None
         self.__cache = Cache()
-        self.__min_confidence = TEXT_MIN_CONFIDENCE
+        self.__min_confidence = Config.TEXT_MIN_CONFIDENCE
         self.__WIDTH = 320  # this val should be multiple of 32
         self.__HEIGHT = 320  # same thing for this
-        self.__skip_frames = TEXT_SKIP_FRAMES
+        self.__skip_frames = Config.TEXT_SKIP_FRAMES
 
         # saving the original dim of the frame
         self._original_H, self._original_W = None, None
@@ -312,7 +313,7 @@ class Textual:
 
                 # if text is detected
                 if detectedText:
-                    self.__text_ranks.extend([RANK_TEXT] * int(self.__skip_frames))
+                    self.__text_ranks.extend([Config.RANK_TEXT] * int(self.__skip_frames))
                     Log.d("Text detected.")
                 else:
                     self.__text_ranks.extend([0] * int(self.__skip_frames))

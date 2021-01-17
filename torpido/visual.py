@@ -9,6 +9,7 @@ from time import sleep
 import cv2
 import numpy as np
 
+from .config.config import Config
 from torpido.config.cache import Cache
 from torpido.config.constants import *
 from torpido.tools.logger import Log
@@ -43,8 +44,8 @@ class Visual:
 
     def __init__(self):
         cv2.setUseOptimized(True)
-        self.__blur_threshold = BLUR_THRESHOLD
-        self.__motion_threshold = MOTION_THRESHOLD
+        self.__blur_threshold = Config.BLUR_THRESHOLD
+        self.__motion_threshold = Config.MOTION_THRESHOLD
         self.__cache = Cache()
         self.__fps = None
         self.__frame_count = None
@@ -67,7 +68,7 @@ class Visual:
         # if blur rank is 0 else RANK_BLUR
         if cv2.Laplacian(image, cv2.CV_64F).var() >= self.__blur_threshold:
             return 0
-        return RANK_BLUR
+        return Config.RANK_BLUR
 
     def __timed_ranking_normalize(self):
         """
@@ -191,7 +192,7 @@ class Visual:
 
             threshMax = np.max(thresh)
             if threshMax > 0:
-                self.__motion.append(RANK_MOTION)
+                self.__motion.append(Config.RANK_MOTION)
             else:
                 self.__motion.append(0)
 

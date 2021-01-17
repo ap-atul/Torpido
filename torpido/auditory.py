@@ -10,10 +10,11 @@ import numpy as np
 import soundfile
 from matplotlib import pyplot as plt
 
-from torpido.config.cache import Cache
-from torpido.config.constants import *
-from torpido.tools.logger import Log
-from torpido.wavelet import FastWaveletTransform, VisuShrinkCompressor, snr
+from .config.config import Config
+from .config.cache import Cache
+from .config.constants import *
+from .tools.logger import Log
+from .wavelet import FastWaveletTransform, VisuShrinkCompressor, snr
 
 matplotlib.use("TkAgg")
 
@@ -58,9 +59,9 @@ class Auditory:
         self.__energy = None
         self.__snr_before = list()
         self.__snr_after = list()
-        self.__silence_threshold = SILENCE_THRESHOlD
+        self.__silence_threshold = Config.SILENCE_THRESHOLD
         self.__cache = Cache()
-        self.__fwt = FastWaveletTransform(WAVELET)
+        self.__fwt = FastWaveletTransform(Config.WAVELET)
         self.__compressor = VisuShrinkCompressor()
 
     def __get_energy_rms(self, block):
@@ -81,7 +82,7 @@ class Auditory:
             rank for the portion which is then set for all the portion of data
         """
         if np.sqrt(np.mean(block ** 2)) > self.__silence_threshold:
-            return RANK_AUDIO
+            return Config.RANK_AUDIO
         return 0
 
     def __set_audio_info(self):
@@ -154,7 +155,7 @@ class Auditory:
         self.__energy = []
         Log.i(f"Audio duration is {self.__info.duration}.")
 
-        to_read = int(self.__rate * self.__info.duration * AUDIO_BLOCK_PER)
+        to_read = int(self.__rate * self.__info.duration * Config.AUDIO_BLOCK_PER)
         # creating and opening the output audio file
         with soundfile.SoundFile(outputFile, mode="w", samplerate=self.__rate, channels=self.__info.channels) as out:
             for block in soundfile.blocks(self.__file_name, to_read):

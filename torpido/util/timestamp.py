@@ -11,11 +11,11 @@ using ffmpeg.
 """
 from random import randint
 
-from torpido.config.cache import Cache
-from torpido.config.constants import (CACHE_RANK_MOTION, CACHE_RANK_TEXT,
-                                      CACHE_RANK_BLUR, CACHE_RANK_AUDIO,
-                                      MIN_RANK_OUT_VIDEO)
-from torpido.exceptions.custom import RankingOfFeatureMissing
+from ..config.cache import Cache
+from ..config.config import Config
+from ..config.constants import (CACHE_RANK_MOTION, CACHE_RANK_TEXT,
+                                CACHE_RANK_BLUR, CACHE_RANK_AUDIO)
+from ..exceptions.custom import RankingOfFeatureMissing
 
 
 def add_padding(rank_list: list, length):
@@ -92,7 +92,7 @@ def trim_by_rank(ranks):
     """
     timestamps = list()
     start, end, prev_end, i = None, None, 0, 0
-    min_rank_out = MIN_RANK_OUT_VIDEO
+    min_rank_out = Config.MIN_RANK_OUT_VIDEO
 
     for i in range(len(ranks)):
         if start is None and ranks[i] > min_rank_out:
