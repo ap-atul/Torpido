@@ -60,6 +60,8 @@ def _build_split_command(input_file, output_audio_file):
     run with file names that are not formatted correctly.
     or doesn't need any explicit formatting.
 
+    Downmixing to single channel audio(mono) without losing any data
+
     Parameters
     ----------
     input_file : str
@@ -88,6 +90,8 @@ def _build_split_command(input_file, output_audio_file):
         '-y',
         '-i',
         str(input_file),
+        '-ac',
+        '1',
         str(output_audio_file)
     ]
 

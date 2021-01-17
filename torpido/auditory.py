@@ -160,8 +160,10 @@ class Auditory:
         with soundfile.SoundFile(outputFile, mode="w", samplerate=self.__rate, channels=1) as out:
             for block in soundfile.blocks(self.__file_name, to_read):
 
+                # taking only the single channel
+                # without losing any data
                 if block.ndim > 1:
-                    block = block[:, 0]
+                    block = block.sum(axis=1) / 2
 
                 # decomposition -> threshold -> reconstruction
                 coefficients = self.__fwt.wavedec(block)
