@@ -4,7 +4,7 @@ from torpido.pympeg._util import *
 from torpido.pympeg._node import *
 
 
-class MyTestCase(unittest.TestCase):
+class UtilTest(unittest.TestCase):
     def test_labels(self):
         self.assertEqual(str, type(gen_labels()))
 

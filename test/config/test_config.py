@@ -3,7 +3,7 @@ import unittest
 from torpido.config.config import *
 
 
-class MyTestCase(unittest.TestCase):
+class ConfigTest(unittest.TestCase):
     def test_write(self):
         config = Config()
         d = config.read("WAVELET", str)

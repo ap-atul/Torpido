@@ -2,7 +2,7 @@ import unittest
 from torpido.util.validate import *
 
 
-class MyTestCase(unittest.TestCase):
+class ValidateTest(unittest.TestCase):
     def test_check_video(self):
         fil = "sample.json"
 

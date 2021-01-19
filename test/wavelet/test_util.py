@@ -3,7 +3,7 @@ import unittest
 from torpido.wavelet import FastWaveletTransform, decomposeArbitraryLength, getExponent, scalb, isPowerOf2
 
 
-class MyTestCase(unittest.TestCase):
+class WaveletTest(unittest.TestCase):
     def test_wavelet(self):
         WAVELET_NAME = "db4"
         t = FastWaveletTransform(WAVELET_NAME)

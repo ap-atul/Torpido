@@ -106,7 +106,7 @@ def trim_by_rank(ranks):
             start, end = None, None
 
     if end is None and start is not None:
-        timestamps.append([start, i])
+        timestamps.append([start, i + 1])
 
     return timestamps
 

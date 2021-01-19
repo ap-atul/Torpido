@@ -3,7 +3,7 @@ import unittest
 from torpido.config import constants
 
 
-class MyTestCase(unittest.TestCase):
+class ConstantTest(unittest.TestCase):
     def test_rinit(self):
         val = constants.ID_COM_VIDEO
         val += constants.ID_COM_VIDEO + "new_change"

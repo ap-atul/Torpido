@@ -2,7 +2,7 @@ import unittest
 from torpido.util.timestamp import *
 
 
-class MyTestCase(unittest.TestCase):
+class TimestampTest(unittest.TestCase):
     def test_list_padding(self):
         list_test = [1, 2, 3, 4, 5]
         new_list = list_test

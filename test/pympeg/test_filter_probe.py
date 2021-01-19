@@ -3,7 +3,7 @@ import unittest
 from torpido import pympeg
 
 
-class MyTestCase(unittest.TestCase):
+class FFprobeTest(unittest.TestCase):
     def test_probe(self):
         json_dict = pympeg.probe("/home/atul/Videos/example_02.mp4")
 

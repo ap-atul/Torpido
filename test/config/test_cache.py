@@ -3,7 +3,7 @@ import unittest
 from torpido.config.cache import *
 
 
-class MyTestCase(unittest.TestCase):
+class CacheTest(unittest.TestCase):
     def test_read_write_dtype(self):
         cache = Cache()
         cache.write_data("data", {"str": "String", "int": 3})

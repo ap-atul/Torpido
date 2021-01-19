@@ -3,7 +3,7 @@ import unittest
 from torpido.pmpi import Communication
 
 
-class MyTestCase(unittest.TestCase):
+class PmpiTest(unittest.TestCase):
     def test_communication(self):
         sent = {"mydata", 200}
 

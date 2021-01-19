@@ -5,7 +5,7 @@ from torpido.ffpbar import *
 from torpido import pympeg
 
 
-class MyTestCase(unittest.TestCase):
+class FFpbarTest(unittest.TestCase):
     def test_parse(self):
         prg = Progress()
 

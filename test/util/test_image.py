@@ -3,7 +3,7 @@ import unittest
 from torpido.util.image import *
 
 
-class MyTestCase(unittest.TestCase):
+class ImageTest(unittest.TestCase):
     def test_image_resize(self):
         white_image = np.full(
             (1920, 720, 3),
