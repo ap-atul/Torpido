@@ -39,11 +39,14 @@ class PmpiTest(unittest.TestCase):
 
         comm = Communication()
         comm.register("ID", my_function)
-        comm.register("IDD", my_function)
+        comm.register("IDE", my_function)
         sender = comm.sender()
 
+        from time import sleep
+        sleep(0.1)
+
         sender.send("ID", sent)
-        sender.send("IDD", sent)
+        sender.send("IDE", sent)
         comm.end()
 
 

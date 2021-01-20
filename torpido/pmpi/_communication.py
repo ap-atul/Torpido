@@ -51,10 +51,10 @@ class Communication:
             data_to_receive = None
             try:
                 data_to_receive = self._receiver.recv()
-            except EOFError and OSError as _:
+            except EOFError and OSError and TypeError as _:
                 pass
 
-            if not data_to_receive or not isinstance(data_to_receive, dict):
+            if data_to_receive is None or not data_to_receive or not isinstance(data_to_receive, dict):
                 print(f"[PMPI WARN] Unknown data of type :: {type(data_to_receive)} received from the sender. "
                       f"Requires data of the type dict.")
                 continue

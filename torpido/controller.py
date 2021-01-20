@@ -9,8 +9,7 @@ import gc
 import os
 from multiprocessing import Process
 
-from torpido import Analytics
-from torpido import Auditory, FFMPEG, Textual, Visual
+from torpido import Auditory, FFMPEG, Textual, Visual, Analytics
 from torpido.config import Cache, LINUX, ID_COM_LOGGER, ID_COM_PROGRESS, ID_COM_VIDEO
 from torpido.exceptions import RankingOfFeatureMissing, EastModelEnvironmentMissing
 from torpido.manager import ManagerPool
@@ -239,8 +238,8 @@ class Controller:
         self.__pool.add(self.__textual_process.pid)
 
         # waiting for the processes to terminate
-        self.__audio_process.join()
         self.__visual_process.join()
+        self.__audio_process.join()
         self.__textual_process.join()
 
         # running the final pass
@@ -272,7 +271,8 @@ class Controller:
 
         if len(timestamps) == 0:
             Log.w("There are not good enough portions to cut. Try changing the configurations.")
-            self.clean()
+            if self.__App is not None:
+                self.__App.set_percent_complete(100.0)
             return
 
         # merging the final video
@@ -295,8 +295,6 @@ class Controller:
 
     def clean(self):
         """ clean up """
-        if self.__App is not None:
-            self.__App.set_percent_complete(100.0)
 
         # terminating all processing tasks
         if self.__visual_process is not None:

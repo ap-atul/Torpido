@@ -23,6 +23,14 @@
 
 # Logs
 
+### Log 49, 20-01
+```AP```
+* Minor clean up
+* Few bugs fixed
+* Added set sar and dar ffmpeg
+* Fixed process lock errors
+
+----------------------------------------
 ### Log 48, 17-01
 ```AP```
 * Minor clean up

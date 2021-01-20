@@ -1,3 +1,3 @@
-from torpido.tools.ffmpeg import *
-from torpido.tools.logger import *
-from torpido.tools.watcher import *
+from ..tools.ffmpeg import *
+from ..tools.logger import *
+from ..tools.watcher import *

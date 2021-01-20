@@ -144,5 +144,5 @@ class Analytics:
             return
 
         Log.i(f"Clipping a total of {len(self.__timestamps)} sub portion(s).")
-        Log.i(f"Output video length would be approx. :: {self.__output_length} s or {float(self.__output_length / 60)} m")
-        Log.i(f"Percent of video trimmed :: {100 - ((self.__output_length * 100) / self.__actual_length)} %")
+        Log.i(f"Output video length would be approx. :: {self.__output_length}s or {float(self.__output_length / 60)}m")
+        Log.i(f"Percent of video trimmed :: {100 - ((self.__output_length * 100) / self.__actual_length)}%")

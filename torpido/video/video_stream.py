@@ -68,7 +68,11 @@ class Stream:
 
     def read(self):
         try:
-            data = self.__Q.get()
+            if self.stopped:
+                return None
+
+            data = self.__Q.get(timeout=3)
+
         except Empty:
             data = None
         return data

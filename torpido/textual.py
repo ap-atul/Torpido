@@ -221,6 +221,10 @@ class Textual:
         mean/average as the rank for the 1 sec
         """
         text_normalize = list()
+
+        if len(self.__text_ranks) == 0:
+            text_normalize.extend([0] * int(self.__frame_count))
+
         for i in range(0, int(self.__frame_count), int(self.__fps)):
             if len(self.__text_ranks) >= (i + int(self.__fps)):
                 text_normalize.append(np.mean(self.__text_ranks[i: i + int(self.__fps)]))
