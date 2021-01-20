@@ -1,1 +1,1 @@
-from torpido.video.video_reader import *
+from torpido.video.video_stream import *

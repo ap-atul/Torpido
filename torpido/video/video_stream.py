@@ -6,11 +6,10 @@ from time import sleep
 import cv2
 
 from torpido.config.constants import VIDEO_WIDTH
-from torpido.tools.logger import Log
 from torpido.util import resize
 
 
-class VideoGet:
+class Stream:
     """
     Class that continuously gets frames from a VideoCapture object
     with a dedicated thread, which actually speeds up the video
@@ -37,47 +36,37 @@ class VideoGet:
         self.__Q = Queue(maxsize=1200)
         self.stream = cv2.VideoCapture(src)
         self.stopped = False
+        self._thread = None
 
     def start(self):
-        """
-        Create the thread
-        """
-        Thread(target=self.__get, args=()).start()
+        self._thread = Thread(target=self.__get, name="torpido.video.Stream", args=())
+        self._thread.daemon = True
+        self._thread.start()
         return self
 
     def __get(self):
-        """
-        Reads the frame from the stream, much faster
-        in the thread, if queue is full wait for it to
-        be process
-        """
         while True:
             if self.stopped:
-                return
+                break
 
             if not self.__Q.full():
                 (grabbed, frame) = self.stream.read()
 
                 if not grabbed:
-                    self.stop()
+                    self.stream.release()
+                    self.stopped = True
                     return
 
+                # resizing the reduce memory and since im not using full
                 frame = resize(frame, width=VIDEO_WIDTH)
                 self.__Q.put(frame)
 
             else:
-                while self.__Q.empty():
-                    sleep(0.1)
+                sleep(0.1)
+
+        self.stream.release()
 
     def read(self):
-        """
-        Get the frame from the queue
-
-        Returns
-        -------
-        frame : object
-            returns the frame to process, if timeout(queue lock) occurs None is returned
-        """
         try:
             data = self.__Q.get()
         except Empty:
@@ -85,40 +74,21 @@ class VideoGet:
         return data
 
     def get_capture(self):
-        """
-        Returns the video stream of open cv
-
-        Returns
-        -------
-        object
-            stream of the video
-        """
         return self.stream
 
     def get_queue_size(self):
-        """
-        Returns the size of the queue
-
-        Returns
-        -------
-        int
-            size of the queue
-        """
         return self.__Q.qsize()
 
     def more(self):
-        """
-        checking if the video is still processing or done
-        """
         return not self.stopped
 
     def stop(self):
-        """
-        Explicitly ending the reading of the video stream. Minor clean ups
-        """
         self.stopped = True
-        Log.d(f"Garbage collected :: {gc.collect()}")
+        if self._thread is not None:
+            self._thread.join()
+            self._thread = None
         self.stream.release()
+        gc.collect()
 
     def __del__(self):
         del self.__Q
