@@ -8,10 +8,8 @@ class Communication:
     def __init__(self):
         self._index = dict()
         self._receiver, self._channel = Pipe()
-
         self._sender = Sender(channel=self._channel)
-        self._worker = None
-        self._stopped = False
+        self._worker, self._stopped = None, False
 
     def sender(self):
         self._start_communication()
@@ -47,20 +45,16 @@ class Communication:
     def _receive(self):
         while not self._stopped:
             # this should be a single key dictionary
-
             if self._receiver.closed:
                 break
 
             data_to_receive = None
             try:
                 data_to_receive = self._receiver.recv()
-            except EOFError as _:
+            except EOFError and OSError as _:
                 pass
 
-            if not data_to_receive:
-                continue
-
-            if not isinstance(data_to_receive, dict):
+            if not data_to_receive or not isinstance(data_to_receive, dict):
                 print(f"[PMPI WARN] Unknown data of type :: {type(data_to_receive)} received from the sender. "
                       f"Requires data of the type dict.")
                 continue
@@ -70,7 +64,6 @@ class Communication:
 
             if key in self._index:
                 self._make_call(key, val)
-
             else:
                 print(f"[PMPI WARN] Unknown data received from the receiver. Got :: {key} -> {val}")
 

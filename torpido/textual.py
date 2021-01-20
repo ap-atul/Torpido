@@ -7,18 +7,15 @@ geometry for the sections that contain the text.
 If mixed with text extraction it can give text from the image.
 """
 
-import time
-
 import cv2
 import numpy as np
 
-from .config.config import Config
 from .config.cache import Cache
+from .config.config import Config
 from .config.constants import *
 from .exceptions import EastModelEnvironmentMissing
 from .tools.logger import Log
 from .util import image
-from .video import VideoGet
 
 
 class Textual:
@@ -38,8 +35,8 @@ class Textual:
         number of frames in the video
     __text_ranks : list
         list of the ranks
-    __video_getter : VideoGet
-        object of the video get to read the video through thread
+    __video_getter : OpenCV
+        opencv file reader
     __cache : Cache
         object of the Cache to store the ranking
     __min_confidence : int
@@ -65,10 +62,8 @@ class Textual:
         self.__text_ranks = None
         self.__video_getter = None
         self.__cache = Cache()
-        self.__min_confidence = Config.TEXT_MIN_CONFIDENCE
-        self.__WIDTH = 320  # this val should be multiple of 32
-        self.__HEIGHT = 320  # same thing for this
-        self.__skip_frames = Config.TEXT_SKIP_FRAMES
+        self.__min_confidence, self.__skip_frames = Config.TEXT_MIN_CONFIDENCE, Config.TEXT_SKIP_FRAMES
+        self.__WIDTH = self.__HEIGHT = 320  # same thing for this
 
         # saving the original dim of the frame
         self._original_H, self._original_W = None, None
@@ -148,8 +143,7 @@ class Textual:
         rW = self._original_W / float(self.__WIDTH)
         rH = self._original_H / float(self.__HEIGHT)
         rSize = (rW, rH)
-        rect = list()
-        confidences = list()
+        rect, confidences = list(), list()
 
         # since image is 320x320 the output is 80x80 (scores)
         for y in range(0, num_rows):
@@ -263,26 +257,20 @@ class Textual:
             Log.e(f"File {inputFile} does not exists")
             return
 
-        self.__video_getter = VideoGet(str(inputFile)).start()
-        my_clip = self.__video_getter.stream
+        self.__video_getter = cv2.VideoCapture(str(inputFile))
 
-        if self.__video_getter.get_queue_size() == 0:
-            time.sleep(0.5)
-            Log.d("Waiting for the buffer to fill up.")
-
-        self.__fps = my_clip.get(cv2.CAP_PROP_FPS)
-        self.__frame_count = my_clip.get(cv2.CAP_PROP_FRAME_COUNT)
+        self.__fps = self.__video_getter.get(cv2.CAP_PROP_FPS)
+        self.__frame_count = self.__video_getter.get(cv2.CAP_PROP_FRAME_COUNT)
         self.__skip_frames = int(self.__fps * self.__skip_frames)
 
         # maintaining the ranks for text detection
-        count = 0
-        original = None
+        count, original = 0, None
         self.__text_ranks = list()
 
-        while self.__video_getter.more():
-            frame = self.__video_getter.read()
+        while True:
+            ret, frame = self.__video_getter.read()
 
-            if frame is None:
+            if frame is None or not ret:
                 break
 
             if self._original_H is None:
@@ -295,7 +283,6 @@ class Textual:
             frame = cv2.resize(frame, (self.__WIDTH, self.__HEIGHT))
 
             count += 1
-
             if count % self.__skip_frames == 0:
 
                 #  making the image blob
@@ -320,8 +307,7 @@ class Textual:
                     Log.d("No text detected.")
 
         # clearing the memory
-        my_clip.release()
-        self.__video_getter.stop()
+        self.__video_getter.release()
         cv2.destroyAllWindows()
 
         # calling the normalization of ranking

@@ -270,6 +270,11 @@ class Controller:
             Log.e(RankingOfFeatureMissing.cause)
             return
 
+        if len(timestamps) == 0:
+            Log.w("There are not good enough portions to cut. Try changing the configurations.")
+            self.clean()
+            return
+
         # merging the final video
         if self.__ffmpeg.merge_video_audio(timestamps):
             Log.d("Merged the final output video ...............")
@@ -282,11 +287,16 @@ class Controller:
                 Log.d("Generated a thumbnail....")
 
         self.__ffmpeg.clean_up()
-        self.__App.set_percent_complete(100.0)
+
+        if self.__App is not None:
+            self.__App.set_percent_complete(100.0)
+
         Log.set_handler(None)
 
     def clean(self):
         """ clean up """
+        if self.__App is not None:
+            self.__App.set_percent_complete(100.0)
 
         # terminating all processing tasks
         if self.__visual_process is not None:

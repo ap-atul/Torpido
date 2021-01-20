@@ -4,16 +4,15 @@ that have motion in it, saves in the dictionary with frame numbers
 this dictionary is then saved in a joblib file defined in constants.py
 """
 
-from time import sleep
-
 import cv2
 import numpy as np
+from time import sleep
 
-from .config.config import Config
 from torpido.config.cache import Cache
 from torpido.config.constants import *
 from torpido.tools.logger import Log
-from torpido.video import VideoGet
+from torpido.video import Stream
+from .config.config import Config
 
 
 class Visual:
@@ -38,7 +37,7 @@ class Visual:
         list of the ranks for the blur feature
     self.__cache : Cache
         cache object to store the data
-    self.__video_getter : VideoGet
+    self.__video_stream : Stream
         video reader object to read the video and save it in thread
     """
 
@@ -47,11 +46,9 @@ class Visual:
         self.__blur_threshold = Config.BLUR_THRESHOLD
         self.__motion_threshold = Config.MOTION_THRESHOLD
         self.__cache = Cache()
-        self.__fps = None
-        self.__frame_count = None
-        self.__motion = None
-        self.__blur = None
-        self.__video_getter = None
+        self.__frame_count, self.__fps = None, None
+        self.__motion, self.__blur = None, None
+        self.__video_stream = None
         self.__video_pipe = None
 
     def __detect_blur(self, image):
@@ -66,9 +63,7 @@ class Visual:
             frame from the video file
         """
         # if blur rank is 0 else RANK_BLUR
-        if cv2.Laplacian(image, cv2.CV_64F).var() >= self.__blur_threshold:
-            return 0
-        return Config.RANK_BLUR
+        return 0 if cv2.Laplacian(image, cv2.CV_64F).var() >= self.__blur_threshold else Config.RANK_BLUR
 
     def __timed_ranking_normalize(self):
         """
@@ -85,8 +80,7 @@ class Visual:
         mean/average as the rank for the 1 sec
 
         """
-        motion_normalize = list()
-        blur_normalize = list()
+        motion_normalize, blur_normalize = list(), list()
         for i in range(0, int(self.__frame_count), int(self.__fps)):
             if len(self.__motion) >= (i + int(self.__fps)):
                 motion_normalize.append(np.mean(self.__motion[i: i + int(self.__fps)]))
@@ -100,19 +94,11 @@ class Visual:
         Log.d(f"Visual rank length {len(motion_normalize)}  {len(blur_normalize)}")
         Log.i(f"Visual ranking saved .............")
 
-    def __set_video_fps(self):
-        """ Function to set the original video fps to cache """
-        self.__cache.write_data(CACHE_FPS, self.__fps)
-
-    def __set_video_frame_count(self):
-        """ Function to set the original video frame count to cache """
-        self.__cache.write_data(CACHE_FRAME_COUNT, self.__frame_count)
-
     def __del__(self):
         """ Clean  ups """
         del self.__cache
-        if self.__video_getter is not None:
-            del self.__video_getter
+        if self.__video_stream is not None:
+            del self.__video_stream
 
         Log.d("Cleaning up.")
 
@@ -137,21 +123,20 @@ class Visual:
 
         # maintaining the motion and blur frames list
         self.__motion, self.__blur = list(), list()
+        self.__video_stream = Stream(str(inputFile)).start()
+        my_clip = self.__video_stream.stream
 
-        self.__video_getter = VideoGet(str(inputFile)).start()
-        my_clip = self.__video_getter.stream
-
-        if self.__video_getter.get_queue_size() == 0:
-            sleep(1)
-            Log.d(f"Waiting for the buffer to fill up.")
+        if not self.__video_stream.more():
+            sleep(0.1)
 
         fps = my_clip.get(cv2.CAP_PROP_FPS)
         total_frames = my_clip.get(cv2.CAP_PROP_FRAME_COUNT)
 
         self.__fps = fps
         self.__frame_count = total_frames
-        self.__set_video_fps()
-        self.__set_video_frame_count()
+
+        self.__cache.write_data(CACHE_FPS, self.__fps)
+        self.__cache.write_data(CACHE_FRAME_COUNT, self.__frame_count)
         self.__cache.write_data(CACHE_VIDEO_WIDTH, cv2.CAP_PROP_FRAME_WIDTH)
         self.__cache.write_data(CACHE_VIDEO_HEIGHT, cv2.CAP_PROP_FRAME_HEIGHT)
 
@@ -162,20 +147,17 @@ class Visual:
         Log.i(f"Video format :: {cv2.CAP_PROP_FORMAT}")
         Log.i(f"Video four cc :: {cv2.CAP_PROP_FOURCC}")
 
-        count = 0
-        first_frame = self.__video_getter.read()
-        first_frame_processed = True
-        original = None
+        first_frame = self.__video_stream.read()
+        first_frame_processed, original, count = True, None, 0
 
-        while self.__video_getter.more():
-            frame = self.__video_getter.read()
-
+        while self.__video_stream.more():
+            frame = self.__video_stream.read()
             if frame is None:
                 break
 
+            # if display requested get a good color frame
             if display:
                 original = frame
-
             count += 1
 
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -212,15 +194,14 @@ class Visual:
 
             # setting progress on the ui
             if pipe is not None:
-                pipe.send(ID_COM_PROGRESS, float((count / total_frames) * 100))
+                pipe.send(ID_COM_PROGRESS, float((count / total_frames) * 95.0))
 
         # completing the progress
         if pipe is not None:
-            pipe.send(ID_COM_PROGRESS, 99.0)
+            pipe.send(ID_COM_PROGRESS, 95.0)
 
         # clearing memory
-        my_clip.release()
-        self.__video_getter.stop()
+        self.__video_stream.stop()
 
         # calling the normalization of ranking
         self.__timed_ranking_normalize()
