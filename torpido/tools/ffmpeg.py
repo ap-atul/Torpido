@@ -103,28 +103,38 @@ def _build_split_command(input_file, output_audio_file):
 def get_width_height(video_file):
     """ Getting the original videos resolution """
     output = pympeg.probe(video_file)
-    width, height = None, None
+    width, height, sar, dar = None, None, None, None
 
     for stream in output['streams']:
         if 'width' in stream and 'height' in stream:
             width = stream['width']
             height = stream['height']
+            sar = stream['sample_aspect_ratio']
+            dar = stream['display_aspect_ratio']
             break
 
-    if isinstance(width, int) and isinstance(height, int):
-        return width, height
+    if sar is None:
+        sar = "1:1"
 
-    return 1920, 720
+    if dar is None:
+        dar = "16:9"
+
+    sar_dar = "setsar=sar=%s,setdar=dar=%s" % (sar.replace(":", "/"), dar.replace(":", "/"))
+
+    if isinstance(width, int) and isinstance(height, int):
+        return width, height, sar_dar
+
+    return 1920, 720, sar_dar
 
 
 def _build_merge_command_v2(video_file, audio_file, output_file, timestamps, intro=None, outro=None):
     pympeg.init()
 
     # getting output video resolution using ffprobe
-    output_width, output_height = get_width_height(video_file)
+    output_width, output_height, setsardar = get_width_height(video_file)
 
     # creating the input nodes
-    in_file = pympeg.input(name=video_file)
+    in_file = pympeg.option(tag="-preset", name="faster").input(name=video_file)
     in_audio = pympeg.input(name=audio_file)
 
     if intro is not None:
@@ -153,7 +163,7 @@ def _build_merge_command_v2(video_file, audio_file, output_file, timestamps, int
                 .filter(filter_name="trim", params={"start": start, "duration": duration})
                 .setpts()
                 .scale(w=str(output_width), h=str(output_height))
-                .arg(args="setdar=dar=16/9")
+                .arg(args=setsardar)
         )
 
         # audio trim filter
@@ -166,7 +176,7 @@ def _build_merge_command_v2(video_file, audio_file, output_file, timestamps, int
         intro_C = (
             intro
                 .scale(w=str(output_width), h=str(output_height))
-                .arg(args="setdar=dar=16/9")
+                .arg(args=setsardar)
         )
         trim_filters.insert(0, intro_C)
         trim_filters.insert(1, intro.audio)
@@ -175,7 +185,7 @@ def _build_merge_command_v2(video_file, audio_file, output_file, timestamps, int
         outro_C = (
             outro
                 .scale(w=str(output_width), h=str(output_height))
-                .arg(args="setdar=dar=16/9")
+                .arg(args=setsardar)
         )
         trim_filters.insert(len(trim_filters), outro_C)
         trim_filters.insert(len(trim_filters), outro.audio)
