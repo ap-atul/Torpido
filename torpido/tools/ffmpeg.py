@@ -6,7 +6,8 @@ Function to build the commands live here.
 import subprocess
 
 from torpido import pympeg
-from torpido.exceptions.custom import AudioStreamMissingException
+from torpido.exceptions.custom import FFmpegProcessException
+from torpido.tools.filelogger import FileLogger
 from torpido.tools.logger import Log
 
 
@@ -39,18 +40,21 @@ def thumbnail(video_file, output_file, sec):
 
 
 def _ffmpeg_runner(command):
+    logger = FileLogger()
+    logger.open()
     run = subprocess.Popen(args=command,
                            shell=True,
                            stdout=subprocess.PIPE,
                            stderr=subprocess.STDOUT,
                            universal_newlines=True)
     for stdout in iter(run.stdout.readline, ""):
+        logger.log(stdout)
         yield stdout
 
     run.stdout.close()
     if run.wait():
         Log.e("FFMPEG has encounter an error!")
-        raise AudioStreamMissingException
+        raise FFmpegProcessException
 
 
 def _build_split_command(input_file, output_audio_file):
