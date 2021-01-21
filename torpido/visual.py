@@ -171,6 +171,7 @@ class Visual:
 
             frameDelta = cv2.absdiff(first_frame, frame)
             thresh = cv2.threshold(frameDelta, self.__motion_threshold, 255, cv2.THRESH_BINARY)[1]
+            # thresh = cv2.adaptiveThreshold(frameDelta, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
 
             threshMax = np.max(thresh)
             if threshMax > 0:

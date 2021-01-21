@@ -123,7 +123,7 @@ class App(QWidget):
         self.extro = None
         self.video = None
         self.videoDisplayCheckbox = None
-        self.snrPlotDisplayCheckbox = None
+        self.specPlotDisplayCheckbox = None
         self.analyticsCheckbox = None
         self.saveLogsCheckbox = None
 
@@ -211,9 +211,9 @@ class App(QWidget):
         self.videoDisplayCheckbox.setToolTip("Displays the video output while processing")
         self.videoDisplayCheckbox.stateChanged.connect(self.setVideoDisplay)
 
-        self.snrPlotDisplayCheckbox = QCheckBox("Display SNR plot")
-        self.snrPlotDisplayCheckbox.setToolTip("Displays the signal to noise ratio plot for audio de-noising")
-        self.snrPlotDisplayCheckbox.stateChanged.connect(self.setSNRPlot)
+        self.specPlotDisplayCheckbox = QCheckBox("Display Spectrogram plot")
+        self.specPlotDisplayCheckbox.setToolTip("Displays the spectrogram plot for audio de-noising")
+        self.specPlotDisplayCheckbox.stateChanged.connect(self.setSNRPlot)
 
         self.analyticsCheckbox = QCheckBox("Display ranking plot")
         self.analyticsCheckbox.setToolTip("Displays the line plot for ranking of the video and their timestamps")
@@ -224,7 +224,7 @@ class App(QWidget):
         self.saveLogsCheckbox.stateChanged.connect(self.setSaveLogs)
 
         optionsLayout.addWidget(self.videoDisplayCheckbox, 1, 1)
-        optionsLayout.addWidget(self.snrPlotDisplayCheckbox, 1, 2)
+        optionsLayout.addWidget(self.specPlotDisplayCheckbox, 1, 2)
         optionsLayout.addWidget(self.analyticsCheckbox, 2, 1)
         optionsLayout.addWidget(self.saveLogsCheckbox, 2, 2)
 
@@ -342,7 +342,7 @@ class App(QWidget):
 
     def setSNRPlot(self):
         """ Display SNR plot for audio """
-        self.controller.set_snr_plot(self.snrPlotDisplayCheckbox.isChecked())
+        self.controller.set_spec_plot(self.specPlotDisplayCheckbox.isChecked())
 
     def setRankingPlot(self):
         """ Display analytics for the processing """
@@ -360,5 +360,5 @@ class App(QWidget):
         self.close()
 
     def restart(self):
-        # self.exit()
-        QtGui.QGuiApplication.exit(REBOOT)
+        self.exit()
+        # QtGui.QGuiApplication.exit(REBOOT)

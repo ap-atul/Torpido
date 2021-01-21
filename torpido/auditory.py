@@ -14,7 +14,7 @@ from .config.config import Config
 from .config.cache import Cache
 from .config.constants import *
 from .tools.logger import Log
-from .wavelet import FastWaveletTransform, VisuShrinkCompressor, snr
+from .wavelet import FastWaveletTransform, VisuShrinkCompressor
 
 matplotlib.use("TkAgg")
 
@@ -37,10 +37,6 @@ class Auditory:
         sound file object having the info of the audio file
     __energy : list
         list of the ranks for the audio signal
-    __snr_before : list
-        list to store the snr of the original audio
-    __snr_after : list
-        list to store the snr of the de-noised audio
     __silence_threshold : int
         threshold value to determine the rank
     __cache : Cache
@@ -57,8 +53,6 @@ class Auditory:
         self.__plot = False
         self.__info = None
         self.__energy = None
-        self.__snr_before = list()
-        self.__snr_after = list()
         self.__silence_threshold = Config.SILENCE_THRESHOLD
         self.__cache = Cache()
         self.__fwt = FastWaveletTransform(Config.WAVELET)
@@ -89,7 +83,7 @@ class Auditory:
         """ Storing audio info """
         self.__cache.write_data(CACHE_AUDIO_INFO, self.__info)
 
-    def __plot_snr(self):
+    def _specshow(self, original_signal, clean_signal, FR):
         """
         Plotting the snrs for the original and the de-noised signals, the snrs are collected
         during the processing, and the mean of the data is used to represent the final values
@@ -99,14 +93,21 @@ class Auditory:
         this SNR is  the reciprocal of the coefficient of variation, i.e.,
         the ratio of mean to standard deviation of a signal, refer the snr function in wavelet/utility
         """
+        if len(original_signal) == 0 or len(clean_signal) == 0:
+            return
 
-        width = 0.1
-        x_orig = np.arange(len(self.__snr_before))
-        plt.bar(x_orig - width / 2, np.abs(self.__snr_before), width=width, label='Original')
-        plt.bar(x_orig + width / 2, np.abs(self.__snr_after), width=width, label='De-noised')
+        fig = plt.figure()
 
-        plt.title("Signal to noise ratios SNR(dB)")
-        plt.legend(loc=0)
+        # plot original signal
+        ax = fig.add_subplot(211)
+        ax.specgram(original_signal, Fs=FR)
+        ax.title.set_text("Original Signal")
+
+        # plot clean signal
+        ax = fig.add_subplot(212)
+        ax.specgram(clean_signal, Fs=FR)
+        ax.title.set_text("Clean Signal")
+
         plt.tight_layout()
         plt.show()
 
@@ -154,6 +155,7 @@ class Auditory:
         self.__rate = self.__info.samplerate
         self.__energy = []
         Log.i(f"Audio duration is {self.__info.duration}.")
+        count = 0
 
         to_read = int(self.__rate * self.__info.duration * Config.AUDIO_BLOCK_PER)
         # creating and opening the output audio file
@@ -174,15 +176,12 @@ class Auditory:
                 cleaned = np.array(cleaned, dtype=np.float_)
                 out.write(cleaned)
 
-                # collecting the signal to noise ratios
-                self.__snr_before.append(snr(block))
-                self.__snr_after.append(snr(cleaned))
-
                 # calculating the audio rank
                 self.__energy.extend([self.__get_energy_rms(cleaned)] * max(1, int(len(cleaned) / self.__rate)))
+                count += 1
 
-            if plot:
-                self.__plot_snr()
+                if plot and count == 5 or count == 7:
+                    self._specshow(block, cleaned, self.__info.samplerate)
 
         self.__cache.write_data(CACHE_RANK_AUDIO, self.__energy)
         Log.i("Audio de noised successfully")

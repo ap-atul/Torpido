@@ -20,7 +20,7 @@ class Worker(QThread):
 
     def run(self) -> None:
         for i in range(101):
-            time.sleep(0.04)
+            time.sleep(0.01)
             self.progress.emit(i)
 
 

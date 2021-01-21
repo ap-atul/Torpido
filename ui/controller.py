@@ -64,9 +64,9 @@ class Controller(QThread):
         """ Set up the video display request """
         self.controller.set_video_display(value)
 
-    def set_snr_plot(self, value):
+    def set_spec_plot(self, value):
         """ Set up the plotting for SNR audio """
-        self.controller.set_snr_plot(value)
+        self.controller.set_spec_plot(value)
 
     def set_ranking_plot(self, value):
         """ Set up the plotting of the analytics """

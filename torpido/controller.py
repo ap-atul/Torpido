@@ -61,8 +61,8 @@ class Controller:
         displays the output video
     __text_detect_display : bool
         displays the output video when text is detected
-    __snr_plot_display : bool
-        displays the snr plot for the audio
+    __spec_plot_display : bool
+        displays the spectogram plot for the audio
     __analytics_display : bool
         displays the analytics of the processing
     __visual : Visual
@@ -97,7 +97,7 @@ class Controller:
         self.__de_noised_audio_file = None
         self.__video_display = False
         self.__text_detect_display = False
-        self.__snr_plot_display = False
+        self.__spec_plot_display = False
         self.__analytics_display = False
         self.__visual = Visual()
         self.__auditory = Auditory()
@@ -216,7 +216,7 @@ class Controller:
         self.__audio_process = Process(target=self.__auditory.start_processing,
                                        args=(self.__audio_file,
                                              self.__de_noised_audio_file,
-                                             self.__snr_plot_display))
+                                             self.__spec_plot_display))
 
         self.__visual_process = Process(target=self.__visual.start_processing,
                                         args=(self._channel,
@@ -291,7 +291,7 @@ class Controller:
         if self.__App is not None:
             self.__App.set_percent_complete(100.0)
 
-        Log.set_handler(None)
+        # Log.set_handler(None)
 
     def clean(self):
         """ clean up """
@@ -326,9 +326,9 @@ class Controller:
         """ Display the processing video output """
         self.__video_display = value
 
-    def set_snr_plot(self, value=False):
+    def set_spec_plot(self, value=False):
         """ Display the snr plot for the audio """
-        self.__snr_plot_display = value
+        self.__spec_plot_display = value
 
     def set_ranking_plot(self, value=False):
         """ Display the analytics """
