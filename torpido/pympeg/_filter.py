@@ -727,6 +727,42 @@ def setpts(*args, expr="setpts=PTS-STARTPTS"):
 
 
 @stream()
+def asetpts(*args, expr="asetpts=N/SR/TB"):
+    """
+    Function to set the presentation timestamps of the input frames based on the
+    expression according to the docs can have some expression that parses the
+    input stream to generate. The default value is N/SR/TB, i.e. the timestamps
+    starts from zero.
+
+    FFMPEG ::  https://ffmpeg.org/ffmpeg-filters.html#toc-setpts_002c-asetpts
+
+    Parameters
+    ---------
+    args : any
+        caller object
+    expr : str
+        expression for the timestamps
+
+    Returns
+    -------
+    GlobalNode
+        global node for the setpts command
+    """
+    input_node = args[0]
+    inputs = list()
+    inputs.append(_get_label_param(input_node))
+
+    node = GlobalNode(
+            inputs=inputs,
+            args=expr,
+            outputs=Label()
+            )
+
+    s.add(node)
+    return node
+
+
+@stream()
 def fade(*args, typ="in", st=0, d=5, color="black"):
     """
     Filter for applying fade in/out effects to the video stream, takes in type,

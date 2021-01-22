@@ -160,7 +160,7 @@ def _build_merge_command_v2(video_file, audio_file, output_file, timestamps, int
         # video trim and scale filter
         trim_filters.append(
             split[i]
-                .filter(filter_name="trim", params={"start": start, "duration": duration})
+                .filter(filter_name="trim", params={"start": start, "duration": (duration - start)})
                 .setpts()
                 .scale(w=str(output_width), h=str(output_height))
                 .arg(args=setsardar)
@@ -168,7 +168,9 @@ def _build_merge_command_v2(video_file, audio_file, output_file, timestamps, int
 
         # audio trim filter
         trim_filters.append(
-            in_audio.filter(filter_name="atrim", params={"start": start, "duration": duration})
+            in_audio
+                .filter(filter_name="atrim", params={"start": start, "duration": (duration - start)})
+                .asetpts()
         )
 
     # scaling the intro and outro if present
