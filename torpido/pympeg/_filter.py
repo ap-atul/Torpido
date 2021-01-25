@@ -15,10 +15,9 @@ from ._node import (InputNode, FilterNode, Label,
 from ._util import get_str_from_filter, get_str_from_global
 from torpido import ffpbar
 
-
 __all__ = ["input", "filter", "output", "arg", "run", "graph", "option",
-            "concat", "init", "scale", "crop", "setpts", "fade", "afade",
-            "command"]
+           "concat", "init", "scale", "crop", "setpts", "fade", "afade",
+           "command"]
 s = Stream()
 
 
@@ -54,7 +53,7 @@ def _check_arg_type(args):
                 isinstance(arg_, GlobalNode) or
                 isinstance(arg_, Label) or
                 isinstance(arg_, list)
-                ):
+        ):
             flag = True
             break
 
@@ -125,11 +124,11 @@ def _get_nodes_from_graph(graph):
         filter_nodes,
         global_nodes,
         output_nodes
-            ) = (
-                    list(), list(),
-                    list(), list(),
-                    list()
-                )
+    ) = (
+        list(), list(),
+        list(), list(),
+        list()
+    )
 
     for node in graph:
         if isinstance(node, InputNode):
@@ -480,7 +479,7 @@ def option(*args, tag=None, name=None, output=None):
 
 
 @stream()
-def concat(*args, inputs:list, outputs:int):
+def concat(*args, inputs: list, outputs: int):
     """
     Concat filter combines two or more streams into a single stream or a
     multiple streams video and audio. The input for the concat should be
@@ -539,7 +538,7 @@ def concat(*args, inputs:list, outputs:int):
 
 
 @stream()
-def crop(*args, w:str, h:str, x="0", y="0", keep_aspect=1):
+def crop(*args, w: str, h: str, x="0", y="0", keep_aspect=1):
     """
     The arguments for the crop function takes in str, since crop function can
     have complex equation and refernce to the input stream via ffmpeg convecction
@@ -552,7 +551,7 @@ def crop(*args, w:str, h:str, x="0", y="0", keep_aspect=1):
 
     Parameters
     ----------
-    args : any
+    args : any-
         input for the filter
     w : str
         output stream width
@@ -577,16 +576,16 @@ def crop(*args, w:str, h:str, x="0", y="0", keep_aspect=1):
     _inputs.append(_get_label_param(args[0]))
 
     node = FilterNode(
-                inputs=_inputs,
-                filter_name="crop",
-                params={
-                    "w": w,
-                    "h": h,
-                    "x": x,
-                    "y": y,
-                    "keep_aspect": keep_aspect
-                }
-            )
+        inputs=_inputs,
+        filter_name="crop",
+        params={
+            "w": w,
+            "h": h,
+            "x": x,
+            "y": y,
+            "keep_aspect": keep_aspect
+        }
+    )
 
     s.add(node)
 
@@ -594,7 +593,7 @@ def crop(*args, w:str, h:str, x="0", y="0", keep_aspect=1):
 
 
 @stream()
-def scale(*args, w:str, h:str):
+def scale(*args, w: str, h: str):
     """
     Creates a scale filter with basic arguments with output width and height.
     Takes in a single input and one output.
@@ -603,7 +602,7 @@ def scale(*args, w:str, h:str):
 
     Parameters
     ----------
-    args : any
+    args : any-
         caller object
     w : str
         output width of the video
@@ -622,13 +621,13 @@ def scale(*args, w:str, h:str):
     _inputs.append(_get_label_param(args[0]))
 
     node = FilterNode(
-                inputs=_inputs,
-                filter_name="scale",
-                params={
-                    "w": w,
-                    "h": h
-                }
-            )
+        inputs=_inputs,
+        filter_name="scale",
+        params={
+            "w": w,
+            "h": h
+        }
+    )
 
     s.add(node)
 
@@ -644,6 +643,7 @@ def run(caller, display_command=True):
 
     Parameters
     ----------
+    display_command
     caller : OutputNode
         calling node, mostly an OutputNode
 
@@ -668,13 +668,13 @@ def run(caller, display_command=True):
 
     progress = ffpbar.Progress()
     process = Popen(
-            args=command,
-            shell=True,
-            stdout=PIPE,
-            stderr=PIPE,
-            universal_newlines=True,
-            encoding='utf-8'
-            )
+        args=command,
+        shell=True,
+        stdout=PIPE,
+        stderr=PIPE,
+        universal_newlines=True,
+        encoding='utf-8'
+    )
 
     for out in process.stdout:
         progress.display(out)
@@ -684,10 +684,10 @@ def run(caller, display_command=True):
     if code:
         progress.clear()
         raise FFmpegException(
-                'ffmpeg',
-                ''.join(process.stderr.readlines()[-10: ]),
-                'Error code :: %s' % code
-            )
+            'ffmpeg',
+            ''.join(process.stderr.readlines()[-10:]),
+            'Error code :: %s' % code
+        )
 
 
 @stream()
@@ -717,10 +717,10 @@ def setpts(*args, expr="setpts=PTS-STARTPTS"):
     inputs.append(_get_label_param(input_node))
 
     node = GlobalNode(
-            inputs=inputs,
-            args=expr,
-            outputs=Label()
-            )
+        inputs=inputs,
+        args=expr,
+        outputs=Label()
+    )
 
     s.add(node)
     return node
@@ -753,10 +753,10 @@ def asetpts(*args, expr="asetpts=N/SR/TB"):
     inputs.append(_get_label_param(input_node))
 
     node = GlobalNode(
-            inputs=inputs,
-            args=expr,
-            outputs=Label()
-            )
+        inputs=inputs,
+        args=expr,
+        outputs=Label()
+    )
 
     s.add(node)
     return node
@@ -772,7 +772,7 @@ def fade(*args, typ="in", st=0, d=5, color="black"):
 
     Parameters
     ----------
-    args : any
+    args : any-
         caller object
     typ : str
         type of fade filter options :: (in, out)
@@ -796,15 +796,15 @@ def fade(*args, typ="in", st=0, d=5, color="black"):
     inputs.append(_get_label_param(input_node))
 
     node = FilterNode(
-            filter_name= fade.__name__,
-            params={
-                "type": typ,
-                "st": st,
-                "d": d,
-                "color": color
-                },
-            inputs=inputs
-            )
+        filter_name=fade.__name__,
+        params={
+            "type": typ,
+            "st": st,
+            "d": d,
+            "color": color
+        },
+        inputs=inputs
+    )
 
     s.add(node)
     return node
@@ -820,7 +820,7 @@ def afade(*args, typ="in", st=0, d=5, curve="tri"):
 
     Parameters
     ----------
-    args : any
+    args : any-
         caller object
     typ : str
         type of fade filter options :: (in, out)
@@ -844,15 +844,15 @@ def afade(*args, typ="in", st=0, d=5, curve="tri"):
     inputs.append(_get_label_param(input_node))
 
     node = FilterNode(
-            filter_name= afade.__name__,
-            params={
-                "type": typ,
-                "st": st,
-                "d": d,
-                "curve": curve
-                },
-            inputs=inputs
-            )
+        filter_name=afade.__name__,
+        params={
+            "type": typ,
+            "st": st,
+            "d": d,
+            "curve": curve
+        },
+        inputs=inputs
+    )
 
     s.add(node)
     return node
@@ -863,10 +863,8 @@ def graph(*args):
     """ Returns the chain of the nodes, printable for representations """
     return s.graph()
 
+
 @stream()
 def command(*args):
     """ Returns the command for the chain """
-    graph = s.graph()
-    command = _get_command_from_graph(graph)
-    return command
-
+    return _get_command_from_graph(s.graph())

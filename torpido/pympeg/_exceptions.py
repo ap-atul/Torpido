@@ -22,7 +22,7 @@ class InputParamsMissing(Exception):
                 """ pympeg.input(name="example.mp4") """
 
 
-class  OptionNodeParamMissing(Exception):
+class OptionNodeParamMissing(Exception):
     """
     When name of the file and tag is missing in the Option node initialization
     this exception would be raised. And corresponding node won't be created.
