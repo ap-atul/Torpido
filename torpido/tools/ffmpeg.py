@@ -31,7 +31,7 @@ def merge(video_file, audio_file, output_file, timestamps, intro=None, extro=Non
 
 
 def thumbnail(video_file, output_file, sec):
-    """ Generates a thumnail for the video using the time in the video """
+    """ Generates a thumbnail for the video using the time in the video """
     command = _build_thumbnail_gen(video_file, output_file, sec)
     Log.i(command)
 
@@ -42,6 +42,7 @@ def thumbnail(video_file, output_file, sec):
 def _ffmpeg_runner(command):
     logger = FileLogger()
     logger.open()
+    logger.log(command)
     run = subprocess.Popen(args=command,
                            shell=True,
                            stdout=subprocess.PIPE,
