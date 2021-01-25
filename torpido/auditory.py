@@ -85,14 +85,14 @@ class Auditory:
 
     def _specshow(self, original_signal, clean_signal, FR):
         """
-        Plotting the snrs for the original and the de-noised signals, the snrs are collected
+        Plotting the spectrogram for the original and the de-noised signals, the spectrogram are collected
         during the processing, and the mean of the data is used to represent the final values
-        The snr is very low (negative with raised to values) so abs of the mean is taken.
-        Note: not to be mistaken with positive values
-
-        this SNR is  the reciprocal of the coefficient of variation, i.e.,
-        the ratio of mean to standard deviation of a signal, refer the snr function in wavelet/utility
         """
+        original_signal, clean_signal = (
+                                            list(filter(lambda x: x != 0, original_signal)),
+                                            list(filter(lambda x: x != 0, clean_signal))
+                                        )
+
         if len(original_signal) == 0 or len(clean_signal) == 0:
             return
 
@@ -112,13 +112,8 @@ class Auditory:
         plt.show()
 
     def __del__(self):
-        """
-        clean up
-        """
-        del self.__cache
-        del self.__fwt
-        del self.__compressor
-
+        """ clean up """
+        del self.__cache, self.__fwt, self.__compressor
         Log.d("Cleaning up.")
 
     def start_processing(self, inputFile, outputFile, plot=False):
