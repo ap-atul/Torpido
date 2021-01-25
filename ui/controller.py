@@ -109,7 +109,5 @@ class Controller(QThread):
     def terminate(self) -> None:
         """ Clean up """
         self.controller.clean()
-        del Controller.percentComplete
-        del Controller.percentMem
-        del Controller.percentCpu
-        del Controller.logger
+        del (Controller.percentComplete, Controller.percentMem,
+             Controller.percentCpu, Controller.logger)

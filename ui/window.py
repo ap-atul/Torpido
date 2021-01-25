@@ -1,11 +1,10 @@
 import numpy as np
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtCore import pyqtSignal
-from PyQt5.QtGui import QPalette, QColor, QPixmap, QIcon, QFont
-from PyQt5.QtWidgets import (QWidget, QVBoxLayout,
-                             QHBoxLayout, QGridLayout,
-                             QGraphicsDropShadowEffect, QPushButton,
-                             QCheckBox, QPlainTextEdit, QFileDialog, QGroupBox)
+from PyQt5.QtGui import QPalette, QPixmap, QIcon, QFont
+from PyQt5.QtWidgets import (QWidget, QVBoxLayout, QHBoxLayout,
+                             QGridLayout, QPushButton, QCheckBox,
+                             QPlainTextEdit, QFileDialog, QGroupBox)
 
 from torpido.config.config import Config
 from torpido.config.constants import *
@@ -37,15 +36,6 @@ SELECTED = ("QLabel {"
                                                                    "border-radius: 5px;"
                                                                    "border-width: 1.5px;"
                                                                    "}")
-
-
-def getShadow():
-    shadowEffect = QGraphicsDropShadowEffect()
-    shadowEffect.setBlurRadius(20)
-    shadowEffect.setOffset(-5)
-    shadowEffect.setColor(QColor(72, 58, 78))
-
-    return shadowEffect
 
 
 class Donut:
