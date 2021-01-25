@@ -51,7 +51,9 @@ class Communication:
             data_to_receive = None
             try:
                 data_to_receive = self._receiver.recv()
-            except EOFError and OSError and TypeError as _:
+            except EOFError as _:
+                pass
+            except OSError as _:
                 pass
 
             if data_to_receive is None or not data_to_receive or not isinstance(data_to_receive, dict):
