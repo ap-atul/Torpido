@@ -183,7 +183,7 @@ def get_output_video_length(timestamps: list):
 
 
 def get_thumbnail_sec(timestamps: list):
-    """ Returns the sec for the thumnbail to generate """
+    """ Returns the sec for the thumbnail to generate """
     if len(timestamps) == 0:
         raise TypeError("There are no timestamps.")
 

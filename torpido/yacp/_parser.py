@@ -1,8 +1,8 @@
 """ Parsers for the serialisation and deserialisation"""
 from ._resolver import Resolver
 
-
 __all__ = ["JsonParser", "YamlParser", "CustomParser"]
+
 
 class Parser:
 
@@ -45,8 +45,7 @@ class JsonParser(Parser):
     def deserialize(self):
         import json
 
-        data = ""
-        with open(self._file, "r") as f:
+        with open(self._file) as f:
             self._data = json.load(f)
             f.close()
 
@@ -73,9 +72,7 @@ class YamlParser(Parser):
     def deserialize(self):
         import yaml
 
-        data = ""
-
-        with open(self._file, "r") as f:
+        with open(self._file) as f:
             self._data = yaml.load(f, yaml.FullLoader)
             f.close()
 
@@ -105,7 +102,7 @@ class CustomParser(Parser):
         sep = self._syntax.replace("%s", "")
         new_line = "\n"
 
-        with open(self._file, "r") as f:
+        with open(self._file) as f:
             lines = f.readlines()
 
             for line in lines:

@@ -13,7 +13,7 @@ class Resolver:
     type_mappings = {
             "bool_y": True,
             "bool_n": False,
-            "int" : int,
+            "int": int,
             "float": float,
             "none": None
     }
