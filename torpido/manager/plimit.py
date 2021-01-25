@@ -33,8 +33,7 @@ class Manager:
     """
 
     def __init__(self):
-        self._nice = NICE
-        self._unnice = 0
+        self._nice, self._unnice = NICE, 0
 
     def register(self, pid, nice=None):
         """
