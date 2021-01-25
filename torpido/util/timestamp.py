@@ -134,11 +134,11 @@ def get_timestamps(data):
     else:
         raise RankingOfFeatureMissing
 
-    final_timestamp = []
+    final_timestamp = list()
 
     # validating if there are 2 values in list
     for clip in timestamps:
-        if len(clip) % 2 == 0:
+        if len(clip) % 2 == 0 and clip[1] - clip[0] != 0:  # preventing 0 sec trim
             final_timestamp.append(clip)
 
     return final_timestamp
