@@ -12,18 +12,14 @@ class Time:
         Simple class to store time values extracted
         datetime can be used from python lib
         """
-        self.hour = None
-        self.minute = None
-        self.second = None
+        self.hour, self.minute, self.second = None, None, None
 
     def get_time_in_sec(self):
         """ Returns the time in seconds """
         return (self.hour * 60 * 60) + (self.minute * 60) + self.second
 
     def __del__(self):
-        del self.hour
-        del self.minute
-        del self.second
+        del self.hour, self.minute, self.second
 
 
 class Parser:
@@ -32,8 +28,7 @@ class Parser:
         Stdout logs parser to extract the duration and time
         from the logs stdout
         """
-        self.duration = None
-        self.time = None
+        self.duration, self.time = None, None
 
     def extract_time_duration(self, line):
         """ Extracts the time and duration from the log """
@@ -67,5 +62,4 @@ class Parser:
         return self.duration
 
     def __del__(self):
-        del self.duration
-        del self.time
+        del self.duration, self.time
