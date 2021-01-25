@@ -10,8 +10,8 @@ import numpy as np
 import soundfile
 from matplotlib import pyplot as plt
 
-from .config.config import Config
 from .config.cache import Cache
+from .config.config import Config
 from .config.constants import *
 from .tools.logger import Log
 from .wavelet import FastWaveletTransform, VisuShrinkCompressor
@@ -153,7 +153,7 @@ class Auditory:
         self.__info = soundfile.info(self.__file_name)
         self.__set_audio_info()
         self.__rate = self.__info.samplerate
-        self.__energy = []
+        self.__energy = list()
         Log.i(f"Audio duration is {self.__info.duration}.")
         count = 0
 
@@ -180,7 +180,7 @@ class Auditory:
                 self.__energy.extend([self.__get_energy_rms(cleaned)] * max(1, int(len(cleaned) / self.__rate)))
                 count += 1
 
-                if plot and count == 5 or count == 7:
+                if plot and (count == 5 or count == 7):
                     self._specshow(block, cleaned, self.__info.samplerate)
 
         self.__cache.write_data(CACHE_RANK_AUDIO, self.__energy)
