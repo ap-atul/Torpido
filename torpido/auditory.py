@@ -17,6 +17,7 @@ from .tools.logger import Log
 from .wavelet import FastWaveletTransform, VisuShrinkCompressor
 
 matplotlib.use("TkAgg")
+plt.rcParams["figure.figsize"] = (10, 4.5)
 
 
 class Auditory:

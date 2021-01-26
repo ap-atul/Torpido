@@ -17,6 +17,7 @@ from torpido.util.timestamp import get_timestamps, get_output_video_length
 # since, ui is using QTAgg, need to send the data to main gui thread
 # or just use Tk ;)
 matplotlib.use("TkAgg")
+plt.rcParams["figure.figsize"] = (10, 4.5)
 
 
 class Analytics:
@@ -82,7 +83,6 @@ class Analytics:
                                    self.__cache.read_data(CACHE_FPS))
 
         self.__plot_rank_line()
-        self.__plot_sum_line()
         self.__analytics()
 
     def __plot_rank_line(self):
@@ -93,42 +93,28 @@ class Analytics:
         numbers = [i for i in range(self.__rank_length)]
         fig = plt.figure()
 
-        ax = fig.add_subplot(411)
+        ax = fig.add_subplot(211)
         ax.plot(numbers, self.__motion, label="Motion", color='r')
-        plt.legend(loc=2)
-
-        ax = fig.add_subplot(412)
         ax.plot(numbers, self.__blur, label="Blur", color='g')
-        plt.legend(loc=2)
-
-        ax = fig.add_subplot(413)
         ax.plot(numbers, self.__audio, label="Audio", color='c')
-        plt.legend(loc=2)
-
-        ax = fig.add_subplot(414)
         ax.plot(numbers, self.__text, label="Text", color='m')
-        plt.legend(loc=2)
+        ax.set_title("rankings for all features")
+        ax.set_ylim(-1)
+        plt.legend(loc=2).set_draggable(True)
 
-        plt.tight_layout()
-        plt.show()
-
-    def __plot_sum_line(self):
-        """
-        Plotting the sub rank line graph, also adding the start and end timestamps
-        dashed lines. The green
-        """
+        ax = fig.add_subplot(212)
         for start, end, in self.__timestamps:
-            plt.plot([start, start], [0, 10], color='red', linestyle='dashed', linewidth=2)
-            plt.plot([end, end], [0, 10], color='green', linestyle='dashed', linewidth=2)
+            ax.plot([start, start], [0, 10], color='red', linestyle='dashed', linewidth=1.5)
+            ax.plot([end, end], [0, 10], color='green', linestyle='dashed', linewidth=1.5)
 
-        custom_lines = [Line2D([0], [0], color='red', lw=4),
-                        Line2D([0], [0], color='green', lw=4)]
+        custom_lines = [Line2D([0], [0], color='red', linestyle='dashed', linewidth=1.5),
+                        Line2D([0], [0], color='green', linestyle='dashed', linewidth=1.5)]
 
-        plt.plot([i for i in range(self.__rank_length)], self.__ranks)
-        plt.legend(custom_lines, ['Start time', 'End time'], loc=0)
-        plt.title("Final summation of all ranks")
-        plt.xlabel("Video duration (sec)")
-        plt.ylabel("Summation of all rankings")
+        ax.plot([i for i in range(self.__rank_length)], self.__ranks)
+        ax.set_ylim(0)
+        ax.set_title("sum of all rankings")
+        ax.legend(custom_lines, ['start time', 'end time'], loc=0).set_draggable(True)
+
         plt.tight_layout()
         plt.show()
 
