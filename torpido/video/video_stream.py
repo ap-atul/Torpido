@@ -33,10 +33,8 @@ class Stream:
 
     def __init__(self, src):
         cv2.setUseOptimized(True)
-        self.__Q = Queue(maxsize=1200)
-        self.stream = cv2.VideoCapture(src)
-        self.stopped = False
-        self._thread = None
+        self.__Q, self.stream = Queue(maxsize=1200), cv2.VideoCapture(src)
+        self.stopped, self._thread = False, None
 
     def start(self):
         self._thread = Thread(target=self.__get, name="torpido.video.Stream", args=())

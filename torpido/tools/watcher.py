@@ -94,16 +94,11 @@ class Watcher:
     CLOCK = os.sysconf("SC_CLK_TCK")
 
     def __init__(self):
-        self.__cpu = None
-        self.__mem = None
+        self.__cpu, self.__mem, self._app = None, None, None
+        self.__stop, self.__enable = False, False
 
         # delay for the thread
         self.__delay = Config.WATCHER_DELAY
-
-        # ui controller
-        self._app = None
-        self.__enable = False
-        self.__stop = False
 
     def _start_cpu(self):
         """
@@ -126,7 +121,6 @@ class Watcher:
             try:
                 nstat = self.__read_cpu()
                 ntotal, nidle = times(nstat)
-
                 percent = ((ntotal - total) - (nidle - idle)) / (ntotal - total) * 100
 
             # cases when initial values are zero
@@ -209,8 +203,7 @@ class Watcher:
 
     def enable(self, app, enable=True):
         """ Enables the watcher and the controller object is connected to receives the readings """
-        self._app = app
-        self.__enable = enable
+        self._app, self.__enable = app, enable
 
     def start(self):
         """
@@ -230,7 +223,4 @@ class Watcher:
 
     def __del__(self):
         """ Clean up """
-        if self.__mem is not None:
-            del self.__mem
-        if self.__cpu is not None:
-            del self.__cpu
+        del self.__mem, self.__cpu

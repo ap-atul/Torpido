@@ -10,7 +10,7 @@ from._parser import JsonParser, YamlParser, CustomParser
 #   ...
 #   self.name = None
 #
-#..config.yaml
+# ..config.yaml
 #   name: ABC
 #   age: 20
 #

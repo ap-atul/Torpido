@@ -8,10 +8,7 @@ class Parser:
 
     def __init__(self, file=None, data=None, syntax=None):
         self.__name__ = "parser"
-
-        self._file = file
-        self._data = data
-        self._syntax = syntax
+        self._file, self._data, self._syntax = file, data, syntax
 
     def __str__(self):
         return "@%s" % self.__name__
@@ -36,11 +33,8 @@ class JsonParser(Parser):
 
     def __init__(self, file: str):
         super().__init__()
-        self.__name__ = "Jsonparser"
-
-        self._file = file
-        self._syntax = "json"
-        self._data = None
+        self.__name__ = "jsonparser"
+        self._file, self._syntax, self._data = file, "json", None
 
     def deserialize(self):
         import json
@@ -63,11 +57,8 @@ class YamlParser(Parser):
 
     def __init__(self, file: str):
         super().__init__()
-        self.__name__ = "Yamlparser"
-
-        self._file = file
-        self._syntax = "yaml"
-        self._data = None
+        self.__name__ = "yamlparser"
+        self._file, self._syntax, self._data = file, "yaml", None
 
     def deserialize(self):
         import yaml
@@ -90,17 +81,12 @@ class CustomParser(Parser):
     def __init__(self, file: str, syntax: str):
         super().__init__()
         self.__name__ = "Customparser"
-
-        self._file = file
-        self._syntax = syntax
-        self._data = None
-
+        self._file, self._syntax, self._data = file, syntax, None
         self._resolver = Resolver()
 
     def deserialize(self):
         self._data = dict()
         sep = self._syntax.replace("%s", "")
-        new_line = "\n"
 
         with open(self._file) as f:
             lines = f.readlines()
