@@ -1,7 +1,7 @@
-from torpido.exceptions.custom import RankingOfFeatureMissing
-from torpido.config.cache import Cache
-from torpido.config.config import Config
-from torpido.config.constants import CACHE_FRAME_COUNT, CACHE_FPS
+from ..exceptions.custom import RankingOfFeatureMissing
+from ..config.cache import Cache
+from ..config.config import Config
+from ..config.constants import CACHE_FRAME_COUNT, CACHE_FPS
 
 
 class Ranking:

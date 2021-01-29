@@ -1,3 +1,4 @@
+Cython
 PyQt5
 tqdm
 soundfile

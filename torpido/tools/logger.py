@@ -115,7 +115,7 @@ class Log:
             normal string to print function any fstring or
             format strings can be possible
         """
-        Log.log(message, mode='INFO')
+        Log.log(message)
 
     @staticmethod
     def e(message):
