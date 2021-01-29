@@ -37,31 +37,23 @@ class FFMPEG:
     __intro : str
         name of the intro video file
     __extro : str
-        name of the extro video file
+        name of the outro video file
     __extension : str
         name of the extension of the input file
     __progress_bar : tqdm
         object of tqdm to display a progress bar
     """
     def __init__(self):
-        self.__input_file_name = None
-        self.__input_file_path = None
-        self.__output_video_file_name = None
-        self.__input_audio_file_name = None
-        self.__output_audio_file_name = None
-        self.__output_file_path = None
-        self.__thumbnail_file = None
-        self.__intro = None
-        self.__extro = None
-        self.__extension = None
-        self.__progress_bar = None
+        self.__input_file_name = self.__input_file_path = self.__output_video_file_name = self.__input_audio_file_name = None
+        self.__output_audio_file_name = self.__output_file_path = self.__thumbnail_file = self.__intro = None
+        self.__extro = self.__extension = self.__progress_bar = None
 
     def set_intro_video(self, intro):
         """ Sets the intro video file """
         self.__intro = intro
 
     def set_outro_video(self, extro):
-        """ Sets the extro video file """
+        """ Sets the outro video file """
         self.__extro = extro
 
     def get_input_file_name_path(self):
@@ -238,7 +230,5 @@ class FFMPEG:
         if os.path.isfile(os.path.join(CACHE_DIR, CACHE_NAME)):
             os.unlink(os.path.join(CACHE_DIR, CACHE_NAME))
 
-        if self.__progress_bar is not None:
-            del self.__progress_bar
-
+        del self.__progress_bar
         Log.d("Clean up completed.")

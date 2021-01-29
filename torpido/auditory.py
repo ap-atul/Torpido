@@ -48,14 +48,9 @@ class Auditory:
         performs visu shrink thresholding on the coefficients
     """
     def __init__(self):
-        self.__file_name = None
-        self.__rate = None
-        self.__data = None
-        self.__plot = False
-        self.__info = None
-        self.__energy = None
-        self.__silence_threshold = Config.SILENCE_THRESHOLD
-        self.__cache = Cache()
+        self.__file_name = self.__rate = self.__data = None
+        self.__plot = self.__info = self.__energy = None
+        self.__silence_threshold, self.__cache = Config.SILENCE_THRESHOLD, Cache()
         self.__fwt = FastWaveletTransform(Config.WAVELET)
         self.__compressor = VisuShrinkCompressor()
 
@@ -145,15 +140,13 @@ class Auditory:
             Log.e(f"File {inputFile} does not exists")
             return
 
-        self.__file_name = inputFile
+        self.__file_name, self.__energy = inputFile, list()
         self.__info = soundfile.info(self.__file_name)
-        self.__set_audio_info()
         self.__rate = self.__info.samplerate
-        self.__energy = list()
+        self.__set_audio_info()
         Log.i(f"Audio duration is {self.__info.duration}.")
-        count = 0
 
-        to_read = int(self.__rate * self.__info.duration * Config.AUDIO_BLOCK_PER)
+        count, to_read = 0, int(self.__rate * self.__info.duration * Config.AUDIO_BLOCK_PER)
         # creating and opening the output audio file
         with soundfile.SoundFile(outputFile, mode="w", samplerate=self.__rate, channels=1) as out:
             for block in soundfile.blocks(self.__file_name, to_read):

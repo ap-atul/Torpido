@@ -43,13 +43,10 @@ class Visual:
 
     def __init__(self):
         cv2.setUseOptimized(True)
-        self.__blur_threshold = Config.BLUR_THRESHOLD
-        self.__motion_threshold = Config.MOTION_THRESHOLD
         self.__cache = Cache()
-        self.__frame_count, self.__fps = None, None
-        self.__motion, self.__blur = None, None
-        self.__video_stream = None
-        self.__video_pipe = None
+        self.__blur_threshold, self.__motion_threshold = Config.BLUR_THRESHOLD, Config.MOTION_THRESHOLD
+        self.__frame_count = self.__fps = self.__motion = self.__blur = None
+        self.__video_stream = self.__video_pipe = None
 
     def __detect_blur(self, image):
         """
@@ -96,11 +93,7 @@ class Visual:
 
     def __del__(self):
         """ Clean  ups """
-        del self.__cache
-        if self.__video_stream is not None:
-            del self.__video_stream
-
-        Log.d("Cleaning up.")
+        del self.__cache, self.__video_stream
 
     def start_processing(self, pipe, inputFile, display=False):
         """
@@ -131,9 +124,7 @@ class Visual:
 
         fps = my_clip.get(cv2.CAP_PROP_FPS)
         total_frames = my_clip.get(cv2.CAP_PROP_FRAME_COUNT)
-
-        self.__fps = fps
-        self.__frame_count = total_frames
+        self.__fps, self.__frame_count = fps, total_frames
 
         self.__cache.write_data(CACHE_FPS, self.__fps)
         self.__cache.write_data(CACHE_FRAME_COUNT, self.__frame_count)

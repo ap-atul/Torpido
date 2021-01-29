@@ -57,10 +57,7 @@ class Textual:
 
     def __init__(self):
         cv2.setUseOptimized(True)
-        self.__fps = None
-        self.__frame_count = None
-        self.__text_ranks = None
-        self.__video_getter = None
+        self.__fps = self.__frame_count = self.__text_ranks = self.__video_getter = None
         self.__cache = Cache()
         self.__min_confidence, self.__skip_frames = Config.TEXT_MIN_CONFIDENCE, Config.TEXT_SKIP_FRAMES
         self.__WIDTH = self.__HEIGHT = 320  # same thing for this
@@ -237,9 +234,7 @@ class Textual:
         Log.i("Textual ranking saved .............")
 
     def __del__(self):
-        """
-        clean ups
-        """
+        """ clean ups """
         del self.__net
         del self.__video_getter
         Log.d("Cleaning up.")
@@ -262,7 +257,6 @@ class Textual:
             return
 
         self.__video_getter = cv2.VideoCapture(str(inputFile))
-
         self.__fps = self.__video_getter.get(cv2.CAP_PROP_FPS)
         self.__frame_count = self.__video_getter.get(cv2.CAP_PROP_FRAME_COUNT)
         self.__skip_frames = int(self.__fps * self.__skip_frames)

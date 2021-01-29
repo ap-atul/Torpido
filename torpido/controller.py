@@ -9,13 +9,13 @@ import gc
 import os
 from multiprocessing import Process
 
-from torpido import Auditory, FFMPEG, Textual, Visual, Analytics
-from torpido.config import Cache, LINUX, ID_COM_LOGGER, ID_COM_PROGRESS, ID_COM_VIDEO
-from torpido.exceptions import RankingOfFeatureMissing, EastModelEnvironmentMissing
-from torpido.manager import ManagerPool
-from torpido.pmpi import Communication
-from torpido.tools import Watcher, Log
-from torpido.util import get_timestamps, read_rankings, check_type_video, get_thumbnail_sec
+from . import Auditory, FFMPEG, Textual, Visual, Analytics
+from .config import Cache, LINUX, ID_COM_LOGGER, ID_COM_PROGRESS, ID_COM_VIDEO
+from .exceptions import RankingOfFeatureMissing, EastModelEnvironmentMissing
+from .manager import ManagerPool
+from .pmpi import Communication
+from .tools import Watcher, Log
+from .util import get_timestamps, read_rankings, check_type_video, get_thumbnail_sec
 
 
 def logo():
@@ -62,7 +62,7 @@ class Controller:
     __text_detect_display : bool
         displays the output video when text is detected
     __spec_plot_display : bool
-        displays the spectogram plot for the audio
+        displays the spectrogram plot for the audio
     __analytics_display : bool
         displays the analytics of the processing
     __visual : Visual
@@ -88,24 +88,12 @@ class Controller:
     """
 
     def __init__(self):
-        self.__App = None
-        self.__video_file = None
-        self.__audio_file = None
-        self.__audio_process = None
-        self.__visual_process = None
-        self.__textual_process = None
-        self.__de_noised_audio_file = None
-        self.__video_display = False
-        self.__text_detect_display = False
-        self.__spec_plot_display = False
-        self.__analytics_display = False
-        self.__visual = Visual()
-        self.__auditory = Auditory()
-        self.__ffmpeg = FFMPEG()
-        self.__analytics = Analytics()
-        self.__cache = Cache()
-        self.__watcher = None
-        self.__pool = None
+        self.__App = self.__watcher = self.__pool = None
+        self.__video_file = self.__audio_file = self.__de_noised_audio_file = None
+        self.__audio_process = self.__visual_process = self.__textual_process = None
+        self.__video_display = self.__text_detect_display = self.__spec_plot_display = self.__analytics_display = False
+        self.__visual, self.__auditory, self.__ffmpeg = Visual(), Auditory(), FFMPEG()
+        self.__analytics, self.__cache = Analytics(), Cache()
 
         # communication manager
         self._communication = Communication()
@@ -145,7 +133,7 @@ class Controller:
         intro : str
             name of the intro video file
         extro : str
-            name of the extro video file
+            name of the outro video file
 
         Notes
         ------

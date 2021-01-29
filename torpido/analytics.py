@@ -47,13 +47,8 @@ class Analytics:
 
     def __init__(self):
         self.__motion, self.__blur, self.__text, self.__audio = None, None, None, None
-        self.__rank_length = None
-        self.__ranks = None
-        self.__data = None
-        self.__timestamps = None
-        self.__output_length = None
-        self.__actual_length = None
-        self.__cache = Cache()
+        self.__rank_length, self.__ranks, self.__data, self.__timestamps = None, None, None, None
+        self.__output_length, self.__actual_length, self.__cache = None, None, Cache()
 
     def analyze(self, data):
         """
