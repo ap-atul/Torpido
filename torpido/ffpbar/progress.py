@@ -1,7 +1,8 @@
 """
-This file defines the progress bar from tqdm
-and updates it according to the FFmpeg  logs based on
-the time and duration in the logs
+This file defines the progress bar from tqdm and updates it according to the FFmpeg
+logs based on the time and duration in the logs. Command that have dynamic lengths like
+multiple trims and concatenation the progress cannot be predicted so the progress bar does not
+accurately detects the progress.
 """
 
 from tqdm import tqdm
@@ -11,17 +12,13 @@ from .parser import Parser
 
 class Progress:
     def __init__(self):
-        """ Initializes the percent bar object """
-        self._bar = tqdm(total=100)
-        self._parser = Parser()
-        self._percent = 0
+        self._bar, self._percent, self._parser = tqdm(total=100), 0, Parser()
 
     @property
     def progress(self):
         return self._percent
 
-    def display(self, log: str, display_log=False):
-        """ Extracts the time and duration from log and update the percent bar"""
+    def display(self, log: str, display_log=False):  # parse the log and update the progress
         duration, time = self._parser.extract_time_duration(log)
 
         if time is not None:
@@ -34,21 +31,18 @@ class Progress:
         elif display_log:
             print(log)
 
-    def complete(self):
-        """ Completes the progress bar """
+    def complete(self):  # completes the progress bar
         self._bar.update(100)
         self._percent = 100
 
-    def __get_progress(self, duration, time):
-        """ Returns the percent as percentage from duration and time """
+    def __get_progress(self, duration, time): # returns the percentage of the progress
         duration_in_sec = duration.get_time_in_sec()
         if duration_in_sec == 0:
             return 100
 
         return int(time.get_time_in_sec() * 100 / duration_in_sec)
 
-    def clear(self):
-        """ Clears the percent bar """
+    def clear(self):  # sets the progress to 0
         self._bar.clear()
         self._percent = 0
 

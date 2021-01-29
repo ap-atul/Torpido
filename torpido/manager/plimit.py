@@ -2,9 +2,9 @@
 
 from os import setpriority, PRIO_PROCESS
 
-from torpido.config.constants import NICE, NICE_MAX
-from torpido.exceptions.custom import ProcessDoesNotExists
-from torpido.tools.logger import Log
+from ..config.constants import NICE, NICE_MAX
+from ..exceptions.custom import ProcessDoesNotExists
+from ..tools.logger import Log
 
 
 class Manager:
@@ -114,11 +114,7 @@ class ManagerPool:
     """
 
     def __init__(self):
-        self.__max = NICE_MAX
-        self.__pool = dict()
-
-        # manager object
-        self.__manager = Manager()
+        self.__max, self.__pool, self.__manager = NICE_MAX, dict(), Manager()
 
     def __get_max(self):
         """
@@ -138,13 +134,8 @@ class ManagerPool:
         int
             nice value for the distribution
         """
-        np = len(self.__pool)
-        nice = np * self.__max
-
-        if nice >= 19:
-            nice = 18
-
-        return int(nice)
+        nice = int(len(self.__pool) * self.__max)
+        return 18 if nice >= 19 else nice
 
     def add(self, pid, nice=None):
         """

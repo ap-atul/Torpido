@@ -6,10 +6,9 @@ from ._sender import Sender
 
 class Communication:
     def __init__(self):
-        self._index = dict()
+        self._index, self._worker, self._stopped = dict(), None, False
         self._receiver, self._channel = Pipe()
         self._sender = Sender(channel=self._channel)
-        self._worker, self._stopped = None, False
 
     def sender(self):
         self._start_communication()

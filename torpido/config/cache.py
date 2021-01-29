@@ -20,7 +20,7 @@ class Cache:
     """
 
     def __init__(self):
-        if os.path.isdir(os.path.join(os.getcwd(), CACHE_DIR)) is False:
+        if not os.path.isdir(os.path.join(os.getcwd(), CACHE_DIR)):
             os.mkdir(os.path.join(os.getcwd(), CACHE_DIR))
         self.__file_name = os.path.join(os.getcwd(), CACHE_DIR, CACHE_NAME)
 
@@ -65,11 +65,6 @@ class Cache:
         """
         if os.path.isfile(self.__file_name):
             data = load(self.__file_name)
-            if key in data:
-                return data[key]
-            else:
-                Log.e(f"[CACHE] : Requested {key} does not exists")
-                return None
-        else:
-            Log.e(f"[CACHE] : Cache does not exists yet")
-            return None
+            return data[key] if key in data else None
+        Log.e(f"[CACHE] : Cache does not exists yet")
+        return None
