@@ -136,7 +136,7 @@ class App(QWidget):
         fileLayout = QVBoxLayout()
         fileLayout.setSpacing(10)
 
-        # extro and intro layout
+        # outro and intro layout
         extraLayout = QHBoxLayout()
         extraLayout.setSpacing(10)
 

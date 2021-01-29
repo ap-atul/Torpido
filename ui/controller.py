@@ -44,21 +44,15 @@ class Controller(QThread):
     def __init__(self):
         super().__init__()
         self.controller = MainController()
-
-        self.videoFile = None
-        self.intro = None
-        self.extro = None
+        self.videoFile = self.intro = self.outro = None
 
     def set_video(self, videoFile, intro, extro):
         """ Set the video file for processing """
-
-        self.videoFile = videoFile
-        self.intro = intro
-        self.extro = extro
+        self.videoFile, self.intro, self.outro = videoFile, intro, extro
 
     def run(self):
         """ Start the processing on the input video file """
-        self.controller.start_processing(self, self.videoFile, intro=self.intro, extro=self.extro)
+        self.controller.start_processing(self, self.videoFile, intro=self.intro, extro=self.outro)
 
     def set_video_display(self, value):
         """ Set up the video display request """
@@ -109,5 +103,4 @@ class Controller(QThread):
     def terminate(self) -> None:
         """ Clean up """
         self.controller.clean()
-        del (Controller.percentComplete, Controller.percentMem,
-             Controller.percentCpu, Controller.logger)
+        del (Controller.percentComplete, Controller.percentMem, Controller.percentCpu, Controller.logger)
