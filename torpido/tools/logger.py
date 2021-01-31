@@ -83,7 +83,6 @@ class Log:
 
                 with open(os.path.join(CACHE_DIR, LOG_FILE), "a", encoding='utf-8') as f:
                     f.write(str(message) + "\n")
-
                 f.close()
 
         except FileNotFoundError as _:

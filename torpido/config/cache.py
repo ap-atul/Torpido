@@ -39,13 +39,11 @@ class Cache:
         """
         if os.path.isfile(self.__file_name):
             data = load(self.__file_name)
-            data[key] = value
-            dump(data, self.__file_name)
         else:
             data = dict()
-            data[key] = value
-            dump(data, self.__file_name)
 
+        data[key] = value
+        dump(data, self.__file_name)
         Log.d(f"[CACHE] : {key} is stored")
 
     def read_data(self, key):
@@ -66,5 +64,6 @@ class Cache:
         if os.path.isfile(self.__file_name):
             data = load(self.__file_name)
             return data[key] if key in data else None
+
         Log.e(f"[CACHE] : Cache does not exists yet")
         return None

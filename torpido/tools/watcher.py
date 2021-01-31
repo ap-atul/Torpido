@@ -34,8 +34,8 @@ def times(values):
     user, nice, system, idle, io, irq, soft, steal, _, _ = values
 
     idle = idle + io
-    nonIdle = user + nice + system + irq + soft + steal
-    total = idle + nonIdle
+    non_idle = user + nice + system + irq + soft + steal
+    total = idle + non_idle
 
     return total, idle
 
