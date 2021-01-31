@@ -22,7 +22,13 @@
 -----------------------------------------------------------
 
 # Logs
+### Log 50, 31-01
+```AP```
+* Small bug fixes
+* Major clean up
+* Changes to the code structures
 
+----------------------------------------
 ### Log 49, 20-01
 ```AP```
 * Minor clean up

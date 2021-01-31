@@ -1,17 +1,59 @@
+import os
+
+from joblib import load, dump
+
+from .. import Log
 from ..exceptions.custom import RankingOfFeatureMissing
 from ..config.cache import Cache
 from ..config.config import Config
-from ..config.constants import CACHE_FRAME_COUNT, CACHE_FPS
+from ..config.constants import CACHE_FRAME_COUNT, CACHE_FPS, CACHE_DIR, CACHE_NAME
+
+
+class _RankCache:
+    RANK_KEY = "rank"  # key val for the rank cache dict
+
+    def __init__(self):
+        if not os.path.isdir(CACHE_DIR):
+            os.mkdir(CACHE_DIR)
+        self._filename = os.path.join(CACHE_DIR, CACHE_NAME)
+
+    def write(self, key, val):
+        if os.path.isfile(self._filename):
+            data = load(self._filename)
+        else:
+            data = dict()
+
+        if _RankCache.RANK_KEY not in data:
+            rank = dict()
+            rank[key] = val
+            data[_RankCache.RANK_KEY] = rank
+            return
+
+        data[_RankCache.RANK_KEY][key] = val
+        dump(data, self._filename)
+        Log.d(f"[RANK CACHE] {key} stored")
+
+    def read(self, key):
+        if os.path.isfile(self._filename):
+            data = load(self._filename)
+            if _RankCache.RANK_KEY in data:
+                return data[_RankCache.RANK_KEY][key]
+
+        return None
+
+    def all_ranks(self):
+        if os.path.isfile(self._filename):
+            data = load(self._filename)
+            return list(data[_RankCache].values())
 
 
 class Ranking:
 
-    _ranks = dict()
+    # _ranks = dict()
 
     @staticmethod
     def _add_padding(val):
         _max_length = int(Cache().read_data(CACHE_FRAME_COUNT) / Cache().read_data(CACHE_FPS))
-        _min_rank = Config.MIN_RANK_OUT_VIDEO
         if len(val) < _max_length:
             val.extend([sum(val) / len(val)] * int(_max_length - len(val)))
             return val
@@ -19,10 +61,8 @@ class Ranking:
 
     @staticmethod
     def _trim_by_rank(ranks):
-        _max_length = int(Cache().read_data(CACHE_FRAME_COUNT) / Cache().read_data(CACHE_FPS))
-        _min_rank = Config.MIN_RANK_OUT_VIDEO
-
         timestamps = list()
+        _min_rank = Config.MIN_RANK_OUT_VIDEO
         start, end, prev_end, i = None, None, 0, 0
 
         for i in range(len(ranks)):
@@ -43,23 +83,20 @@ class Ranking:
 
     @staticmethod
     def add(key, rank: list):
-        _max_length = int(Cache().read_data(CACHE_FRAME_COUNT) / Cache().read_data(CACHE_FPS))
-        _min_rank = Config.MIN_RANK_OUT_VIDEO
-
         rank = Ranking._add_padding(rank)
-        Ranking._ranks[key] = rank
+        _RankCache().write(key, rank)
 
     @staticmethod
     def get(key):
-        return None if key not in Ranking._ranks else Ranking._ranks[key]
+        return _RankCache().read(key)
 
     @staticmethod
     def ranks():
-        return Ranking._ranks
+        return _RankCache().all_ranks()
 
     @staticmethod
     def get_timestamps():
-        sum_ranks = [sum(rank_list) for rank_list in zip(* Ranking._ranks.values())]
+        sum_ranks = [sum(rank_list) for rank_list in zip(* _RankCache().all_ranks())]
 
         if sum_ranks is None:
             raise RankingOfFeatureMissing

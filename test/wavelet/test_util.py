@@ -49,21 +49,6 @@ class WaveletTest(unittest.TestCase):
         self.assertTrue(isPowerOf2(8))
         self.assertTrue(not isPowerOf2(10))
 
-    def test_spec(self):
-        from matplotlib import pyplot as plt
-        import numpy as np
-        from torpido.wavelet.util.utility import amp_to_db
-
-        z = np.random.random((11, 11))
-        x, y = np.mgrid[:11, :11]
-
-        fig, ax = plt.subplots()
-        ax.set_yscale('symlog')
-        ax.pcolormesh(x, y, z)
-        plt.show()
-
-        self.assertTrue(True)
-
 
 if __name__ == '__main__':
     unittest.main()
