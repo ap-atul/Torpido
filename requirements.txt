@@ -3,6 +3,6 @@ PyQt5
 tqdm
 soundfile
 matplotlib
-python-opencv
+opencv-python
 joblib
 numpy
