@@ -1,6 +1,7 @@
 import unittest
 
 from torpido.config.cache import *
+from torpido.tools.ranking import Ranking
 
 
 class CacheTest(unittest.TestCase):
@@ -23,6 +24,16 @@ class CacheTest(unittest.TestCase):
         obg = cache.read_data("d")
 
         self.assertEqual(type(obg), type(cache))
+
+    def test_ranking(self):
+        Cache().write_data(CACHE_FPS, 20)
+        Cache().write_data(CACHE_FRAME_COUNT, 600)
+        Ranking.add("MOTION", [1, 1, 1, 1, 1])
+        Ranking.add("BLUR", [1, 1, 1, 6, 7])
+        Ranking.add("AUDIO", [1, 1, 4, 5, 1])
+        Ranking.add("TEXT", [1, 2, 3, 1, 1])
+
+        self.assertEqual(4, len(Ranking.ranks()))
 
 
 if __name__ == '__main__':

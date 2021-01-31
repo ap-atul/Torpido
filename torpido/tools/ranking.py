@@ -27,9 +27,9 @@ class _RankCache:
             rank = dict()
             rank[key] = val
             data[_RankCache.RANK_KEY] = rank
-            return
+        else:
+            data[_RankCache.RANK_KEY][key] = val
 
-        data[_RankCache.RANK_KEY][key] = val
         dump(data, self._filename)
         Log.d(f"[RANK CACHE] {key} stored")
 
@@ -37,14 +37,15 @@ class _RankCache:
         if os.path.isfile(self._filename):
             data = load(self._filename)
             if _RankCache.RANK_KEY in data:
-                return data[_RankCache.RANK_KEY][key]
-
+                if key in data[_RankCache.RANK_KEY]:
+                    return data[_RankCache.RANK_KEY][key]
+                return None
         return None
 
     def all_ranks(self):
         if os.path.isfile(self._filename):
             data = load(self._filename)
-            return list(data[_RankCache].values())
+            return list(data[_RankCache.RANK_KEY].values())
 
 
 class Ranking:
