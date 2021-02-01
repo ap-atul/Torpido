@@ -15,7 +15,8 @@ from .exceptions import RankingOfFeatureMissing, EastModelEnvironmentMissing
 from .manager import ManagerPool
 from .pmpi import Communication
 from .tools import Watcher, Log
-from .util import get_timestamps, read_rankings, check_type_video, get_thumbnail_sec
+from .tools.ranking import Ranking
+from .util import check_type_video
 
 
 def logo():
@@ -245,14 +246,14 @@ class Controller:
         if self.__watcher is not None:
             self.__watcher.stop()  # ending the watcher
 
-        rankings = read_rankings()
+        rankings = Ranking.ranks()
         if self.__analytics_display:
             #  separate process for analytics
             Process(target=self.__analytics.analyze, args=(rankings,)).start()
 
         # cache file got missing
         try:
-            timestamps = get_timestamps(data=rankings)
+            timestamps = Ranking.get_timestamps()
         except RankingOfFeatureMissing:
             Log.e(RankingOfFeatureMissing.cause)
             return
@@ -271,7 +272,7 @@ class Controller:
 
         # doing it anyway
         if True:
-            if self.__ffmpeg.gen_thumbnail(get_thumbnail_sec(timestamps)):
+            if self.__ffmpeg.gen_thumbnail(Ranking.get_thumbnail_sec()):
                 Log.d("Generated a thumbnail....")
 
         self.__ffmpeg.clean_up()
