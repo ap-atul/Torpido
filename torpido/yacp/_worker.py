@@ -37,7 +37,7 @@ def dump(filename: str, cls, syntax=None):
 
 
 def populate(data: dict, cls):
-    # reading the memebers of the class and mapping 
+    # reading the members of the class and mapping
     # the values from the data, if match not found
     # it is skipped. 
     # TODO: add some message for no matches
@@ -46,7 +46,7 @@ def populate(data: dict, cls):
 
 
 def allocate(cls):
-    # reading the memebers of the class and mapping
+    # reading the members of the class and mapping
     # the values from the class to create a dictionary
     # to be dumped via the parser
     # TODO: parsing exceptions 
