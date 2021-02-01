@@ -8,11 +8,11 @@ import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
 
-from torpido.config.cache import Cache
-from torpido.config.constants import CACHE_FPS, CACHE_FRAME_COUNT
-from torpido.exceptions import RankingOfFeatureMissing
-from torpido.tools.logger import Log
-from torpido.util.timestamp import get_timestamps, get_output_video_length
+from .config.cache import Cache
+from .config.constants import CACHE_FPS, CACHE_FRAME_COUNT
+from .exceptions import RankingOfFeatureMissing
+from .tools.ranking import Ranking
+from .tools.logger import Log
 
 # since, ui is using QTAgg, need to send the data to main gui thread
 # or just use Tk ;)
@@ -68,12 +68,12 @@ class Analytics:
                         self.__text[i] + self.__audio[i] for i in range(self.__rank_length)]
 
         try:
-            self.__timestamps = get_timestamps(data=data)
+            self.__timestamps = Ranking.get_timestamps()
         except RankingOfFeatureMissing:
             Log.e(RankingOfFeatureMissing.cause)
             return
 
-        self.__output_length = get_output_video_length(self.__timestamps)
+        self.__output_length = Ranking.get_video_length()
         self.__actual_length = abs(self.__cache.read_data(CACHE_FRAME_COUNT) /
                                    self.__cache.read_data(CACHE_FPS))
 
@@ -87,6 +87,8 @@ class Analytics:
         """
         numbers = [i for i in range(self.__rank_length)]
         fig = plt.figure()
+
+        print(len(self.__motion), len(self.__blur), len(self.__audio), len(self.__text))
 
         ax = fig.add_subplot(211)
         ax.plot(numbers, self.__motion, label="Motion", color='r')
