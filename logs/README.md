@@ -22,6 +22,14 @@
 -----------------------------------------------------------
 
 # Logs
+### Log 51, 01-02
+```AP```
+* Small bug fixes
+* Major clean up
+* Changes in ranking
+* Saving from the ranking to cache
+
+----------------------------------------
 ### Log 50, 31-01
 ```AP```
 * Small bug fixes
