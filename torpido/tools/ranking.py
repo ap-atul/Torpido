@@ -2,11 +2,12 @@ import os
 
 from joblib import load, dump
 
-from .. import Log
+from ..tools.logger import Log
 from ..exceptions.custom import RankingOfFeatureMissing
 from ..config.cache import Cache
 from ..config.config import Config
-from ..config.constants import CACHE_FRAME_COUNT, CACHE_FPS, CACHE_DIR, CACHE_NAME
+from ..config.constants import (CACHE_FRAME_COUNT, CACHE_FPS,
+                                CACHE_DIR, CACHE_NAME)
 
 
 class _RankCache:
@@ -49,9 +50,6 @@ class _RankCache:
 
 
 class Ranking:
-
-    # _ranks = dict()
-
     @staticmethod
     def _add_padding(val):
         _max_length = int(Cache().read_data(CACHE_FRAME_COUNT) / Cache().read_data(CACHE_FPS))
@@ -84,7 +82,6 @@ class Ranking:
 
     @staticmethod
     def add(key, rank: list):
-        rank = Ranking._add_padding(rank)
         _RankCache().write(key, rank)
 
     @staticmethod
@@ -93,17 +90,16 @@ class Ranking:
 
     @staticmethod
     def ranks():
-        return _RankCache().all_ranks()
+        return [Ranking._add_padding(rank_list) for rank_list in _RankCache().all_ranks()]
 
     @staticmethod
     def get_timestamps():
-        sum_ranks = [sum(rank_list) for rank_list in zip(* _RankCache().all_ranks())]
+        sum_ranks = [sum(rank_list) for rank_list in zip(* Ranking.ranks())]
 
         if sum_ranks is None:
             raise RankingOfFeatureMissing
 
-        timestamps = Ranking._trim_by_rank(sum_ranks)
-        final = list()
+        timestamps, final = Ranking._trim_by_rank(sum_ranks), list()
 
         for clip in timestamps:
             if len(clip) % 2 == 0:
@@ -113,8 +109,7 @@ class Ranking:
 
     @staticmethod
     def get_video_length():
-        timestamps = Ranking.get_timestamps()
-        video_length = 0
+        video_length, timestamps = 0, Ranking.get_timestamps()
 
         if len(timestamps) < 0:
             return 0
