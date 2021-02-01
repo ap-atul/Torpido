@@ -118,7 +118,7 @@ class Controller:
         # communication for logs to ui
         Log.set_handler(self._channel)
 
-    def start_processing(self, app, input_file, intro=None, extro=None):
+    def start_processing(self, app, input_file, intro=None, outro=None):
         """
         Process the input file call splitting function to split the input video file into
         audio and create 3 processes each for feature ranking, After completion of all the
@@ -133,7 +133,7 @@ class Controller:
             input video file (validating if its in supported format)
         intro : str
             name of the intro video file
-        extro : str
+        outro : str
             name of the outro video file
 
         Notes
@@ -153,7 +153,7 @@ class Controller:
 
         # adding optional video file
         self.__ffmpeg.set_intro_video(intro)
-        self.__ffmpeg.set_outro_video(extro)
+        self.__ffmpeg.set_outro_video(outro)
 
         # saving the instance of the ui controller
         self.__App = app
