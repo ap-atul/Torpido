@@ -86,10 +86,8 @@ class Analytics:
         legends and color specified
         """
         numbers = [i for i in range(self.__rank_length)]
+
         fig = plt.figure()
-
-        print(len(self.__motion), len(self.__blur), len(self.__audio), len(self.__text))
-
         ax = fig.add_subplot(211)
         ax.plot(numbers, self.__motion, label="Motion", color='r')
         ax.plot(numbers, self.__blur, label="Blur", color='g')

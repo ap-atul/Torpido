@@ -93,9 +93,8 @@ class Auditory:
         if len(original_signal) == 0 or len(clean_signal) == 0:
             return
 
-        fig = plt.figure()
-
         # plot original signal
+        fig = plt.figure()
         ax = fig.add_subplot(211)
         ax.specgram(original_signal, Fs=frame_rate)
         ax.title.set_text("Original Signal")
