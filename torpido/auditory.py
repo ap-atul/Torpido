@@ -14,6 +14,7 @@ from .config.cache import Cache
 from .config.config import Config
 from .config.constants import *
 from .tools.logger import Log
+from .tools.ranking import Ranking
 from .wavelet import FastWaveletTransform, VisuShrinkCompressor
 
 matplotlib.use("TkAgg")
@@ -63,7 +64,7 @@ class Auditory:
 
         Parameters
         ----------
-        block : array
+        block : np-array
             input signal block
 
         Returns
@@ -71,7 +72,7 @@ class Auditory:
         int
             rank for the portion which is then set for all the portion of data
         """
-        if np.sqrt(np.mean(block ** 2)) > self.__silence_threshold:
+        if np.sqrt(np.mean(np.power(block, 2))) > self.__silence_threshold:
             return Config.RANK_AUDIO
         return 0
 
@@ -79,7 +80,7 @@ class Auditory:
         """ Storing audio info """
         self.__cache.write_data(CACHE_AUDIO_INFO, self.__info)
 
-    def _specshow(self, original_signal, clean_signal, FR):
+    def _specshow(self, original_signal, clean_signal, frame_rate):
         """
         Plotting the spectrogram for the original and the de-noised signals, the spectrogram are collected
         during the processing, and the mean of the data is used to represent the final values
@@ -96,12 +97,12 @@ class Auditory:
 
         # plot original signal
         ax = fig.add_subplot(211)
-        ax.specgram(original_signal, Fs=FR)
+        ax.specgram(original_signal, Fs=frame_rate)
         ax.title.set_text("Original Signal")
 
         # plot clean signal
         ax = fig.add_subplot(212)
-        ax.specgram(clean_signal, Fs=FR)
+        ax.specgram(clean_signal, Fs=frame_rate)
         ax.title.set_text("Clean Signal")
 
         plt.tight_layout()
@@ -112,7 +113,7 @@ class Auditory:
         del self.__cache, self.__fwt, self.__compressor
         Log.d("Cleaning up.")
 
-    def start_processing(self, inputFile, outputFile, plot=False):
+    def start_processing(self, input_file, output_file, plot=False):
         """
         Calculates the de noised signal based on the wavelets
         default wavelet is = db4, mode = per and thresh method = soft.
@@ -128,19 +129,19 @@ class Auditory:
 
         Parameters
         ----------
-        inputFile : str
+        input_file : str
             input audio file
-        outputFile : str
+        output_file : str
             output audio file
         plot : bool
             True to plot the audio signal
 
         """
-        if os.path.isfile(inputFile) is False:
-            Log.e(f"File {inputFile} does not exists")
+        if os.path.isfile(input_file) is False:
+            Log.e(f"File {input_file} does not exists")
             return
 
-        self.__file_name, self.__energy = inputFile, list()
+        self.__file_name, self.__energy = input_file, list()
         self.__info = soundfile.info(self.__file_name)
         self.__rate = self.__info.samplerate
         self.__set_audio_info()
@@ -148,7 +149,7 @@ class Auditory:
 
         count, to_read = 0, int(self.__rate * self.__info.duration * Config.AUDIO_BLOCK_PER)
         # creating and opening the output audio file
-        with soundfile.SoundFile(outputFile, mode="w", samplerate=self.__rate, channels=1) as out:
+        with soundfile.SoundFile(output_file, mode="w", samplerate=self.__rate, channels=1) as out:
             for block in soundfile.blocks(self.__file_name, to_read):
 
                 # taking only the single channel
@@ -172,7 +173,7 @@ class Auditory:
                 if plot and (count == 5 or count == 7):
                     self._specshow(block, cleaned, self.__info.samplerate)
 
-        self.__cache.write_data(CACHE_RANK_AUDIO, self.__energy)
+        Ranking.add(CACHE_RANK_AUDIO, self.__energy)
         Log.i("Audio de noised successfully")
         Log.d(f"Audio ranking length {len(self.__energy)}")
         Log.i("Audio ranking saved .............")
