@@ -4,15 +4,17 @@ that have motion in it, saves in the dictionary with frame numbers
 this dictionary is then saved in a joblib file defined in constants.py
 """
 
-import cv2
-import numpy as np
 from time import sleep
 
-from torpido.config.cache import Cache
-from torpido.config.constants import *
-from torpido.tools.logger import Log
-from torpido.video import Stream
+import cv2
+import numpy as np
+
+from .config.cache import Cache
 from .config.config import Config
+from .config.constants import *
+from .tools.logger import Log
+from .tools.ranking import Ranking
+from .video import Stream
 
 
 class Visual:
@@ -86,8 +88,8 @@ class Visual:
                 break
 
         # saving all processed stuffs
-        self.__cache.write_data(CACHE_RANK_MOTION, motion_normalize)
-        self.__cache.write_data(CACHE_RANK_BLUR, blur_normalize)
+        Ranking.add(CACHE_RANK_MOTION, motion_normalize)
+        Ranking.add(CACHE_RANK_BLUR, blur_normalize)
         Log.d(f"Visual rank length {len(motion_normalize)}  {len(blur_normalize)}")
         Log.i(f"Visual ranking saved .............")
 
@@ -95,7 +97,7 @@ class Visual:
         """ Clean  ups """
         del self.__cache, self.__video_stream
 
-    def start_processing(self, pipe, inputFile, display=False):
+    def start_processing(self, pipe, input_file, display=False):
         """
         Function to run the processing on the Video file. Motion and Blur features are
         detected and based on that ranking is set
@@ -104,19 +106,19 @@ class Visual:
         ----------
         pipe : Communication link
             set progress on the ui
-        inputFile : str
+        input_file : str
             input video file
         display : bool
             True to display the video while processing
         """
 
-        if os.path.isfile(inputFile) is False:
-            Log.e(f"File {inputFile} does not exists")
+        if os.path.isfile(input_file) is False:
+            Log.e(f"File {input_file} does not exists")
             return
 
         # maintaining the motion and blur frames list
         self.__motion, self.__blur = list(), list()
-        self.__video_stream = Stream(str(inputFile)).start()
+        self.__video_stream = Stream(str(input_file)).start()
         my_clip = self.__video_stream.stream
 
         if not self.__video_stream.more():
@@ -160,12 +162,12 @@ class Visual:
                 first_frame = cv2.GaussianBlur(first_frame, (21, 21), 0)
                 first_frame_processed = False
 
-            frameDelta = cv2.absdiff(first_frame, frame)
-            thresh = cv2.threshold(frameDelta, self.__motion_threshold, 255, cv2.THRESH_BINARY)[1]
+            frame_delta = cv2.absdiff(first_frame, frame)
+            thresh = cv2.threshold(frame_delta, self.__motion_threshold, 255, cv2.THRESH_BINARY)[1]
             # thresh = cv2.adaptiveThreshold(frameDelta, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
 
-            threshMax = np.max(thresh)
-            if threshMax > 0:
+            thresh_max = np.max(thresh)
+            if thresh_max > 0:
                 self.__motion.append(Config.RANK_MOTION)
             else:
                 self.__motion.append(0)

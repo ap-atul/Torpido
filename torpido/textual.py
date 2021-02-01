@@ -16,6 +16,7 @@ from .config.constants import *
 from .exceptions import EastModelEnvironmentMissing
 from .tools.logger import Log
 from .util import image
+from .tools.ranking import Ranking
 
 
 class Textual:
@@ -102,12 +103,12 @@ class Textual:
         # make this faster some how ?
         # since image is 320x320 the output is 80x80 (scores)
         for x in range(0, num_rows):
-            scoreData = scores[0][0][0][x]
+            score_data = scores[0][0][0][x]
             for y in range(0, num_cols):
-                if scoreData[y] < self.__min_confidence:
+                if score_data[y] < self.__min_confidence:
                     continue
 
-                confidences.append(scoreData[y])
+                confidences.append(score_data[y])
 
         # if confidences contain some value
         if len(confidences) > 0:
@@ -229,7 +230,7 @@ class Textual:
                 break
 
         # saving all processed stuffs
-        self.__cache.write_data(CACHE_RANK_TEXT, text_normalize)
+        Ranking.add(CACHE_RANK_TEXT, text_normalize)
         Log.d(f"Textual rank length {len(text_normalize)}")
         Log.i("Textual ranking saved .............")
 
@@ -239,24 +240,24 @@ class Textual:
         del self.__video_getter
         Log.d("Cleaning up.")
 
-    def start_processing(self, inputFile, display=False):
+    def start_processing(self, input_file, display=False):
         """
         Function to perform the Textual Processing on the input video file.
         The video can be displayed as the processing is going on.
 
         Parameters
         ----------
-        inputFile : str
+        input_file : str
             input video file
         display : bool
             True to display the video while processing
         """
 
-        if os.path.isfile(inputFile) is False:
-            Log.e(f"File {inputFile} does not exists")
+        if os.path.isfile(input_file) is False:
+            Log.e(f"File {input_file} does not exists")
             return
 
-        self.__video_getter = cv2.VideoCapture(str(inputFile))
+        self.__video_getter = cv2.VideoCapture(str(input_file))
         self.__fps = self.__video_getter.get(cv2.CAP_PROP_FPS)
         self.__frame_count = self.__video_getter.get(cv2.CAP_PROP_FRAME_COUNT)
         self.__skip_frames = int(self.__fps * self.__skip_frames)
@@ -292,12 +293,12 @@ class Textual:
 
                 # run text detection
                 if display:
-                    detectedText = self.__run_text_detect_display(blob, original)
+                    detected_text = self.__run_text_detect_display(blob, original)
                 else:
-                    detectedText = self.__run_text_detect(blob)
+                    detected_text = self.__run_text_detect(blob)
 
                 # if text is detected
-                if detectedText:
+                if detected_text:
                     self.__text_ranks.extend([Config.RANK_TEXT] * int(self.__skip_frames))
                     Log.d("Text detected.")
                 else:
@@ -306,7 +307,9 @@ class Textual:
 
         # clearing the memory
         self.__video_getter.release()
-        cv2.destroyAllWindows()
+
+        if display:
+            cv2.destroyAllWindows()
 
         # calling the normalization of ranking
         self.__timed_ranking_normalize()
