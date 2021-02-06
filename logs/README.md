@@ -22,6 +22,15 @@
 -----------------------------------------------------------
 
 # Logs
+
+### Log 52, 06-02
+```AP```
+* Minor big fixes and clean up
+* Added video widget
+* Made ranking accurate in terms of identity
+* Improved plots
+
+----------------------------------------
 ### Log 51, 01-02
 ```AP```
 * Small bug fixes
