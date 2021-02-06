@@ -7,7 +7,9 @@ from ..exceptions.custom import RankingOfFeatureMissing
 from ..config.cache import Cache
 from ..config.config import Config
 from ..config.constants import (CACHE_FRAME_COUNT, CACHE_FPS,
-                                CACHE_DIR, CACHE_NAME)
+                                CACHE_DIR, CACHE_NAME,
+                                CACHE_RANK_MOTION, CACHE_RANK_BLUR,
+                                CACHE_RANK_TEXT, CACHE_RANK_AUDIO)
 
 
 class _RankCache:
@@ -19,6 +21,7 @@ class _RankCache:
         self._filename = os.path.join(CACHE_DIR, CACHE_NAME)
 
     def write(self, key, val):
+        print(key, val)
         if os.path.isfile(self._filename):
             data = load(self._filename)
         else:
@@ -90,7 +93,8 @@ class Ranking:
 
     @staticmethod
     def ranks():
-        return [Ranking._add_padding(rank_list) for rank_list in _RankCache().all_ranks()]
+        keys = [CACHE_RANK_MOTION, CACHE_RANK_BLUR, CACHE_RANK_TEXT, CACHE_RANK_AUDIO]
+        return [Ranking._add_padding(Ranking.get(key)) for key in keys]
 
     @staticmethod
     def get_timestamps():
@@ -103,7 +107,9 @@ class Ranking:
 
         for clip in timestamps:
             if len(clip) % 2 == 0:
-                final.append(clip)
+                start, end = clip
+                if end - start > 0:  # not storing 0 or negative value
+                    final.append(clip)
 
         return final
 
