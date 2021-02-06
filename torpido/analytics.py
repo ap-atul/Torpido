@@ -7,7 +7,6 @@ start and stop are displayed. All ranks are displayed as subplots
 import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
-from joblib import load, dump
 
 from .config.cache import Cache
 from .config.constants import CACHE_FPS, CACHE_FRAME_COUNT
@@ -75,10 +74,6 @@ class Analytics:
 
         self.__plot_rank_line()
         self.__analytics()
-
-        # testing
-        dump(Ranking.ranks(), "all_ranks")
-        dump(Ranking.get_timestamps(), "timestamps")
 
     def __plot_rank_line(self):
         """
