@@ -7,6 +7,7 @@ start and stop are displayed. All ranks are displayed as subplots
 import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.lines import Line2D
+from joblib import load, dump
 
 from .config.cache import Cache
 from .config.constants import CACHE_FPS, CACHE_FRAME_COUNT
@@ -50,17 +51,12 @@ class Analytics:
         self.__rank_length, self.__ranks, self.__data, self.__timestamps = None, None, None, None
         self.__output_length, self.__actual_length, self.__cache = None, None, Cache()
 
-    def analyze(self, data):
+    def analyze(self):
         """
         Calculating the sum of all ranks, calling plotting
-        functions on the data stored
-
-        Parameters
-        ----------
-        data : lol
-            list of list of all feature ranks
+        functions on the data stored.
         """
-        self.__data = data
+        self.__data = Ranking.ranks()
         self.__motion, self.__blur, self.__text, self.__audio = self.__data
         self.__rank_length = len(self.__motion)
 
@@ -79,6 +75,10 @@ class Analytics:
 
         self.__plot_rank_line()
         self.__analytics()
+
+        # testing
+        dump(Ranking.ranks(), "all_ranks")
+        dump(Ranking.get_timestamps(), "timestamps")
 
     def __plot_rank_line(self):
         """
