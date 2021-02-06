@@ -246,10 +246,9 @@ class Controller:
         if self.__watcher is not None:
             self.__watcher.stop()  # ending the watcher
 
-        rankings = Ranking.ranks()
         if self.__analytics_display:
             #  separate process for analytics
-            Process(target=self.__analytics.analyze, args=(rankings,)).start()
+            Process(target=self.__analytics.analyze, args=()).start()
 
         # cache file got missing
         try:
