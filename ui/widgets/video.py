@@ -32,8 +32,9 @@ class QVideoWidget(QtWidgets.QWidget):
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
+
         self.image_label = QLabel()
-        self.setWindowTitle("Video Output")
+        self.image_label.setWindowTitle("Video Output")
 
         self._frame = None
         self.__stopped = False
@@ -51,7 +52,6 @@ class QVideoWidget(QtWidgets.QWidget):
 
     def end(self):
         """ Close all the windows """
-        cv2.destroyAllWindows()
         self.__stopped = True
 
     def changeEvent(self, event: QtCore.QEvent) -> None:
@@ -77,11 +77,6 @@ class QVideoWindow(QMainWindow):
         super().__init__()
 
         self.window = window
-
-        self.setWindowTitle("Video Output")
-        self.setMaximumSize(600, 500)
-        self.setMinimumSize(600, 500)
-
         self.video = QVideoWidget(self)
         self.setCentralWidget(self.video)
 
