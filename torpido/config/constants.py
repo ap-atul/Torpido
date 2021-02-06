@@ -28,9 +28,6 @@ CACHE_FRAME_COUNT = "FRAME_COUNT"
 # audio info object
 CACHE_AUDIO_INFO = "CACHE_AUDIO_INFO"
 
-# ranking for audio
-CACHE_RANK_AUDIO = "CACHE_AUDIO_RANK"
-
 # ranking for motion
 CACHE_RANK_MOTION = "CACHE_RANK_MOTION"
 
@@ -39,6 +36,9 @@ CACHE_RANK_BLUR = "CACHE_RANK_BLUR"
 
 # ranking for text
 CACHE_RANK_TEXT = "CACHE_RANK_TEXT"
+
+# ranking for audio
+CACHE_RANK_AUDIO = "CACHE_RANK_AUDIO"
 
 # video width
 CACHE_VIDEO_WIDTH = "CACHE_VIDEO_WIDTH"
