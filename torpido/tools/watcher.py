@@ -138,7 +138,7 @@ class Watcher:
             elif percent > 100:
                 percent = 100
 
-            Log.d(f"[CPU] :: {percent}")
+            # Log.d(f"[CPU] :: {percent}")
 
             # send to the UI
             if self._app is not None:
@@ -163,7 +163,7 @@ class Watcher:
                 percent = 0
                 Log.e(WatcherFileMissing.cause)
 
-            Log.d(f"[RAM] :: {percent}")
+            # Log.d(f"[RAM] :: {percent}")
 
             # send to the UI
             if self._app is not None:
