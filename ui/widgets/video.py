@@ -3,7 +3,8 @@
 import cv2
 import numpy as np
 from PyQt5 import QtCore, QtWidgets, QtGui
-from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtGui import QPixmap, QImage
+from PyQt5.QtWidgets import QMainWindow, QLabel
 
 
 class OpenCVQImage(QtGui.QImage):
@@ -31,19 +32,22 @@ class QVideoWidget(QtWidgets.QWidget):
 
     def __init__(self, parent=None) -> None:
         super().__init__(parent)
-
-        width, height = 500, 500
-        self.setMinimumSize(width, height)
-        self.setMaximumSize(width, height)
+        self.image_label = QLabel()
+        self.setWindowTitle("Video Output")
 
         self._frame = None
         self.__stopped = False
 
-    def setFrame(self, frame: np.ndarray):
+    def set_frame(self, frame: np.ndarray):
         """ Set the frame to the window """
         if not self.__stopped:
-            self._frame = frame
-            cv2.imshow("Video Output", self._frame)
+            self._frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            w, h = frame.shape[1], frame.shape[0]
+            self.image_label.resize(w, h)
+            self.image_label.setPixmap(QPixmap.fromImage(
+                QImage(self._frame, w, h, QImage.Format_RGB888))
+            )
+            self.image_label.show()
 
     def end(self):
         """ Close all the windows """
@@ -81,5 +85,5 @@ class QVideoWindow(QMainWindow):
         self.video = QVideoWidget(self)
         self.setCentralWidget(self.video)
 
-        self.window.videoFrame.connect(self.video.setFrame)
+        self.window.videoFrame.connect(self.video.set_frame)
         self.window.videoClose.connect(self.video.end)
