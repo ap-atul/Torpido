@@ -7,6 +7,7 @@ this dictionary is then saved in a joblib file defined in constants.py
 from time import sleep
 
 import cv2
+
 import numpy as np
 
 from .config.cache import Cache
