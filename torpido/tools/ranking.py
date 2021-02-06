@@ -21,7 +21,6 @@ class _RankCache:
         self._filename = os.path.join(CACHE_DIR, CACHE_NAME)
 
     def write(self, key, val):
-        print(key, val)
         if os.path.isfile(self._filename):
             data = load(self._filename)
         else:

@@ -3,6 +3,6 @@ PyQt5~=5.15.2
 tqdm~=4.56.0
 soundfile~=0.10.3.post1
 matplotlib~=3.3.4
-opencv-python-headless
+opencv-contrib-python-headless
 joblib~=1.0.0
 numpy~=1.20.0
