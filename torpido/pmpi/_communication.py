@@ -1,4 +1,5 @@
 from multiprocessing import Pipe
+from pickle import UnpicklingError
 from threading import Thread
 
 from ._sender import Sender
@@ -53,6 +54,8 @@ class Communication:
             except EOFError as _:
                 pass
             except OSError as _:
+                pass
+            except UnpicklingError as _:
                 pass
 
             if data_to_receive is None or not data_to_receive or not isinstance(data_to_receive, dict):
