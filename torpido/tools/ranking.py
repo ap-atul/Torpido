@@ -93,7 +93,7 @@ class Ranking:
     @staticmethod
     def ranks():
         keys = [CACHE_RANK_MOTION, CACHE_RANK_BLUR, CACHE_RANK_TEXT, CACHE_RANK_AUDIO]
-        return [Ranking._add_padding(Ranking.get(key)) for key in keys]
+        return [Ranking._add_padding(Ranking.get(key) if Ranking.get(key) else list()) for key in keys]
 
     @staticmethod
     def get_timestamps():
