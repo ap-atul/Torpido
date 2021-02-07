@@ -110,7 +110,7 @@ class App(QWidget):
         self.logWindow = None
         self.inputVideoFile = None
         self.intro = None
-        self.extro = None
+        self.outro = None
         self.video = None
         self.videoDisplayCheckbox = None
         self.specPlotDisplayCheckbox = None
@@ -304,7 +304,7 @@ class App(QWidget):
             self.exitVideoImage.setPixmap(self.videoPicSelected)
             self.exitVideoImage.setStyleSheet(SELECTED)
             self.exitVideoImage.setToolTip(str(name[0]))
-            self.extro = str(name[0])
+            self.outro = str(name[0])
 
     def selectIntroFile(self):
         """ Starts a file explorer to select video file """
@@ -323,7 +323,7 @@ class App(QWidget):
     def start(self):
         """ Starting the processing """
         if self.inputVideoFile is not None:
-            self.controller.set_video(self.inputVideoFile, self.intro, self.extro)
+            self.controller.set_video(self.inputVideoFile, self.intro, self.outro)
             self.controller.start()
 
     def setVideoDisplay(self):

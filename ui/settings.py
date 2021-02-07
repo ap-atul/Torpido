@@ -242,8 +242,8 @@ class SettingsDialog(QWidget):
         formLayout.addRow(QLabel("Wavelet name:"), self.waveletInput)
         formLayout.addRow(QLabel("Watcher delay (s):"), self.watcherDelayInput)
 
-        formFrame = QGroupBox("Configuration")
-        formFrame.setLayout(formLayout)
+        form_frame = QGroupBox("Configuration")
+        form_frame.setLayout(formLayout)
 
         self.save = QPushButton("Save")
         self.save.setToolTip("Requires restart")
@@ -255,7 +255,7 @@ class SettingsDialog(QWidget):
         buttonLayout.addWidget(self.save)
         buttonLayout.addWidget(self.exit)
 
-        mainLayout.addWidget(formFrame)
+        mainLayout.addWidget(form_frame)
         mainLayout.addLayout(buttonLayout)
 
         self.setLayout(mainLayout)
