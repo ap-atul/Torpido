@@ -193,7 +193,7 @@ class SettingsDialog(QWidget):
         self.rankTextInput.setText(str(Config.RANK_TEXT))
 
         self.rankAudioInput = QLineEdit()
-        self.rankAudioInput.setText(str(Config.RANK_MOTION))
+        self.rankAudioInput.setText(str(Config.RANK_AUDIO))
 
         self.minRankInput = QLineEdit()
         self.minRankInput.setText(str(Config.MIN_RANK_OUT_VIDEO))
