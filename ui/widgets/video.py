@@ -42,13 +42,14 @@ class QVideoWidget(QtWidgets.QWidget):
     def set_frame(self, frame: np.ndarray):
         """ Set the frame to the window """
         if not self.__stopped:
-            self._frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+            self._frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # frame color convert
             w, h = frame.shape[1], frame.shape[0]
+
             self.image_label.resize(w, h)
             self.image_label.setPixmap(QPixmap.fromImage(
                 QImage(self._frame, w, h, QImage.Format_RGB888))
             )
-            self.image_label.show()
+            self.image_label.show()  # displays the widget
 
     def end(self):
         """ Close all the windows """
