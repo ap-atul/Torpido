@@ -36,7 +36,7 @@ class FFMPEG:
         same as the input file path
     __intro : str
         name of the intro video file
-    __extro : str
+    __outro : str
         name of the outro video file
     __extension : str
         name of the extension of the input file
@@ -46,15 +46,15 @@ class FFMPEG:
     def __init__(self):
         self.__input_file_name = self.__input_file_path = self.__output_video_file_name = self.__input_audio_file_name = None
         self.__output_audio_file_name = self.__output_file_path = self.__thumbnail_file = self.__intro = None
-        self.__extro = self.__extension = self.__progress_bar = None
+        self.__outro = self.__extension = self.__progress_bar = None
 
     def set_intro_video(self, intro):
         """ Sets the intro video file """
         self.__intro = intro
 
-    def set_outro_video(self, extro):
+    def set_outro_video(self, outro):
         """ Sets the outro video file """
-        self.__extro = extro
+        self.__outro = outro
 
     def get_input_file_name_path(self):
         """ Returns file name that was used for processing """
@@ -161,7 +161,7 @@ class FFMPEG:
                              os.path.join(self.__output_file_path, self.__output_video_file_name),
                              timestamps,
                              intro=self.__intro,
-                             extro=self.__extro):
+                             extro=self.__outro):
                 self.__progress_bar.display(log)
 
             if not os.path.isfile(os.path.join(self.__output_file_path, self.__output_video_file_name)):
