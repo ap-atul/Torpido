@@ -2,10 +2,12 @@ import unittest
 
 from torpido import pympeg
 
+FILE = "/home/atul/Videos/VEA/tests/motion/test_20s_m3_b2_a3_t5_min2.mp4"
+
 
 class FFprobeTest(unittest.TestCase):
     def test_probe(self):
-        json_dict = pympeg.probe("/home/atul/Videos/example_02.mp4")
+        json_dict = pympeg.probe(FILE)
 
         self.assertEqual(dict, type(json_dict))
 
@@ -18,9 +20,14 @@ class FFprobeTest(unittest.TestCase):
 
     def test_command_gen(self):
         pympeg.init()
-        command = pympeg.input(name="/home/atul/Videos/example_02.mp4").output(name="my_output.mp4", map_cmd="").command()
+        command = (
+            pympeg
+                .input(name=FILE)
+                .output(name="my_output.mp4", map_cmd="")
+                .command()
+        )
 
-        if "ffmpeg -y -i /home/atul/Videos/example_02.mp4" in command:
+        if "ffmpeg -y -i " + FILE in command:
             out = True
         else:
             out = False
@@ -29,13 +36,13 @@ class FFprobeTest(unittest.TestCase):
 
     def test_filter_outputs(self):
         pympeg.init()
-        splits = pympeg.input(name="/home/atul/Videos/example_02.mp4").filter(filter_name="split", outputs=2)
+        splits = pympeg.input(name=FILE).filter(filter_name="split", outputs=2)
 
         self.assertEqual(2, len(splits.outputs))
 
     def test_filter_inputs(self):
         pympeg.init()
-        in_file = pympeg.input(name="/home/atul/Videos/example_02.mp4")
+        in_file = pympeg.input(name=FILE)
         concat = in_file.arg(inputs=[in_file, in_file], args="concat=2", outputs=2)
 
         self.assertEqual(2, len(concat.inputs))

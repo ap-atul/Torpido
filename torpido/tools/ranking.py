@@ -56,7 +56,7 @@ class Ranking:
     def _add_padding(val):
         _max_length = int(Cache().read_data(CACHE_FRAME_COUNT) / Cache().read_data(CACHE_FPS))
         if len(val) < _max_length:
-            val.extend([sum(val) / len(val)] * int(_max_length - len(val)))
+            val.extend([sum(val) / len(val)] * abs(_max_length - len(val)))
             return val
         return val[0: _max_length]
 
@@ -107,7 +107,7 @@ class Ranking:
         for clip in timestamps:
             if len(clip) % 2 == 0:
                 start, end = clip
-                if end - start > 0:  # not storing 0 or negative value
+                if end - start > 0:  # not storing 0 or negative timestamp
                     final.append(clip)
 
         return final

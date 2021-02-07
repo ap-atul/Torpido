@@ -33,8 +33,8 @@ class FFpbarTest(unittest.TestCase):
     def test_prg_on_cmd(self):
         progress = Progress()
 
-        file = "/home/atul/Videos/example_02.mp4"
-        audio = "/home/atul/Videos/example_02.wav"
+        file = "/home/atul/Videos/VEA/tests/motion/test_20s_m3_b2_a3_t5_min2.mp4"
+        audio = "/home/atul/Videos/VEA/tests/motion/test.wav"
         command = pympeg.input(name=file).output(name=audio).command()
 
         process = Popen(

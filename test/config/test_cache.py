@@ -28,10 +28,10 @@ class CacheTest(unittest.TestCase):
     def test_ranking(self):
         Cache().write_data(CACHE_FPS, 20)
         Cache().write_data(CACHE_FRAME_COUNT, 600)
-        Ranking.add("MOTION", [1, 1, 1, 1, 1])
-        Ranking.add("BLUR", [1, 1, 1, 6, 7])
-        Ranking.add("AUDIO", [1, 1, 4, 5, 1])
-        Ranking.add("TEXT", [1, 2, 3, 1, 1])
+        Ranking.add("CACHE_RANK_MOTION", [1, 1, 1, 1, 1])
+        Ranking.add("CACHE_RANK_BLUR", [1, 1, 1, 6, 7])
+        Ranking.add("CACHE_RANK_AUDIO", [1, 1, 4, 5, 1])
+        Ranking.add("CACHE_RANK_TEXT", [1, 2, 3, 1, 1])
 
         self.assertEqual(4, len(Ranking.ranks()))
 

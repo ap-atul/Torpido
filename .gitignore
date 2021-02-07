@@ -7,6 +7,8 @@ __pycache__/
 
 # C extensions
 *.so
+./torpido/wavelet/extension/base_transform.cpython-38-x86_64-linux-gnu.so
+./torpido/wavelet/extension/wavelet_transform.cpython-38-x86_64-linux-gnu.so
 
 # Distribution / packaging
 .Python
