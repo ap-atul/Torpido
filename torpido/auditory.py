@@ -62,6 +62,8 @@ class Auditory:
         can be ranked
         RMS -> square root of mean of squared data
 
+        Audio data range : -1 to 1
+
         Parameters
         ----------
         block : np-array
