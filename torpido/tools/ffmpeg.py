@@ -17,16 +17,16 @@ def split(input_file, output_audio_file):
     command = ' '.join(command)
     Log.i(command)
 
-    for log in _ffmpeg_runner(command):
+    for log in _ffmpeg_runner(command, "No audio stream found"):
         yield log
 
 
 def merge(video_file, audio_file, output_file, timestamps, intro=None, extro=None):
-    """ Merging the final video using the denoised audio and the video stream """
+    """ Merging the final video using the de-noised audio and the video stream """
     command = _build_merge_command_v2(video_file, audio_file, output_file, timestamps, intro, extro)
     Log.i(command)
 
-    for log in _ffmpeg_runner(command):
+    for log in _ffmpeg_runner(command, "Error while merging the final cut"):
         yield log
 
 
@@ -35,14 +35,12 @@ def thumbnail(video_file, output_file, sec):
     command = _build_thumbnail_gen(video_file, output_file, sec)
     Log.i(command)
 
-    for log in _ffmpeg_runner(command):
+    for log in _ffmpeg_runner(command, "Error generating the thumbnail"):
         yield log
 
 
-def _ffmpeg_runner(command):
-    logger = FileLogger()
-    logger.open()
-    logger.log(command)
+def _ffmpeg_runner(command, exception=''):
+    logger = FileLogger().open().log(command)
     run = subprocess.Popen(args=command,
                            shell=True,
                            stdout=subprocess.PIPE,
@@ -54,8 +52,11 @@ def _ffmpeg_runner(command):
 
     run.stdout.close()
     if run.wait():
-        Log.e("FFMPEG has encounter an error!")
-        raise FFmpegProcessException
+        logger.log(exception).close()
+        Log.e("FFMPEG has encounter an error! Check the logs for details")
+        raise FFmpegProcessException(exception)
+
+    logger.close()
 
 
 def _build_split_command(input_file, output_audio_file):
@@ -152,7 +153,7 @@ def _build_merge_command_v2(video_file, audio_file, output_file, timestamps, int
     outputs = list()
     for i in range(len(timestamps)):
         outputs.append("split_%s" % str(i))
-    split = pympeg.arg(inputs=in_file, args=args, outputs=outputs)
+    split_ = pympeg.arg(inputs=in_file, args=args, outputs=outputs)
 
     # making trims and scaling them to the output resolution
     for i, times in enumerate(timestamps):
@@ -160,7 +161,7 @@ def _build_merge_command_v2(video_file, audio_file, output_file, timestamps, int
 
         # video trim and scale filter
         trim_filters.append(
-            split[i]
+            split_[i]
                 .filter(filter_name="trim", params={"start": start, "duration": (duration - start)})
                 .setpts()
                 .scale(w=str(output_width), h=str(output_height))

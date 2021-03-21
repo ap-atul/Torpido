@@ -12,6 +12,7 @@ class FileLogger:
 
     def open(self):
         self._file = open(path.join(FileLogger.DIRNAME, self._filename), "w")
+        return self
 
     def log(self, log):
         if not self._file.closed:
@@ -19,6 +20,7 @@ class FileLogger:
         else:
             self.open()
             self._file.write(str(log) + "\n")
+        return self
 
     def close(self):
         self._file.close()
