@@ -20,13 +20,24 @@ class Worker(QThread):
 
     def run(self) -> None:
         for i in range(101):
-            time.sleep(0.01)
+            time.sleep(0.04)
             self.progress.emit(i)
 
 
 class Splash(QWidget):
-    def __init__(self):
+    def __init__(self, app):
         super().__init__()
+
+        self._w = 680
+        self._h = 400
+
+        self._size = app.primaryScreen().size()
+        self._display_w = self._size.width()
+        self._display_h = self._size.height()
+
+        # setting display coordinates
+        self._splash_x = (self._display_w - self._w) / 2
+        self._splash_y = (self._display_h - self._h) / 2
 
         self.val = 0
         self.worker = Worker()
@@ -42,8 +53,8 @@ class Splash(QWidget):
         theme.open(QtCore.QIODevice.ReadOnly)
 
         self.setStyleSheet(QtCore.QTextStream(theme).readAll())
-        self.setMinimumSize(680, 400)
-        self.move(400, 200)
+        self.setMinimumSize(self._w, self._h)
+        self.move(self._splash_x, self._splash_y)
 
         self.progress = None
         self.loading = None
@@ -114,12 +125,12 @@ def start_splash():
 
     # QtCore.QCoreApplication.setAttribute(QtCore.Qt.AA_X11InitThreads)
     app = QApplication(sys.argv)
-    torpido = Splash()
+    torpido = Splash(app)
     torpido.start()
 
     QtCore.QTimer.singleShot(1500, lambda: torpido.loading.setText("<strong>LOADING</strong> visuals ..."))
-    QtCore.QTimer.singleShot(2700, lambda: torpido.loading.setText("<strong>LOADING</strong> constants ..."))
-    QtCore.QTimer.singleShot(3000, lambda: torpido.loading.setText("<strong>LOADING</strong> models ..."))
-    QtCore.QTimer.singleShot(3500, lambda: torpido.loading.setText("almost done ..."))
+    QtCore.QTimer.singleShot(2100, lambda: torpido.loading.setText("<strong>LOADING</strong> constants ..."))
+    QtCore.QTimer.singleShot(2500, lambda: torpido.loading.setText("<strong>LOADING</strong> models ..."))
+    QtCore.QTimer.singleShot(3000, lambda: torpido.loading.setText("almost done ..."))
 
     sys.exit(app.exec_())
