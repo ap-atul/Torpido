@@ -97,9 +97,8 @@ sequence.
 
 ## Sample Test
 
-![original](https://user-images.githubusercontent.com/35269424/113189143-80d36300-9278-11eb-8626-63f64c3936fe.mp4)
-![edited](https://user-images.githubusercontent.com/35269424/113189157-83ce5380-9278-11eb-94a1-00004c2afa11.mp4)
-
+[![Input video](https://img.youtube.com/vi/mS1yLQg0Vb0/0.jpg)](https://www.youtube.com/watch?v=mS1yLQg0Vb0)
+[![Edited video](https://img.youtube.com/vi/6BI9O0n-Wso/0.jpg)](https://www.youtube.com/watch?v=6BI9O0n-Wso)
 
 
 ## Docs
