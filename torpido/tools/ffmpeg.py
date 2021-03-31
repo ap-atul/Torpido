@@ -21,12 +21,15 @@ def split(input_file, output_audio_file):
         yield log
 
 
-def merge(video_file, audio_file, output_file, timestamps, intro=None, extro=None):
+def merge(video_file, audio_file, output_file, timestamps, intro=None, outro=None):
     """ Merging the final video using the de-noised audio and the video stream """
-    command = _build_merge_command_v2(video_file, audio_file, output_file, timestamps, intro, extro)
+    command = _build_merge_command_v2(video_file, audio_file, output_file, timestamps, intro, outro)
     Log.i(command)
 
-    for log in _ffmpeg_runner(command, "Error while merging the final cut"):
+    exception = "Error while merging the final cut" if not intro or not outro else ("No audio stream found in intro or "
+                                                                                    "outro. Requires audio streams. ")
+
+    for log in _ffmpeg_runner(command, exception):
         yield log
 
 
@@ -209,11 +212,11 @@ def _build_thumbnail_gen(video_file, output_file, sec):
 
     command = (
         pympeg
-        .option(tag="-ss", name=str(sec))
-        .option(tag="-frames", name="1")
-        .input(name=video_file)
-        .output(name=output_file, map_cmd="")
-        .command()
+            .option(tag="-ss", name=str(sec))
+            .option(tag="-frames", name="1")
+            .input(name=video_file)
+            .output(name=output_file, map_cmd="")
+            .command()
     )
 
     return command
