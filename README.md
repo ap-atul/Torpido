@@ -1,20 +1,5 @@
 ![logo](https://github.com/AP-Atul/Torpido/blob/master/img/torpido.png)
 
-
-## Table of Contents
-* [Introduction](https://github.com/AP-Atul/Torpido#introduction)
-* [How?](https://github.com/AP-Atul/Torpido#how-are-we-doing-this)
-* [Which?](https://github.com/AP-Atul/Torpido#which-features-are-we-talking-about)
-   * [Visual](https://github.com/AP-Atul/Torpido#1-visual)
-   * [Auditory](https://github.com/AP-Atul/Torpido#2-auditory)
-   * [Textual](https://github.com/AP-Atul/Torpido#3-textual)
-* [Basic Working](https://github.com/AP-Atul/Torpido#basic-working)
-* [Applications](https://github.com/AP-Atul/Torpido#applications)
-* [Architecture](https://github.com/AP-Atul/Torpido#architecture)
-* [Screen](https://github.com/AP-Atul/Torpido#screens)
-* [Documentation](https://github.com/AP-Atul/Torpido#docs)
-* [Execution](https://github.com/AP-Atul/Torpido#execution)
-
 ## Introduction
 As we progress in this digital life concept, everyone tries to create contents plus they almost shoot
 everything moreover they spend a whole lot of time in editing and making that content watchable.
@@ -109,6 +94,13 @@ sequence.
 ## Screens
 
 ![window](https://github.com/AP-Atul/Torpido/blob/master/img/window.png)
+
+## Sample Test
+
+![original](https://user-images.githubusercontent.com/35269424/113189143-80d36300-9278-11eb-8626-63f64c3936fe.mp4)
+![edited](https://user-images.githubusercontent.com/35269424/113189157-83ce5380-9278-11eb-94a1-00004c2afa11.mp4)
+
+
 
 ## Docs
 
