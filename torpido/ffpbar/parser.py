@@ -15,7 +15,13 @@ class Time:
 
 class Parser:
     def __init__(self):
-        self.duration, self.time, self.time_re, self.duration_re = None, None, re.compile(r'time=(\d+):(\d+):(\d+)'), re.compile(r'Duration: (\d{2}):(\d{2}):(\d{2})')
+        (
+            self.duration, self.time,
+            self.time_re, self.duration_re
+         ) = (
+                None, None,
+                re.compile(r'time=(\d+):(\d+):(\d+)'), re.compile(r'Duration: (\d{2}):(\d{2}):(\d{2})')
+        )
 
     def extract_time_duration(self, line):
         return self.extract_duration(line), self.extract_time(line)
