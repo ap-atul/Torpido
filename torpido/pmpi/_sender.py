@@ -3,10 +3,7 @@ class Sender:
         self._channel = channel
 
     def send(self, identifier, obj):
-        data = dict()
-        data[identifier] = obj
-
-        self._channel.send(data)
+        self._channel.send({identifier: obj})
 
     def close(self):
         self._channel.close()
