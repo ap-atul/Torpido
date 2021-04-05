@@ -161,7 +161,7 @@ class FFMPEG:
                              os.path.join(self.__output_file_path, self.__output_video_file_name),
                              timestamps,
                              intro=self.__intro,
-                             extro=self.__outro):
+                             outro=self.__outro):
                 self.__progress_bar.display(log)
 
             if not os.path.isfile(os.path.join(self.__output_file_path, self.__output_video_file_name)):
