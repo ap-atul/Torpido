@@ -7,6 +7,7 @@ object would be shared in functions
 
 import gc
 import os
+from time import time
 from multiprocessing import Process
 
 from . import Auditory, FFMPEG, Textual, Visual, Analytics
@@ -95,6 +96,7 @@ class Controller:
         self.__video_display = self.__text_detect_display = self.__spec_plot_display = self.__analytics_display = False
         self.__visual, self.__auditory, self.__ffmpeg = Visual(), Auditory(), FFMPEG()
         self.__analytics, self.__cache = Analytics(), Cache()
+        self._start_time = 0
 
         # communication manager
         self._communication = Communication()
@@ -157,6 +159,7 @@ class Controller:
 
         # saving the instance of the ui controller
         self.__App = app
+        self._start_time = time()
 
         if self.__App is not None:
 
@@ -280,6 +283,7 @@ class Controller:
             self.__App.set_percent_complete(100.0)
 
         # Log.set_handler(None)
+        Log.i(f"Time required for processing the video :: {round(time() - self._start_time)} s")
 
     def clean(self):
         """ clean up """
