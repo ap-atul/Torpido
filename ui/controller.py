@@ -74,6 +74,8 @@ class Controller(QThread):
     def set_percent_complete(self, value):
         """ Emits the signal with the percent for the progress bar """
         self.percentComplete.emit(value)
+        if value == 95:
+            self.videoClose.emit()
 
     @pyqtSlot()
     def set_cpu_complete(self, value: float):
