@@ -54,6 +54,7 @@ class QVideoWidget(QtWidgets.QWidget):
     def end(self):
         """ Close all the windows """
         self.__stopped = True
+        self.close()
 
     def changeEvent(self, event: QtCore.QEvent) -> None:
         if event.type() == QtCore.QEvent.EnabledChange:
