@@ -141,6 +141,9 @@ $ echo $EAST_MODEL
 * Run the run.py using some video file
 ```
 $ python run.py /example/sample.mp4
+
+// or with ui
+$ python3 start_up.py
 ```
 
 
