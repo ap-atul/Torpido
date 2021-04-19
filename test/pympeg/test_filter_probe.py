@@ -2,7 +2,7 @@ import unittest
 
 from torpido import pympeg
 
-FILE = "/home/atul/Videos/VEA/tests/motion/test_20s_m3_b2_a3_t5_min2.mp4"
+FILE = "/home/atul/Videos/VEA/tests/motion/motion_test.mp4"
 
 
 class FFprobeTest(unittest.TestCase):
