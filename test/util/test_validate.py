@@ -10,7 +10,7 @@ class ValidateTest(unittest.TestCase):
         self.assertFalse(check_type_video(fil))
 
     def test_check_video_exits(self):
-        file = "/home/atul/Videos/VEA/tests/motion/test_20s_m3_b2_a3_t5_min2.mp4"
+        file = "/home/atul/Videos/VEA/tests/motion/motion_test.mp4"
 
         self.assertTrue(check_type_video(file))
 
