@@ -167,14 +167,14 @@ def _no_filter_command(input_nodes, output_nodes, option_nodes, cmd="ffmpeg"):
     result.append(" -y")
 
     for inp in input_nodes:
-        result.append(" -i %s " % inp.name)
+        result.append(" -i '%s' " % inp.name)
 
     # adding option nodes in filter
     for opt in option_nodes:
         result.append(" %s %s " % (opt.tag, opt.name))
 
     for out in output_nodes:
-        result.append("%s  %s " % (out.map, out.name))
+        result.append("%s  '%s' " % (out.map, out.name))
     return ''.join(result)
 
 
@@ -211,7 +211,7 @@ def _get_command_from_graph(graph, cmd="ffmpeg"):
     # adding input nodes in fiter
     result.append(cmd)
     for inp in input_nodes:
-        result.append(" -i %s " % inp.name)
+        result.append(" -i '%s' " % inp.name)
 
     # adding option nodes in filter
     for opt in option_nodes:
@@ -236,7 +236,7 @@ def _get_command_from_graph(graph, cmd="ffmpeg"):
         map_cmd = out.map
         for inp in out.inputs:
             result.append(' %s "[%s]"' % (map_cmd, inp.label))
-        result.append(" %s " % out.name)
+        result.append(" '%s' " % out.name)
 
     return ''.join(result)
 

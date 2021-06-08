@@ -283,7 +283,7 @@ class App(QWidget):
         name = QFileDialog.getOpenFileName(None,
                                            "Open File",
                                            "~",
-                                           "Video Files (*.mp4 *.flv *.avi *.mov *.mpg *.mxf)")
+                                           "Video Files (*.mp4 *.flv *.avi *.mov *.mpg *.mxf *.mkv)")
 
         # setting the data and ui image for video
         if len(name[0]) > 0:

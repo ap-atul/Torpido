@@ -98,10 +98,10 @@ def _build_split_command(input_file, output_audio_file):
         'ffmpeg',
         '-y',
         '-i',
-        str(input_file),
+        "'" + str(input_file) + "'",
         '-ac',
         '1',
-        str(output_audio_file)
+        "'" + str(output_audio_file) + "'"
     ]
 
 
