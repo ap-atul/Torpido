@@ -95,12 +95,6 @@ sequence.
 
 ![window](https://github.com/AP-Atul/Torpido/blob/master/img/window.png)
 
-## Sample Test
-
-[![Input video](https://img.youtube.com/vi/mS1yLQg0Vb0/0.jpg)](https://www.youtube.com/watch?v=mS1yLQg0Vb0)
-[![Edited video](https://img.youtube.com/vi/6BI9O0n-Wso/0.jpg)](https://www.youtube.com/watch?v=6BI9O0n-Wso)
-
-
 ## Docs
 
 For all docs visit [torpido](https://ap-atul.github.io/torpido/)
